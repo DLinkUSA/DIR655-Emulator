@@ -1,0 +1,60 @@
+﻿/* 
+Properties moved into the CSS3 models
+http://www.w3.org/TR/2002/WD-css3-ui-20020802/#overflow-props
+*/
+
+/* GUI Layouts */
+#MapNetworkIcons,
+.MapNetworkIcons{overflow: hidden;}
+
+.TabPanelVisible,
+#layout_tabinfo
+{	
+	overflow-x: auto;
+	overflow-y: hidden;	
+}
+#layout_options_footer,
+#layout_options_full,
+#divShoppingCart,
+#layout_GUI1_content
+{
+	overflow-x: hidden;
+	overflow-y: auto;	
+}
+
+/* Registration Layouts */
+a.Button span, span.Button button, span.Button input, del.Button span{
+  /*http://www.xulplanet.com/references/elemref/ref_StyleProperties.html*/
+  display:-moz-inline-box;
+  zoom:1;
+}
+a.Button, span.Button, del.Button{
+  /*http://www.xulplanet.com/references/elemref/ref_StyleProperties.html*/
+  display:-moz-inline-box;
+  zoom:1;
+}
+
+#DLinkMiddleContainer,
+.DLinkMiddleContainer
+{
+	overflow-x: hidden;
+	overflow-y: auto;	
+}
+.ContentMask ,
+.modalBackground
+{
+	filter:alpha(opacity=70);
+	opacity:0.7;
+}
+.btnCloseParent
+{
+  opacity: 100; 
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+}
+.ListCellWrap,
+.blockedLblUrl
+{
+	/*http://www.w3.org/TR/css3-text/#word-break
+	This is For breaking up long words in the Firewall List sections. IE only. */	
+	word-break:break-all;
+}

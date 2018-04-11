@@ -1,0 +1,1258 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+    	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+    <!-- InstanceBeginEditable name="Page Title" -->
+    <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+        Advanced / Inbound Filter
+    </title>
+    <!-- InstanceEndEditable -->
+
+    <!-- InstanceBeginEditable name="Local Styles" -->
+    <style type="text/css">
+    /*
+     * Styles used only on this page.
+     */
+    </style>
+    <!-- InstanceEndEditable -->
+
+    
+        
+    
+
+    
+        
+    
+
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="ajax.js"></script>
+    <script type="text/javascript" src="navigation.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Advanced/Inbound_Filter.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+    //]]>
+    </script>
+
+    <!-- InstanceBeginEditable name="Scripts" -->
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * Handle for document forms.
+         */
+        var mf, rf;
+
+        /*
+         * Check for validation errors.
+         */
+        var verify_failed = "";
+
+        /*
+         * get_action_string()
+         */
+        function get_action_string(i)
+        {
+            if (rf["action_" + i].value == "0") {
+                return "Allow";
+            } else if (rf["action_" + i].value == 1) {
+                return "Deny";
+            }
+                return "Unknown";
+        }
+
+        /*
+         * get_ip_range_string()
+         */
+        function get_ip_range_string(idx)
+        {
+            var ip_range_str = "";
+            var cnt = parseInt("8", 10);
+            for (var i = 0; i < cnt; i++) {
+                if (rf["ip_range_" + idx + "_enabled_" + i].value == "true") {
+                    if (!is_blank(ip_range_str)) {
+                        ip_range_str += ",";
+                    }
+                    if (rf["ip_range_" + idx + "_ip_start_" + i].value == "0.0.0.0" && rf["ip_range_" + idx + "_ip_end_" + i].value == "255.255.255.255") {
+                        ip_range_str += "*";
+                    } else {
+                        ip_range_str += rf["ip_range_" + idx + "_ip_start_" + i].value + "-" + rf["ip_range_" + idx + "_ip_end_" + i].value;
+                    }
+                }
+            }
+            return ip_range_str;
+        }
+
+        /*
+         * update_rulesform()
+         */
+        function update_rulesform()
+        {
+            var cnt = parseInt("24", 10);
+            for (var i = 0; i < cnt; i++) {
+                if (typeof(rf["used_" + i]) != "undefined") {
+                    document.getElementById("ingress_filter_name_str_" + i).innerHTML = rf["ingress_filter_name_" + i].value;
+                    document.getElementById("action_str_" + i).innerHTML = get_action_string(i);
+                    document.getElementById("ip_range_str_" + i).innerHTML = get_ip_range_string(i);
+                }
+            }
+        }
+
+        /*
+         * ip_range_selector()
+         */
+        function ip_range_selector(idx)
+        {
+            var cnt = parseInt("8", 10);
+            for (var i = 0; i < cnt; i++) {
+                mf["enabled_checkbox_" + i].checked = (rf["ip_range_" + idx + "_enabled_" + i].value == "true") ? true : false;
+                mf["ip_start_" + i].value = rf["ip_range_" + idx + "_ip_start_" + i].value;
+                mf["ip_end_" + i].value = rf["ip_range_" + idx + "_ip_end_" + i].value;
+            }
+        }
+
+        /*
+         * action_selector()
+         */
+        function action_selector(val)
+        {
+            mf.action.value = parseInt(val, 10);
+            mf.action_select.selectedIndex = parseInt(val, 10);
+        }
+
+        /*
+         * enabled_checkbox_selector()
+         */
+        function enabled_checkbox_selector(idx, val)
+        {
+            mf["enabled_" + idx].value = val ? true : false;
+        }
+
+        /*
+         * table_form_set_display_if_table_is_full()
+         */
+        function table_form_set_display_if_table_is_full(val)
+        {
+            if (val == true) {
+                document.getElementById("mainform_box").style.display = "none";
+                document.getElementById("fullform_box").style.display = "block";
+            } else {
+                document.getElementById("mainform_box").style.display = "block";
+                document.getElementById("fullform_box").style.display = "none";
+            }
+        }
+
+        /*
+         * table_form_set_action_title()
+         */
+        function table_form_set_action_title(val)
+        {
+            if (val == "1") {   // Add
+                document.getElementById("Action_button").value = "Add";
+                document.getElementById("Action_button").onclick = table_form_add;
+                document.getElementById("inbound_filter_rule_title").innerHTML = "Add";
+            } else if (val == "2") {    // Update
+                document.getElementById("Action_button").value = "Update";
+                document.getElementById("Action_button").onclick = table_form_update;
+                document.getElementById("inbound_filter_rule_title").innerHTML = "Update";
+            }
+        }
+
+        /*
+         * table_form_delete()
+         */
+        function table_form_delete(idx)
+        {
+            if (!is_admin) {
+                return;
+            }
+
+            var name = rf["ingress_filter_name_" + idx].value;
+            if (!confirm("Are you sure you want to delete: " + " " + name)) {
+                return;
+            }
+
+            mf.used.value = 0;
+            mf.used.name = "config.ingress_rules[" + idx + "].used";
+
+            mf.submit();
+        }
+
+        /*
+         * table_form_edit()
+         */
+        function table_form_edit(idx)
+        {
+            if (!is_admin) {
+                return;
+            }
+
+            table_form_set_display_if_table_is_full(false);
+            table_form_set_action_title("2");
+
+            mf.index.value = idx;
+            mf.used.value = rf["used_" + idx].value;
+            mf.ingress_filter_name.value = rf["ingress_filter_name_" + idx].value;
+
+            action_selector(rf["action_" + idx].value);
+            ip_range_selector(idx);
+            //save_form_default_values("mainform");
+        }
+
+        /*
+         * edit_form_submit()
+         */
+        function edit_form_submit(idx)
+        {
+            mf.used.value = 1;
+            mf.used.name = "config.ingress_rules[" + idx + "].used";
+            mf.action.name = "config.ingress_rules[" + idx + "].action";
+            mf.ingress_filter_name.name = "config.ingress_rules[" + idx + "].ingress_filter_name";
+
+            // add by yufa, 2007/11/15
+            // Check filter name can not set be "Allow All" or "Deny All"
+            var allow_all = "Allow All";
+            var deny_all = "Deny All";
+            var filter_name = mf.ingress_filter_name.value;
+
+            if ((filter_name.toUpperCase() == allow_all.toUpperCase()) ||
+                (filter_name.toUpperCase() == deny_all.toUpperCase()))
+            {
+                alert("The 'Allow All' and 'Deny All' are default filter name, can not be added");
+                mf.ingress_filter_name.select();
+                mf.ingress_filter_name.focus();
+                return;
+            }
+
+            var cnt = parseInt("8", 10);
+            for (var i = 0; i < cnt; i++) {
+                if (!is_ipv4_valid(mf["ip_start_" + i].value)) {
+                    alert("Invalid IP address" + ": " + mf["ip_start_" + i].value + ".");
+                    mf["ip_start_" + i].select();
+                    mf["ip_start_" + i].focus();
+                    return;
+                }
+                if (!is_ipv4_valid(mf["ip_end_" + i].value)) {
+                    alert("Invalid IP address" + ": " + mf["ip_end_" + i].value + ".");
+                    mf["ip_end_" + i].select();
+                    mf["ip_end_" + i].focus();
+                    return;
+                }
+
+                // 2007.08.01
+                // check strat ip > end ip
+                // server side will check this issue
+
+                // here check illegail ip address
+                var ip1 = ipv4_to_unsigned_integer(mf["ip_start_" + i].value);
+                var ip2 = ipv4_to_unsigned_integer(mf["ip_end_" + i].value);
+
+                //alert(ip1);
+                //alert(ip2);
+
+                var ip_null = 0; // 0.0.0.0
+                var ip_broadcast = 4294967295; // 255.255.255.255
+                var ip_127_0     = 2130706432; // 127.0.0.0
+                var ip_127_255   = 2147483647; // 127.255.255.255
+                var ip_224_0     = 3758096384; // IGMP
+
+                if( (ip1 == ip_null) && (ip2 == ip_broadcast) ) {
+                    // pass
+                }
+                else if( (ip1 == ip_broadcast) && (ip2 == ip_null) ) {
+                    // pass
+                }
+                else {
+                    //
+                    var illegal;
+                    var side;
+
+                    side = 0; // start
+                    illegal = 0;
+
+                    // ip1
+                    if( (ip1 >= ip_127_0) && ( ip1 <= ip_127_255) ) {
+                        illegal = 1;
+                    }
+                    else if( (ip1 >= ip_224_0) && (ip1 < ip_broadcast) ) {
+                        illegal = 1;
+                    }
+                    // ip2
+                    else if( (ip2 >= ip_127_0) && ( ip2 <= ip_127_255) ) {
+                        illegal = 1;
+                        side = 1;
+                    }
+                    else if( (ip2 >= ip_224_0) && (ip2 < ip_broadcast) ) {
+                        illegal = 1;
+                        side = 1;
+                    }
+
+                    if( illegal) {
+                        if( side == 0) {
+                            alert("Invalid IP address: " + mf["ip_start_" + i].value + ".");
+                        }
+                        else {
+                            alert("Invalid IP address: " + mf["ip_end_" + i].value + ".");
+                        }
+                        return;
+                    }
+
+                }
+
+                enabled_checkbox_selector(i, mf["enabled_checkbox_" + i].checked);
+                mf["enabled_" + i].name = "config.ingress_rules[" + idx + "].ip_range_table[" + i + "].enabled";
+                mf["ip_start_" + i].name = "config.ingress_rules[" + idx + "].ip_range_table[" + i + "].ip_start";
+                mf["ip_end_" + i].name = "config.ingress_rules[" + idx + "].ip_range_table[" + i + "].ip_end";
+            }
+            mf.submit();
+        }
+
+        /*
+         * table_form_recover()
+         */
+        function table_form_recover()
+        {
+            var idx = "";
+            var act = "";
+            if (idx != "") {
+                table_form_set_display_if_table_is_full(false);
+                table_form_set_action_title(act);
+
+                mf.index.value = idx;
+                mf.ingress_filter_name.value = "";
+                mf.action.value = "";
+                action_selector(mf.action.value);
+
+                var cnt = parseInt("8", 10);
+
+                // 
+                    mf["enabled_" + "0"].value = "";
+                    mf["ip_start_" + "0"].value = "";
+                    mf["ip_end_" + "0"].value = "";
+                    mf["enabled_checkbox_" + "0"].checked = (mf["enabled_" + "0"].value == "true") ? true : false;
+                // 
+                    mf["enabled_" + "1"].value = "";
+                    mf["ip_start_" + "1"].value = "";
+                    mf["ip_end_" + "1"].value = "";
+                    mf["enabled_checkbox_" + "1"].checked = (mf["enabled_" + "1"].value == "true") ? true : false;
+                // 
+                    mf["enabled_" + "2"].value = "";
+                    mf["ip_start_" + "2"].value = "";
+                    mf["ip_end_" + "2"].value = "";
+                    mf["enabled_checkbox_" + "2"].checked = (mf["enabled_" + "2"].value == "true") ? true : false;
+                // 
+                    mf["enabled_" + "3"].value = "";
+                    mf["ip_start_" + "3"].value = "";
+                    mf["ip_end_" + "3"].value = "";
+                    mf["enabled_checkbox_" + "3"].checked = (mf["enabled_" + "3"].value == "true") ? true : false;
+                // 
+                    mf["enabled_" + "4"].value = "";
+                    mf["ip_start_" + "4"].value = "";
+                    mf["ip_end_" + "4"].value = "";
+                    mf["enabled_checkbox_" + "4"].checked = (mf["enabled_" + "4"].value == "true") ? true : false;
+                // 
+                    mf["enabled_" + "5"].value = "";
+                    mf["ip_start_" + "5"].value = "";
+                    mf["ip_end_" + "5"].value = "";
+                    mf["enabled_checkbox_" + "5"].checked = (mf["enabled_" + "5"].value == "true") ? true : false;
+                // 
+                    mf["enabled_" + "6"].value = "";
+                    mf["ip_start_" + "6"].value = "";
+                    mf["ip_end_" + "6"].value = "";
+                    mf["enabled_checkbox_" + "6"].checked = (mf["enabled_" + "6"].value == "true") ? true : false;
+                // 
+                    mf["enabled_" + "7"].value = "";
+                    mf["ip_start_" + "7"].value = "";
+                    mf["ip_end_" + "7"].value = "";
+                    mf["enabled_checkbox_" + "7"].checked = (mf["enabled_" + "7"].value == "true") ? true : false;
+                // 
+            }
+        }
+
+        /*
+         * table_form_update()
+         */
+        function table_form_update()
+        {
+            var idx = mf.index.value;
+
+            var name = rf["ingress_filter_name_" + idx].value;
+            if (!confirm("Are you sure you want to update: " + " " + name)) {
+                return;
+            }
+
+            mf.act.value = "2"; // 2: update an entry
+            edit_form_submit(idx);
+        }
+
+        /*
+         * table_form_add()
+         */
+        function table_form_add()
+        {
+            
+        }
+
+        /*
+         * page_clear()
+         */
+        function page_clear()
+        {
+            if (is_form_modified("mainform") || verify_failed != "") {
+                if (verify_failed != "") {
+                    top.location = "/Advanced/Inbound_Filter.html";
+                } else {
+                    reset_form("mainform");
+                    reset_form("rulesform");
+                    table_form_set_action_title("1");
+                    page_load();
+                }
+            }
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+            rf = document.forms.rulesform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                rf.free.value = 0;
+                table_form_set_display_if_table_is_full(false);
+                return;
+            }
+
+            /*
+             * Update the rules list.
+             */
+            update_rulesform();
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                document.getElementById("mainform_box").style.display = "none";
+                do_block_enable(rf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            table_form_set_display_if_table_is_full(rf.free.value == -1);
+            save_form_default_values("mainform");
+            save_form_default_values("rulesform");
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed != "") {
+                table_form_recover();
+                alert(verify_failed);
+            }
+        }
+    //]]>
+    </script>
+    <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+    <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+    <div id="outside">
+        <table id="table_shell" summary="" cellspacing="0"><col span="1">
+            <tbody><tr>
+                <td>
+                    <div id="header_container">
+                        <div id="info_bar">
+                            <div class="fwv">Firmware Version:
+                            1.32NA
+                            </div>
+                            <div class="hwv">Hardware Version:
+                            A4
+                            </div>
+                            <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                        </div>
+                    </div>
+                    <table id="masthead_container" summary="" cellspacing="0">
+                        <tbody><tr>
+                            <td><div id="masthead_image"></div></td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="topnav_container" summary="" border="0" cellspacing="1">
+                        <tbody><tr>
+                            <td id="modnum">
+                                <div id="modnum_image"></div>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                            </td>
+                            <td class="topnavon">
+                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                            </td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                        <tbody><tr>
+                            <td id="sidenav_container">
+                                <div id="sidenav">
+
+                                    <ul id="Basic_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul style="display: block;" id="Advanced_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="here">
+                                            <div>
+                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                            </div>
+                                        </li>
+
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                            </div>
+                                        </li>
+                                        
+
+
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                            </div>
+                                        </li>
+                     										
+								                    		<li>
+											                     <div>
+											                        	<a id="Advanced_Bsecure_nav_link" href="Bsecure.html" onclick="return jump_if();">securespot</a>
+											                     </div>
+								                    		</li>
+										                    
+                                        
+                                        <li>
+                                            <div>
+                                                 <a href="Guest_Zone.html" onclick="return jump_if();">Guest Zone</a>
+                                            </div>
+                                        </li>
+                                         
+                                    </ul>
+
+                                    <ul id="Tools_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                            </div>
+                                        </li>
+
+                                        
+                                    </ul>
+
+                                    <ul id="Status_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                    </ul>
+
+                                    <ul id="Help_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </td>
+                            <td id="maincontent_container">
+                                <div id="rebootcontent" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>Reboot needed</h2>
+                                            <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                            <form id="rebootdummy" action="#" method="get">
+
+                                            <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                            <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                            </form>
+                                        </div>
+                                    </div> <!-- reboot_warning -->
+                                </div>
+                                <div id="warnings_section" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>
+                                                Configuration Warnings
+                                            </h2>
+                                            <div style="display: block;" id="warnings_section_content">
+                                                <!-- This division will be populated with configuration warning information -->
+                                            </div><!-- box warnings_section_content -->
+                                        </div>
+                                    </div>
+                                </div> <!-- warnings_section -->
+                                <input id="radio_count" value="1" type="hidden">
+                                <div id="maincontent" style="display: block;">
+                                    <!-- InstanceBeginEditable name="Main Content" -->
+                                    <div class="section">
+                                        <form saved="true" id="mainform" action="/Advanced/Inbound_Filter.html" method="post" onsubmit="return false;">
+                                            <div class="section_head">
+                                                <h2>Inbound Filter</h2>
+                                                <p>The
+Inbound Filter option is an advanced method of controlling data
+received from the Internet. With this feature you can configure inbound
+data filtering rules that control data based on an IP address range.</p>
+                                                <p>Inbound
+Filters can be used for limiting access to a server on your network to
+a system or group of systems. Filter rules can be used with Virtual
+Server, Port Forwarding, or Remote Administration features. </p>
+                                                <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                            </div>
+                                            <div id="fullform_box" class="box" style="display: none;">
+                                                <h3>
+                                                    <span id="inbound_filter_rule_title0">
+                                                        Add
+                                                    </span>
+                                                    Inbound Filter Rule
+                                                </h3>
+                                                You cannot add more rules because the table is full.
+                                            </div>
+                                            <div style="display: block;" id="mainform_box" class="box">
+                                                <h3>
+                                                    <span id="inbound_filter_rule_title">
+                                                        Add
+                                                    </span>
+                                                    Inbound Filter Rule
+                                                </h3>
+                                                <fieldset>
+                                                    <input default="" name="act" type="hidden">
+                                                    <input default="" name="index" type="hidden">
+                                                    <input default="" id="used" type="hidden">
+                                                    <input default="1" id="action" value="1" type="hidden">
+                                                    <p>
+                                                        <label class="duple" for="ingress_filter_name">Name&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="ingress_filter_name" size="20" maxlength="15" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple">Action&nbsp;:</label>
+                                                        <select id="action_select" onchange="action_selector(this.selectedIndex);">
+                                                            <option default="false" value="0">Allow</option>
+                                                            <option default="true" value="1" selected="selected">Deny</option>
+                                                        </select>
+                                                    </p>
+                                                    <label class="duple">Remote IP Range&nbsp;:</label>
+                                                    <table>
+                                                        <tbody><tr>
+                                                            <th>Enable</th>
+                                                            <th>Remote IP Start</th>
+                                                            <th>Remote IP End</th>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_0" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_0" onclick='enabled_checkbox_selector("0", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_0" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_0" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_1" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_1" onclick='enabled_checkbox_selector("1", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_1" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_1" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_2" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_2" onclick='enabled_checkbox_selector("2", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_2" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_2" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_3" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_3" onclick='enabled_checkbox_selector("3", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_3" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_3" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_4" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_4" onclick='enabled_checkbox_selector("4", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_4" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_4" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_5" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_5" onclick='enabled_checkbox_selector("5", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_5" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_5" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_6" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_6" onclick='enabled_checkbox_selector("6", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_6" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_6" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>
+                                                                <input default="" id="enabled_7" type="hidden">
+                                                                <input default="false" id="enabled_checkbox_7" onclick='enabled_checkbox_selector("7", this.checked);' type="checkbox">
+                                                            </td>
+                                                            <td><input autocomplete="off" default="0.0.0.0" size="15" maxlength="15" id="ip_start_7" value="0.0.0.0" type="text"></td>
+                                                            <td><input autocomplete="off" default="255.255.255.255" size="15" maxlength="15" id="ip_end_7" value="255.255.255.255" type="text"></td>
+                                                        </tr>
+                                                        
+                                                    </tbody></table>
+                                                    <p>
+                                                        <input class="button_submit" id="Action_button" value="Add" onclick=";" type="button">
+                                                        <input class="button_submit" value="Clear" onclick="page_clear();" type="button">
+                                                    </p>
+                                                </fieldset>
+                                            </div><!-- box -->
+                                    </form><!-- mainform -->
+                                    <form saved="true" id="rulesform" action="/Advanced/Inbound_Filter.html" method="post" onsubmit="return false;">
+                                            <div id="rulesform_box" class="box">
+                                                <h3>Inbound Filter Rules List</h3>
+                                                <fieldset>
+                                                <table class="formlisting" id="adv_inboundfilter_ruleslist" summary="" border="0" cellpadding="0" cellspacing="1">
+                                                    <tbody><tr class="form_label_row">
+                                                        <th class="formlist_col1" rowspan="1" colspan="1">Name</th>
+                                                        <th class="formlist_col2" rowspan="1" colspan="1">Action</th>
+                                                        <th class="formlist_col3" rowspan="1" colspan="1">Remote IP Range</th>
+                                                        <th class="formlist_img" rowspan="1" colspan="1">&nbsp;</th>
+                                                        <th class="formlist_img" rowspan="1" colspan="1">&nbsp;</th>
+                                                    </tr>
+                                                    
+                                                        
+                                                            
+                                                                
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                    
+                                                </tbody></table>
+                                                </fieldset>
+                                                <input default="0" id="free" value="0" type="hidden">
+                                            </div><!-- box -->
+                                        </form><!-- rulesform -->
+                                    </div><!-- section -->
+                                    <!-- InstanceEndEditable -->
+                                </div><!-- main_content -->
+                            </td>
+
+                            <td id="sidehelp_container">
+                                <div id="help_text">
+                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                    <strong>Helpful Hints...</strong>
+                                    <p>Give each rule a <strong>Name</strong> that is meaningful to you.</p>
+                                    <p>Each rule can either <strong>Allow</strong> or <strong>Deny</strong> access from the WAN.</p>
+                                    <p>Up
+to eight ranges of WAN IP addresses can be controlled by each rule. The
+checkbox by each IP range can be used to disable ranges already defined.</p>
+                                    <p>The starting and ending IP addresses are WAN-side address.</p>
+                                    <p>Click the <strong>Add</strong> or <strong>Update</strong> button to store a finished rule in the Rules List below.</p>
+                                    <p>Click the <strong>Edit</strong> icon in the Rules List to change a rule.</p>
+                                    <p>Click the <strong>Delete</strong> icon in the Rules List to permanently remove a rule.</p>
+                                    <p class="more">
+                                        <!-- Link to more help -->
+                                        <a href="Advanced.html#Inbound_Filter" onclick="return jump_if();">More...</a>
+                                    </p>
+                                <!-- InstanceEndEditable -->
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody></table>
+                    <table id="footer_container" summary="" border="0" cellspacing="0">
+                        <tbody><tr>
+                            <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </tbody></table>
+                </td>
+            </tr>
+        </tbody></table>
+
+        <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+    </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

@@ -1,0 +1,1784 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Setup / Network Settings
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Basic/Network.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+                //document.getElementById("fw_minor_head").innerHTML = global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        
+                
+        
+
+        <script type="text/javascript">
+        //<![CDATA[
+        //
+		/*
+		 * General array editor (AE) functions
+		 */
+
+		/*extern add_class, remove_class */
+
+		/*
+		 * The currently selected AE row, or null
+		 */
+		var ae_selected_row = null;
+
+		/*
+		 * Call this function when you are finished
+		 *  with a specific row of the array.
+		 */
+		function deselect_ae_row()
+		{
+			if (ae_selected_row !== null) {
+				remove_class(ae_selected_row, 'ae_selected_row');
+				ae_selected_row = null;
+			}
+		}
+
+		/*
+		 * Call this function anytime you want to talk to the user
+		 *  about a specific row of the array (i.e. edit or delete it).
+		 */
+		function select_ae_row(child_element)
+		{
+			deselect_ae_row();
+
+			/*
+			 * Find the table row that contains the given element.
+			 * Allowing caller to specify a row by passing
+			 *  a child element of the row is simply a convenience,
+			 *  so you don't have to add an ID to the TR element.
+			 * Follow the parent chain up the tree, but stop if you leave the table.
+			 * The child_element parameter can be either an element id or element object.
+			 */
+
+			var el = child_element;
+			if (typeof(el) === 'string') {
+				el = document.getElementById(el);
+				if (el === null) {
+					//alert('select_ae_row: Element "' + child_element + '" does not exist.');
+					return;
+				}
+			}
+			if (typeof(el) !== 'object') {
+				//alert('select_ae_row: Invalid parameter: ' + child_element);
+				return;
+			}
+			if (el === null) {
+				//alert('select_ae_row: Invalid null parameter');
+				return;
+			}
+			if ('' === el.getAttribute('tagName'))  {
+				//alert('select_ae_row: Parameter has no attribute "tagName": ' + child_element);
+				return;
+			}
+
+			while (el.tagName !== 'TR') {
+				if (el.tagName === 'TABLE') {
+					return;
+				}
+				el = el.parentNode;
+			}
+			/*
+			 * Highlight the row with CSS properties
+			 *  so the user is sure which row will be operated on.
+			 */
+			add_class(el, 'ae_selected_row');
+			/*
+			 * Remember which row it is, so we don't have to look it up later.
+			 */
+			ae_selected_row = el;
+		}
+
+
+
+        /*
+         * Handle for document forms.
+         */
+        var mf, ef, rf;
+
+        /*
+         * Check for validation errors.
+         */
+        var verify_failed = "";
+
+        /*
+         * Browser client MAC address.
+         */
+        var pcmac = "00:05:5d:ce:b3:8d";
+
+        /*
+         * populate_dhcp()
+         *  Populate the edit form with the selected option.
+         */
+        function populate_dhcp()
+        {
+            if (ef.dhcp_leases_pulldown.options[ef.dhcp_leases_pulldown.selectedIndex].value != "-1") {
+                var index = rf.free.value;
+                if (index == "") {
+                    alert("No more reservations may be created");
+                    return;
+                }
+
+                ef.used.value = "true";
+                ef.enabled_select.checked = 1;
+                ef.mac_ip.value = ef.dhcp_leases_pulldown.options[ef.dhcp_leases_pulldown.selectedIndex].getAttribute("ip_address");
+                ef.mac_addr.value = ef.dhcp_leases_pulldown.options[ef.dhcp_leases_pulldown.selectedIndex].getAttribute("mac");
+                ef.comp_name.value = ef.dhcp_leases_pulldown.options[ef.dhcp_leases_pulldown.selectedIndex].getAttribute("host_name");
+                ef.dhcp_leases_pulldown.value = -1 ;
+
+                /*
+                 * Set the action of the editform to 'add'.
+                 */
+                edit_form_set_action_title("1");
+            }
+        }
+
+        /*
+         * revoke_lease()
+         *  Issue the form to revoke the lease.
+         */
+        function revoke_lease(ip_address)
+        {
+            window.location.replace("/dhcp_lease_revoke.cgi" + "?ip_address=" + ip_address + "&response_resource=/Basic/Network.html");
+        }
+
+        /*
+         * reserve_lease()
+         * Reserve the given lease, if there is a free entry available.
+         */
+        function reserve_lease(ip_address, mac, host_name)
+        {
+            var index = rf.free.value;
+            if (index == "") {
+                alert("No more reservations may be created");
+                return;
+            }
+
+            /*
+             * Copy the given parameters to the editform page.
+             */
+            ef.used.value = "true";
+            ef.enabled_select.checked = 1;
+            ef.comp_name.value = host_name;
+            ef.mac_ip.value = ip_address;
+            ef.mac_addr.value = mac;
+
+            /*
+             * Set the action of the editform to 'add'
+             */
+            edit_form_set_action_title("1");
+        }
+
+        /*
+         * clone_mac()
+         */
+        function clone_mac() {
+            ef.mac_addr.value = pcmac;
+        }
+
+        /*
+         * edit_form_submit()
+         */
+        function edit_form_submit(index)
+        {
+            if (!is_ipv4_valid(ef.mac_ip.value)) {
+                alert("Invalid Reservation IP Address");
+                ef.mac_ip.select();
+                ef.mac_ip.focus();
+                return;
+            }
+            if (!is_mac_valid(ef.mac_addr.value, false)) {
+                alert("Invalid Reservation MAC address");
+                ef.mac_addr.select();
+                ef.mac_addr.focus();
+                return;
+            }
+
+            ef.used.name = "config.dhcp_server_reservation_table[" + index + "].used";
+            ef.used.value = "true";
+            ef.enabled.name = "config.dhcp_server_reservation_table[" + index + "].enabled";
+            ef.enabled.value = ef.enabled_select.checked;
+            ef.comp_name.name = "config.dhcp_server_reservation_table[" + index + "].comp_name";
+            ef.mac_ip.name = "config.dhcp_server_reservation_table[" + index + "].mac_ip";
+            ef.mac_addr.name = "config.dhcp_server_reservation_table[" + index + "].mac_addr";
+
+            ef.submit_index.value = index;
+            ef.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * edit_form_add()
+         */
+        function edit_form_add()
+        {
+            
+        }
+
+        /*
+         * edit_form_update()
+         */
+        function edit_form_update()
+        {
+            /*
+             * Restore the previous action of the editform back to 'add'.
+             */
+            edit_form_set_action_title("1");
+
+            /*
+             * Retrieve the saved index of the edited data and invoke the submit function.
+             */
+            edit_form_submit(ef.submit_index.value);
+            deselect_ae_row();
+        }
+
+        /*
+         * edit_form_cancel()
+         */
+        function edit_form_cancel()
+        {
+            /*
+             * Reset the editform, then restore the action of the editform to 'add'.
+             */
+            if (is_form_modified("editform") && confirm("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed != "") {
+                    top.location = "/Basic/Network.html";
+                } else {
+                    reset_form("editform");
+                }
+            }
+            ef.act.value = "1";     // Add
+            edit_form_set_action_title(ef.act.value);
+            deselect_ae_row();
+        }
+
+            /*
+         * edit_form_set_action_title()
+             */
+        function edit_form_set_action_title(val)
+        {
+            if (val == "1") {       // Add
+                ef.action.value = "Save";
+                ef.action.onclick = edit_form_add;
+                document.getElementById("form_title").innerHTML = "Add";
+            } else if (val == "2") {        // Update
+                ef.action.value = "Update";
+                ef.action.onclick = edit_form_update;
+                document.getElementById("form_title").innerHTML = "Edit";
+            }
+        }
+
+        /*
+         * rule_entry_enable()
+         */
+        function rule_entry_enable(index)
+        {
+            select_ae_row("mac_ip_" + index);
+            var name = document.getElementById("mac_ip_" + index).innerText;
+            var tick = rf["enabled_select_" + index];
+            var confirmed = true;
+            if (tick.checked) {
+                confirmed = confirm("Do you want to enable the DHCP Reservation entry for IP Address " + name);
+            } else {
+                confirmed = confirm("Do you want to disable the DHCP Reservation entry for IP Address " + name);
+            }
+            if (!confirmed) {
+                tick.checked = !tick.checked;
+                deselect_ae_row();
+                return;
+            }
+            ef.enabled.name = "config.dhcp_server_reservation_table[" + index + "].enabled";
+            ef.enabled.value = tick.checked;
+            ef.submit_index.value = index;
+            ef.act.value = "3";     // Enable
+            ef.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * rule_entry_delete()
+         */
+        function rule_entry_delete(index)
+        {
+            select_ae_row("mac_ip_" + index);
+            var name = document.getElementById("mac_ip_" + index).innerText;
+            if (!confirm("Are you sure you want to delete " + name)) {
+                deselect_ae_row();
+                return;
+            }
+            ef.used.value = "false";
+            ef.used.name = "config.dhcp_server_reservation_table[" + index + "].used";
+            ef.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * rule_entry_edit()
+         * Each entry in the ruleslist has an edit button set to invoke this routine with a given index.
+         */
+        function rule_entry_edit(index)
+        {
+            /*
+             * Using the index, identify the ruleslist data, copy that data into the editform fields.
+             */
+            ef.submit_index.value = index;      // Store the index for later use should the user submit changes.
+            ef.used.value = "true";
+            ef.enabled_select.checked = document.getElementById("enabled_select_" + index).checked;
+            ef.comp_name.value = document.getElementById("comp_name_" + index).innerText;
+            ef.mac_ip.value = document.getElementById("mac_ip_" + index).innerText;
+            ef.mac_addr.value = document.getElementById("mac_addr_" + index).innerText;
+            select_ae_row("enabled_select_" + index);
+
+            /*
+             * Change the editform action button to invoke the updating function (rather than adding).
+             */
+            ef.act.value = "2";     // Edit
+            edit_form_set_action_title(ef.act.value);
+
+            save_form_default_values("editform");
+        }
+
+        /*
+         * DHCP client list.
+         * Note that one data document is fetched and then translated via two different translators.
+         * We fetch the translators first (as this is a once-only operation) and then repeatedly fetch the data
+         * processing it via the translators as the data arrives.
+         */
+        var dhcp_client_xsl_loader = new ajax_xslproc("../Basic/dhcp_clients.sxsl", dhcp_client_xsl_ready);
+        var dhcp_client_pulldown_xsl_loader = new ajax_xslproc("../Basic/computer_ipaddr_list.sxsl", dhcp_client_pulldown_xsl_ready);
+        var dhcp_client_xsl_data_ready = false;
+        var dhcp_client_pulldown_xsl_data_ready = false;
+        var dhcp_client_xml_loader = new ajax_xmlhttp("../dhcp_clients.xml", dhcp_client_xml_ready);
+
+        /*
+         * dhcp_client_xml_ready()
+         */
+        function dhcp_client_xml_ready(xml_doc)
+        {
+            /*
+             * Wait for both data and translator to be available.
+             */
+            if (!(dhcp_client_xsl_data_ready && dhcp_client_pulldown_xsl_data_ready)) {
+                return;
+            }
+
+            /*
+             * Get the document element in which to write the data.
+             */
+            var computer_list = document.getElementById("dhcp_client_list");
+            var computer_pulldown_parent = document.getElementById("dhcp_leases_pulldown_parent");
+
+            /*
+             * Clear contents ready for new write.
+             */
+            computer_list.innerHTML = "";
+            computer_pulldown_parent.innerHTML = "";
+
+            /*
+             * Perform the XML transformation.
+             */
+            dhcp_client_xsl_loader.transform(xml_doc, window.document, computer_list);
+            dhcp_client_pulldown_xsl_loader.transform(xml_doc, window.document, computer_pulldown_parent);
+            ef.dhcp_leases_pulldown.setAttribute("modified", "ignore");
+
+            /*
+             * Reaquire the routing table in a little while.
+             */
+            
+        }
+
+        /*
+         * dhcp_client_xsl_ready()
+         */
+        function dhcp_client_xsl_ready(xml_doc)
+        {
+            dhcp_client_xsl_data_ready = true;
+
+            /*
+             * Now get the data document that is to be translated.
+             */
+            dhcp_client_xml_loader.retrieve_xml();
+        }
+
+        /*
+         * dhcp_client_pulldown_xsl_ready()
+         */
+        function dhcp_client_pulldown_xsl_ready(xml_doc)
+        {
+            dhcp_client_pulldown_xsl_data_ready = true;
+            dhcp_client_pulldown_xsl_loader.add_param("onchange_spec", "populate_dhcp();");
+            dhcp_client_pulldown_xsl_loader.add_param("id_spec", "dhcp_leases_pulldown");
+        }
+
+        //
+            //
+        //
+
+		/*
+		 * wan_type_selector()
+		 */
+		function wan_type_selector(mode)
+		{
+			mf.wan_type.value = mode;
+			mf.wan_type_select.value = mode;
+			if (mode == "0") { //Ethernet
+				document.getElementById("dslbridge_section").style.display = "none";
+			} else { //DSL
+				document.getElementById("dslbridge_section").style.display = "block";
+				dslbridge_encapsulation_selector(mf.dslbridge_encapsulation.value);
+			}
+		}
+
+        var any_guest_network = false;
+        /*
+         * If there is at least one guest network then disable RIP.
+         */
+        //
+        //
+            //
+                //
+                    //
+                //
+            //
+                //
+            //
+        //
+
+        /*
+         * wan_port_mode_selector()
+         */
+        function wan_port_mode_selector(mode)
+        {
+            if (mf.wan_port_mode.value == "0" && mode == "1" && any_guest_network) {
+                alert("All guest networks will be disabled when switching Bridge mode");
+            }
+
+            mf.wan_port_mode.value = mode;
+            set_radio(mf.wan_port_mode_radio, mode);
+
+            var router_mode = (mode == "0");
+
+            /*
+             * Show/hide elements in Router Settings section as per selected wan port mode(1 Bridge mode, 0 router mode).
+             * Enable/disable related elements as we do not want to submit the elements not used in the selected mode.
+             */
+            disable_form_field(mf.lan_gateway, router_mode);
+            disable_form_field(mf.lan_primary_dns, router_mode);
+            disable_form_field(mf.lan_secondary_dns, router_mode);
+            disable_form_field(mf.local_domain_name, !router_mode);
+            disable_form_field(mf.dns_relay_enabled, !router_mode);
+            disable_form_field(mf.dns_relay_enabled_select, !router_mode);
+
+            document.getElementById("router_mode_only_settings").style.display = router_mode ? "block" : "none";
+            document.getElementById("bridge_mode_only_settings").style.display = router_mode ? "none" : "block";
+
+            /*
+             * Show/hide in RIP and DHCP server sections per selected wan port mode(1 Bridge mode, 0 router mode).
+             * In bridge mode, we set lan_use_rip and dhcp_server_enabled to false to cause other related sections to be hidden.
+             */
+            dhcp_server_enabled_selector(router_mode && (dhcp_server_enabled_init == "1"));
+
+            disable_form_field(mf.dhcp_server_enabled, !router_mode);
+            disable_form_field(mf.dhcp_server_enabled_select, !router_mode);
+
+            document.getElementById("dhcp_server_enabled_section").style.display = router_mode ? "block" : "none";
+        }
+
+        /*
+		 * dslbridge_encapsulation_selector()
+		 */
+		function dslbridge_encapsulation_selector(mode)
+		{
+			mf.dslbridge_encapsulation.value = mode;
+			if (mode == "0") {
+				mf.dslbridge_encapsulation_radio_0.checked = true;
+			} else {
+				mf.dslbridge_encapsulation_radio_1.checked = true;
+			}
+		}
+
+		/*
+         * dns_relay_enabled_selector()
+         */
+        function dns_relay_enabled_selector(value)
+        {
+            mf.dns_relay_enabled.value = (value == true) ? "true" : "false";
+            mf.dns_relay_enabled_select.checked = value;
+        }
+
+        /*
+         * lan_netbios_registration_type_selector()
+         */
+        function lan_netbios_registration_type_selector(mode)
+        {
+            mf.lan_netbios_registration_type.value = mode;
+            set_radio(mf.lan_netbios_registration_type_radio, mode);
+        }
+
+        /*
+         * lan_netbios_learn_from_wan_enabled_selector()
+         */
+        function lan_netbios_learn_from_wan_enabled_selector(parent_enabled, value)
+        {
+            mf.lan_netbios_learn_from_wan_enabled.value = (value == true) ? "true" : "false";
+            mf.lan_netbios_learn_from_wan_enabled_select.checked = value;
+
+            /*
+             * Set enabled/disabled, disabled if parent is also disabled.
+             */
+            lan_netbios_registration_type_selector(mf.lan_netbios_registration_type.value);
+            do_block_enable(document.getElementById("lan_wins_settings_1"), parent_enabled && !value);
+        }
+
+        /*
+         * lan_netbios_advertisement_enabled_selector()
+         */
+        function lan_netbios_advertisement_enabled_selector(parent_enabled, value)
+        {
+            mf.lan_netbios_advertisement_enabled.value = (value == true) ? "true" : "false";
+            mf.lan_netbios_advertisement_enabled_select.checked = value;
+
+            /*
+             * Set enabled/disabled.
+             */
+            var enabled = parent_enabled && value;
+            disable_form_field(mf.lan_netbios_learn_from_wan_enabled_select, !enabled);
+            lan_netbios_learn_from_wan_enabled_selector(enabled, mf.lan_netbios_learn_from_wan_enabled.value == "true");
+        }
+
+        /*
+         * dhcp_server_enabled_selector()
+         */
+        function dhcp_server_enabled_selector(value)
+        {
+            mf.dhcp_server_enabled.value = (value == true) ? "1" : "0";
+            mf.dhcp_server_enabled_select.checked = value;
+
+            /*
+             * Set enabled/disabled.
+             */
+            var disabled = !value;
+            disable_form_field(mf.dhcp_server_range_ip_start, disabled);
+            disable_form_field(mf.dhcp_server_range_ip_end, disabled);
+            disable_form_field(mf.dhcp_server_lease_time_max, disabled);
+            disable_form_field(mf.dhcp_server_always_broadcast_select, disabled);
+            disable_form_field(mf.lan_netbios_advertisement_enabled_select, disabled);
+            lan_netbios_advertisement_enabled_selector(value, mf.lan_netbios_advertisement_enabled.value == "true");
+
+            /*
+             * Set display for other forms.
+             */
+            var form_display = (value == true) ? "block" : "none";
+            document.getElementById("editform").style.display = form_display;
+            document.getElementById("rulesform").style.display = form_display;
+            document.getElementById("dhcp_client_list").style.display = form_display;
+        }
+
+        /*
+         * dhcp_server_always_broadcast_selector()
+         */
+        function dhcp_server_always_broadcast_selector(value)
+        {
+            mf.dhcp_server_always_broadcast.value = (value == true) ? "1" : "0";
+            mf.dhcp_server_always_broadcast_select.checked = value;
+        }
+
+				function _length(str)
+				{
+						var len=0
+						for(var i=0;i<str.length;i++)
+						    if (str.charAt(i)>'~')
+						        len+=3;
+						    else 
+						        len++;
+							return len;			
+			  }
+        /*
+         * Validate and submit the form.
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+
+            var str =document.getElementById("lan_netbios_name").value;
+            
+            var ch_total =_length(str);
+      
+            if(ch_total > 15)
+          {
+              alert("Invalid Device Name");
+            return;
+           } 
+          
+						//if(document.getElementById("lan_netbios_name").value.length)
+            if (!is_ipv4_valid(mf.lan_network_address.value)) {
+                alert("Invalid LAN IP Address");
+                mf.lan_network_address.select();
+                mf.lan_network_address.focus();
+                return;
+            }
+
+            if (!is_ipv4_valid(mf.lan_subnet_mask.value)) {
+                alert("Invalid LAN subnet mask.");
+                mf.lan_subnet_mask.select();
+                mf.lan_subnet_mask.focus();
+                return;
+            }
+
+            /*
+             * We have done enough validation, if it is bridge mode.
+             */
+            if(mf.wan_port_mode.value == "1") {
+                mf.submit();
+                return;
+            }
+
+            if(mf.dhcp_server_enabled.value != "1") {
+                mf.dhcp_server_range_ip_start.value = "192.168.0.100";
+                mf.dhcp_server_range_ip_end.value = "192.168.0.199";
+                mf.dhcp_server_lease_time_max.value = "1440";
+            } else {
+                if (!is_ipv4_valid(mf.dhcp_server_range_ip_start.value)) {
+                    alert("Invalid DHCP Server Start IP Range");
+                    mf.dhcp_server_range_ip_start.select();
+                    mf.dhcp_server_range_ip_start.focus();
+                    return;
+                }
+
+                if (!is_ipv4_valid(mf.dhcp_server_range_ip_end.value)) {
+                    alert("Invalid DHCP Server End IP Range");
+                    mf.dhcp_server_range_ip_end.select();
+                    mf.dhcp_server_range_ip_end.focus();
+                    return;
+                }
+
+                if (!is_number(mf.dhcp_server_lease_time_max.value) || (mf.dhcp_server_lease_time_max.value < 0)  || (mf.dhcp_server_lease_time_max.value > 65535)) {
+                    alert("Invalid DHCP Server lease time");
+                    mf.dhcp_server_lease_time_max.select();
+                    mf.dhcp_server_lease_time_max.focus();
+                    return;
+                }
+            }
+
+            if ((mf.dhcp_server_enabled.value == "0") || (mf.lan_netbios_advertisement_enabled.value == "false") || (mf.lan_netbios_learn_from_wan_enabled.value == "true")) {
+                mf.lan_netbios_primary_wins_ip.value = "0.0.0.0";
+                mf.lan_netbios_secondary_wins_ip.value = "0.0.0.0";
+            } else {
+                if (!is_ipv4_valid(mf.lan_netbios_primary_wins_ip.value)) {
+                    // 2007.07.09
+                    if( mf.lan_netbios_advertisement_enabled_select.checked && !(mf.lan_netbios_learn_from_wan_enabled_select.checked) ) {
+                        alert("Invalid Primary WINS IP");
+                        mf.lan_netbios_primary_wins_ip.select();
+                        mf.lan_netbios_primary_wins_ip.focus();
+                        return;
+                    }
+                    else {
+                        mf.lan_netbios_primary_wins_ip.value = "0.0.0.0";
+                        mf.lan_netbios_secondary_wins_ip.value = "0.0.0.0";
+                    }
+                }
+                if (!is_ipv4_valid(mf.lan_netbios_secondary_wins_ip.value)) {
+                    alert("Invalid Secondary WINS IP");
+                    mf.lan_netbios_secondary_wins_ip.select();
+                    mf.lan_netbios_secondary_wins_ip.focus();
+                    return;
+                }
+            }
+
+            // 2007.04.27
+            // dhcp & Router IP issue
+            if (mf.dhcp_server_enabled.value == "1") {
+                // DHCP enable
+                var ip_lan_value;
+                var ip_s_value;
+                var ip_e_value;
+
+                ip_lan_value = ipv4_to_unsigned_integer(mf.lan_network_address.value);
+                ip_s_value = ipv4_to_unsigned_integer(mf.dhcp_server_range_ip_start.value);
+                ip_e_value = ipv4_to_unsigned_integer(mf.dhcp_server_range_ip_end.value);
+
+                if( ip_s_value > ip_e_value) {
+                    var s;
+                    s = "DHCP Range Invalid, FROM not bigger than TO";
+                    alert(s);
+                    mf.dhcp_server_range_ip_start.select();
+                    mf.dhcp_server_range_ip_start.focus();
+                    return;
+                }
+
+                if( (ip_lan_value >= ip_s_value) && (ip_lan_value <= ip_e_value) ) {
+                    var s;
+                    s = "Invalid LAN IP Address, ip address in DHCP Server range";
+                    alert(s);
+                    mf.lan_network_address.select();
+                    mf.lan_network_address.focus();
+                    return;
+                }
+            }
+
+            /*
+             * Check leases.
+             */
+            if (ef.mac_ip.value != "") {
+                edit_form_add();
+            } else {
+                /*
+                 * Be sure not to submit empty reservations.
+                 */
+                ef.used.value = false;
+
+                mf.submit();
+            }
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if ((is_form_modified("mainform") || is_form_modified("editform") || is_form_modified("rulesform")) && confirm("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed != "") {
+                    top.location = "/Basic/Network.html";
+                } else {
+                    reset_form("mainform");
+                    reset_form("editform");
+                    ef.act.value = "1";     /* Add */
+                    edit_form_set_action_title(ef.act.value);
+                    page_load();
+                    deselect_ae_row();
+                }
+            }
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+            ef = document.forms.editform;
+            rf = document.forms.rulesform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                wan_port_mode_selector("0");
+                dns_relay_enabled_selector(true);
+                dhcp_server_enabled_selector(true);
+                dhcp_server_always_broadcast_selector(true);
+                return;
+            }
+
+            /*
+             * We save these values as we want to display the init values when the user switch back from bridge mode to router mode.
+             */
+            dhcp_server_enabled_init = mf.dhcp_server_enabled.value;
+
+            wan_port_mode = mf.wan_port_mode.value;
+            wan_port_mode_selector(wan_port_mode);
+
+			//
+
+            /*
+             * Populate the main form check boxes for router mode.
+             */
+            if (wan_port_mode == "0") {
+                dhcp_server_always_broadcast_selector(mf.dhcp_server_always_broadcast.value == "1");
+                dns_relay_enabled_selector(mf.dns_relay_enabled.value == "true");
+
+                /*
+                 * Get the XSLT objects we need.
+                 */
+  
+
+                /*
+                 * Initialise rulesform checkboxes.
+                 */
+                for (var i = 0; i < "32"; ++i) {
+                    var enabled_field = document.getElementById("enabled_" + i);
+                    if (enabled_field == null) {
+                        continue;
+                    }
+                    var chkbox_select = document.getElementById("enabled_select_" + i);
+                    chkbox_select.checked = (enabled_field.value == "true")? 1 : 0;
+                }
+            }
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                do_block_enable(rf, false);
+                ef.style.display = "none";
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+
+            // 2008.09.03
+            //
+
+            /*
+             * Record form values for save comparison.
+             */
+            save_form_default_values("mainform");
+
+            /*
+             * Initialize edit form, following whether verify failed.
+             */
+            var prior_act = "";
+            var prior_index = "";
+
+            ef.submit_index.value = rf.index.value; /* default value */
+            ef.act.value = "1"; /* 1: Add -- default value */
+
+            save_form_default_values("editform");
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed != "") {
+                ef.act.value = "";
+                select_ae_row(document.getElementById("mac_addr_" + prior_index));
+                if (prior_act != 3 ) { //add=(1) or edit(=2), not enable(=3)
+                    /*
+                     * Replace form values with those the user posted.
+                     */
+                    ef.submit_index.value = "";
+                    ef.used.value = "";
+                    ef.used.value = "true";
+                    ef.enabled.value = "";
+                    ef.enabled.value = ef.enabled_select.checked;
+                    ef.comp_name.value = "";
+                    ef.mac_ip.value = "";
+                    ef.mac_addr.value = "";
+                }
+                alert(verify_failed);
+            }
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.<span id="fw_minor_head">21</span>
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul style="display: block;" id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Basic_Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a id="Basic_USB_nav_link" href="USB.html" onclick="return jump_if();">USB Settings</a>
+                                            </div>
+                                        </li>
+                                        
+    
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic_Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <form saved="true" id="mainform" action="/Basic/Network.html" method="post" onsubmit="return false;">
+                                                                                <div class="section">
+                                                                                        <div class="section_head">
+                                                                                                <h2>Network Settings</h2>
+                                                                                                <p>
+Use this section to configure the internal network settings of your
+router and also to configure the built-in DHCP Server to assign IP
+addresses to the computers on your network. The IP Address that is
+configured here is the IP Address that you use to access the Web-based
+management interface. If you change the IP Address here, you may need
+to adjust your PC's network settings to access the network again. </p>
+                                                                                                <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                                                                                <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                                                                <input class="button_submit" value="Don't Save Settings" onclick="page_cancel();" type="button">
+                                                                                        </div>
+                                                                                </div>
+
+                                                                                <!-- hidden bridge mode 2007.05.07 -->
+                                                                                <div class="box" style="display: none;">
+                                                                                        <h3>WAN Port Mode</h3>
+                                                                                        <fieldset>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="wan_port_mode">WAN Port Mode&nbsp;:</label>
+                                                                                                        <input default="0" name="config.wan_port_mode" id="wan_port_mode" value="0" type="hidden">
+                                                                                                        <input default="true" id="wan_port_mode_radio_0" name="wan_port_mode_radio" value="0" onclick="wan_port_mode_selector(this.value);" type="radio">
+                                                                                                        <label for="wan_port_mode_radio_0">Router Mode</label>
+                                                                                                        <input default="false" id="wan_port_mode_radio_1" name="wan_port_mode_radio" value="1" onclick="wan_port_mode_selector(this.value);" type="radio">
+                                                                                                        <label for="wan_port_mode_radio_1">Bridge Mode </label>
+                                                                                                </p>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>Router Settings</h3>
+                                                                                        <p class="box_msg"> </p>
+                                                                                        <p>
+Use this section to configure the internal network settings of your
+router. The IP Address that is configured here is the IP Address that
+you use to access the Web-based management interface. If you change the
+IP Address here, you may need to adjust your PC's network settings to
+access the network again. </p>
+                                                                                        <fieldset>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="lan_network_address">
+Router IP Address: </label>
+                                                                                                        <input autocomplete="off" default="192.168.0.1" id="lan_network_address" size="20" maxlength="15" value="192.168.0.1" name="config.lan_network_address" type="text">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="lan_subnet_mask">
+                                                                                                                Subnet Mask:
+                                                                                                        </label>
+                                                                                                        <input autocomplete="off" default="255.255.255.0" id="lan_subnet_mask" size="20" maxlength="15" value="255.255.255.0" name="config.lan_subnet_mask" type="text">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="lan_netbios_name">
+                                                                                                                Device Name:
+                                                                                                        </label>
+                                                                                                        <input autocomplete="off" default="dlinkrouter" id="lan_netbios_name" size="20" maxlength="15" value="dlinkrouter" name="config.lan_netbios_name" type="text">
+                                                                                                </p>
+                                                                                                <div style="display: none;" id="bridge_mode_only_settings">
+                                                                                                        <p>
+                                                                                                                        <label class="duple" for="lan_gateway">
+Default Gateway: </label>
+                                                                                                                        <input autocomplete="off" default="0.0.0.0" disabled="disabled" class="disabled" id="lan_gateway" size="20" maxlength="15" value="0.0.0.0" name="config.lan_gateway" type="text">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="lan_primary_dns">Primary DNS Server&nbsp;:</label>
+                                                                                                                <input autocomplete="off" default="0.0.0.0" disabled="disabled" class="disabled" id="lan_primary_dns" size="20" maxlength="15" value="0.0.0.0" name="config.lan_primary_dns" type="text">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="lan_secondary_dns">Secondary DNS Server&nbsp;:</label>
+                                                                                                                <input autocomplete="off" default="0.0.0.0" disabled="disabled" class="disabled" id="lan_secondary_dns" size="20" maxlength="15" value="0.0.0.0" name="config.lan_secondary_dns" type="text">
+                                                                                                        </p>
+								<div id="dslbridge_section" style="display: none;">								
+								
+								</div>
+                                                                                                </div>
+                                                                                                <div style="display: block;" id="router_mode_only_settings">
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="local_domain_name">
+Local Domain Name: </label>
+                                                                                                                <input autocomplete="off" default="" class="" id="local_domain_name" size="20" maxlength="30" value="" name="config.local_domain_name" type="text"> (optional)
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="dns_relay_enabled_select">
+Enable DNS Relay: </label>
+                                                                                                                <input default="true" class="" id="dns_relay_enabled" name="config.dns_relay_enabled" value="true" type="hidden">
+                                                                                                                <input default="true" class="" id="dns_relay_enabled_select" onclick="dns_relay_enabled_selector(this.checked);" type="checkbox">
+                                                                                                        </p>
+                                                                                                </div>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div style="display: block;" class="box" id="dhcp_server_enabled_section">
+                                                                                        <h3>
+                                                                                                DHCP Server Settings
+                                                                                        </h3>
+                                                                                        <p>
+Use this section to configure the built-in DHCP Server to assign IP
+addresses to the computers on your network. </p>
+                                                                                        <fieldset>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="dhcp_server_enabled_select">
+Enable DHCP Server: </label>
+                                                                                                        <input default="1" class="" id="dhcp_server_enabled" name="config.dhcp_server_enabled" value="1" type="hidden">
+                                                                                                        <input default="true" class="" id="dhcp_server_enabled_select" onclick="dhcp_server_enabled_selector(this.checked);" type="checkbox">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="dhcp_server_range_ip_start">
+DHCP IP Address Range: </label>
+                                                                                                        <input autocomplete="off" default="192.168.0.100" class="" id="dhcp_server_range_ip_start" size="15" maxlength="15" value="192.168.0.100" name="config.dhcp_server_range_ip_start" type="text">
+                                                                                                        <label for="dhcp_server_range_ip_end">
+                                                                                                                to
+                                                                                                        </label>
+                                                                                                        <input autocomplete="off" default="192.168.0.199" class="" id="dhcp_server_range_ip_end" size="15" maxlength="15" value="192.168.0.199" name="config.dhcp_server_range_ip_end" type="text">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="dhcp_server_lease_time_max">
+                                                                                                                DHCP Lease Time:
+                                                                                                        </label>
+                                                                                                        <input autocomplete="off" default="1440" class="" id="dhcp_server_lease_time_max" size="10" maxlength="5" value="1440" name="config.dhcp_server_lease_time_max" type="text">
+                                                                                                                (minutes)
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="dhcp_server_always_broadcast_select">
+Always broadcast: </label>
+                                                                                                        <input default="1" id="dhcp_server_always_broadcast" name="config.dhcp_server_always_broadcast" value="1" type="hidden">
+                                                                                                        <input default="true" class="" id="dhcp_server_always_broadcast_select" onclick="dhcp_server_always_broadcast_selector(this.checked);" type="checkbox">
+(compatibility for some DHCP Clients) </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="lan_netbios_advertisement_enabled_select">
+NetBIOS announcement: </label>
+                                                                                                        <input default="false" id="lan_netbios_advertisement_enabled" name="config.lan_netbios_advertisement_enabled" value="false" type="hidden">
+                                                                                                        <input default="false" class="" id="lan_netbios_advertisement_enabled_select" onclick="lan_netbios_advertisement_enabled_selector(mf.dhcp_server_enabled.value == '1', this.checked);" type="checkbox">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="lan_netbios_learn_from_wan_enabled_select">
+Learn NetBIOS from WAN: </label>
+                                                                                                        <input default="false" id="lan_netbios_learn_from_wan_enabled" name="config.lan_netbios_learn_from_wan_enabled" value="false" type="hidden">
+                                                                                                        <input default="false" disabled="disabled" class="disabled" id="lan_netbios_learn_from_wan_enabled_select" onclick="lan_netbios_learn_from_wan_enabled_selector(mf.lan_netbios_advertisement_enabled.value == 'true', this.checked);" type="checkbox">
+                                                                                                </p>
+                                                                                                <div id="lan_wins_settings_1">
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="lan_netbios_scope">
+NetBIOS Scope: </label>
+                                                                                                                <input autocomplete="off" default="" class="disabled" disabled="disabled" id="lan_netbios_scope" size="20" maxlength="30" value="" name="config.lan_netbios_scope" type="text"> (optional)
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="lan_netbios_registration_type">NetBIOS node type&nbsp;:</label>
+                                                                                                                <input default="4" class="disabled" disabled="disabled" name="config.lan_netbios_registration_type" id="lan_netbios_registration_type" value="4" type="hidden">
+                                                                                                                <input default="false" class="disabled" disabled="disabled" id="lan_netbios_registration_type_radio_0" name="lan_netbios_registration_type_radio" value="1" onclick="lan_netbios_registration_type_selector(this.value);" type="radio">
+                                                                                                                <label for="lan_netbios_registration_type_radio_0">Broadcast only (use when no WINS servers configured)</label>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple">&nbsp;</label>
+                                                                                                                <input default="false" class="disabled" disabled="disabled" id="lan_netbios_registration_type_radio_1" name="lan_netbios_registration_type_radio" value="2" onclick="lan_netbios_registration_type_selector(this.value);" type="radio">
+                                                                                                                <label for="lan_netbios_registration_type_radio_1">Point-to-Point (no broadcast)</label>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple">&nbsp;</label>
+                                                                                                                <input default="true" class="disabled" disabled="disabled" id="lan_netbios_registration_type_radio_2" name="lan_netbios_registration_type_radio" value="4" onclick="lan_netbios_registration_type_selector(this.value);" type="radio">
+                                                                                                                <label for="lan_netbios_registration_type_radio_2">Mixed-mode (Broadcast then Point-to-Point)</label><br>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple">&nbsp;</label>
+                                                                                                                <input default="false" class="disabled" disabled="disabled" id="lan_netbios_registration_type_radio_3" name="lan_netbios_registration_type_radio" value="8" onclick="lan_netbios_registration_type_selector(this.value);" type="radio">
+                                                                                                                <label for="lan_netbios_registration_type_radio_3">Hybrid (Point-to-Point then Broadcast)</label>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="lan_netbios_primary_wins_ip">
+Primary WINS IP Address: </label>
+                                                                                                                <input autocomplete="off" default="0.0.0.0" class="disabled" disabled="disabled" id="lan_netbios_primary_wins_ip" size="20" maxlength="15" value="0.0.0.0" name="config.lan_netbios_primary_wins_ip" type="text">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="lan_netbios_secondary_wins_ip">
+Secondary WINS IP Address: </label>
+                                                                                                                <input autocomplete="off" default="0.0.0.0" class="disabled" disabled="disabled" id="lan_netbios_secondary_wins_ip" size="20" maxlength="15" value="0.0.0.0" name="config.lan_netbios_secondary_wins_ip" type="text">
+                                                                                                        </p>
+                                                                                                </div>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                        </form>
+                                                                        <form saved="true" style="display: block;" id="editform" action="/Basic/Network.html" method="post" onsubmit="return false;">
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                                <span id="form_title">Add</span>
+                                                                                                DHCP Reservation
+                                                                                        </h3>
+                                                                                        <fieldset>
+                                                                                                <p>
+                                                                                                        <input default="editform" name="form_name" value="editform" type="hidden">
+                                                                                                        <input default="" id="used" type="hidden">
+                                                                                                        <input default="" id="enabled" type="hidden">
+                                                                                                        <label class="duple" for="enabled_select">Enable:</label>
+                                                                                                        <input default="true" id="enabled_select" checked="checked" type="checkbox">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="comp_name">Computer Name:</label>
+                                                                                                        <input autocomplete="off" default="" id="comp_name" size="20" maxlength="39" type="text">
+                                                                                                        <span> &lt;&lt; </span>
+                                                                                                        <span id="dhcp_leases_pulldown_parent"><select modified="ignore" onchange="populate_dhcp();" id="dhcp_leases_pulldown"><option value="-1">Computer Name</option></select></span>
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="mac_ip">
+                                                                                                                IP Address:
+                                                                                                        </label>
+                                                                                                        <input autocomplete="off" default="" id="mac_ip" size="20" maxlength="15" type="text">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple" for="mac_addr">MAC Address:</label>
+                                                                                                        <input autocomplete="off" default="" id="mac_addr" size="20" maxlength="17" type="text">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple">&nbsp;</label>
+                                                                                                        <input class="button_submit" value="Copy Your PC's MAC Address" onclick="clone_mac();" type="button">
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple">&nbsp;</label>
+                                                                                                        <input class="button_submit" id="action" value="Save" onclick=";" type="button">
+                                                                                                        <input class="button_submit" value="Clear" onclick="edit_form_cancel()" type="button">
+                                                                                                </p>
+                            <input default="" value="" name="submit_index" id="submit_index" type="hidden">
+                            <input default="1" value="1" name="act" id="act" type="hidden">
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                        </form>
+                                                                        <form style="display: block;" id="rulesform" action="/Basic/Network.html" method="post" onsubmit="return false;">
+                                                                                <div class="box">
+                                                                                        <h3>DHCP Reservations List</h3>
+                                                                                        <fieldset>
+                                                                                                <table class="formlisting" id="dhcp_server_reservations" summary="" border="0" cellpadding="0" cellspacing="1">
+                                                                                                        <tbody><tr class="form_label_row">
+                                                                                                                <th class="formlist_col1" rowspan="1" colspan="1">
+                                                                                                                        Enable
+                                                                                                                </th>
+                                                                                                                <th class="formlist_col2" rowspan="1" colspan="1">
+Computer Name </th>
+                                                                                                                <th class="formlist_col3" rowspan="1" colspan="1">
+MAC Address </th>
+                                                                                                                <th class="formlist_col4" rowspan="1" colspan="1">
+IP Address </th>
+                                                                                                                <th class="formlist_image" rowspan="1" colspan="1"></th>
+                                                                                                                <th class="formlist_image" rowspan="1" colspan="1"></th>
+                                                                                                        </tr>
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                
+                                                                                                                
+                                                                                                        
+                                                                                                </tbody></table>
+                                                                                        </fieldset>
+                                                                                                <input id="free" value="0" type="hidden">
+                                                                                                <input id="index" type="hidden">
+                                                                                </div>
+                                                                        </form>
+                                                                        <div style="display: block;" class="box" id="dhcp_client_list"><h3>Number of Dynamic DHCP Clients:0</h3><fieldset><table summary="" class="formlisting" cellpadding="0" cellspacing="1"><thead><tr><th>Hardware Address</th><th>Assigned IP</th><th>Hostname</th><th>Expires</th><th></th><th></th></tr></thead><tfoot></tfoot><tbody></tbody></table></fieldset></div>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                                                                                <p>If you already have a DHCP server on your network or are using static IP addresses on all the devices on your network, uncheck <strong>Enable DHCP Server </strong> to disable this feature.</p>
+                                                                                <p>If you have devices on your network that should always have fixed IP addresses, add a <strong>DHCP Reservation </strong> for each such device.</p>
+                                                                                <p class="more">
+                                                                                        <!-- Link to more help -->
+                                                                                        <a href="Basic.html#Network" onclick="return jump_if();">More...</a>
+                                                                                </p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td>
+                                                                <img src="img_wireless_bottom.gif" alt="" width="114" height="35">
+                                                        </td>
+                                                        <td>&nbsp;
+
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

@@ -1,0 +1,1045 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Tools / Firmware       
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("main_content").style.display = "block";
+            document.getElementById("reboot_content").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Tools/Firmware.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * Handle for document forms.
+         */
+        var mf, uf;
+
+        var fw_query_xml_loader = new ajax_xmlhttp("/dfw_query.xml?query=default", fw_query_xml_ready, fw_query_xml_timeout, 10000);
+
+        /*
+         * fw_notify_enable_selector()
+         */
+        function fw_notify_enable_selector(value)
+        {
+            mf.fw_notify_enable.value = value;
+            mf.fw_notify_enable_select.checked = value;
+        }
+
+        /*
+         * fw_notify_email_enable_selector()
+         */
+        function fw_notify_email_enable_selector(value)
+        {
+            mf.fw_notify_email_enable.value = value;
+            mf.fw_notify_email_enable_select.checked = value;
+        }
+
+        /*
+         * do_upload()
+         */
+        function do_upload()
+        {
+            if (uf.upfile.value == "") {
+                alert("You must enter the name of a firmware file first.");
+                return;
+            }
+
+            if (!confirm("Note: Some firmware upgrades reset the router's configuration options to the factory defaults.\n Before performing an upgrade, be sure to save the current configuration from the Tools-System screen.\n Do you still want to upgrade?")) {
+                return;
+            }
+
+            if (!confirm("Do you really want to reprogram the device using the firmware file" + ' "' +
+                         uf.upfile.value + '"?')) {
+                return;
+            }
+
+            document.getElementById("msg_upload").style.display = "block";
+            disable_form_field(uf.upgrade_button, true);
+            try {
+                uf.submit();
+            } catch (e) {
+                alert("%[.error:Error]%: " + e.message);
+                document.getElementById("msg_upload").style.display = "none";
+                disable_form_field(uf.upgrade_button, false);
+            }
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                    return;
+                }
+                mf.submit();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") && confirm("Do you want to abandon all changes you made to this page?")) {
+                reset_form("mainform");
+                page_load();
+            }
+        }
+
+// 2007.08.15
+        var FW_INFO = [
+
+        //
+        //{ site: "",
+        //  URL: ""
+        //},
+        //
+        // try set 10
+        { site: "",  URL: ""},{ site: "",  URL: ""},{ site: "",  URL: ""},{ site: "",  URL: ""},{ site: "",  URL: ""},
+        { site: "",  URL: ""},{ site: "",  URL: ""},{ site: "",  URL: ""},{ site: "",  URL: ""},{ site: "",  URL: ""},
+
+        { site: "", // end ...
+          URL: ""
+        }
+        ];
+
+        var FW_INFO_Count = "";
+
+        var fw_major = "";
+        var fw_minor = "";
+        var fw_date  = "";
+
+        var fw_update_avail = "false";
+
+        function enable_check_on_line()
+        {
+            document.getElementById("check_on_line").disabled = false;
+        }
+
+        /*
+         * Reason: Update by D-Link firmware query Spec. v1.05
+         * Modified: Yufa Huang
+         * Date: 2008.04.16
+         */
+        function show_latest_fw_msg()
+        {
+            document.getElementById("show_latest_fw").style.display = "block";
+        }
+
+// 2007.08.20
+// use our devlope sample code to save time
+        function fw_query_xml_ready(xml_doc)
+        {
+            // enable checknow buton
+            document.getElementById("check_on_line").disabled = false;
+
+            // get information
+            var major = xml_doc.get_element_data("major");
+
+            if (major == null) {
+                // IE issue 2007.08.21
+                top.location = "Firmware.html";
+                return;
+            }
+
+            if (major == "0" ) {
+                show_latest_fw_msg();
+                return;
+            }
+
+            var minor = xml_doc.get_element_data("minor");
+            if (minor == null) {
+                show_latest_fw_msg();
+                return;
+            }
+
+            var fw_date = xml_doc.get_element_data("date");
+            if (fw_date == null) {
+                show_latest_fw_msg();
+                return;
+            }
+
+            var site_count = xml_doc.get_element_data("site_count");
+            if (site_count == null) {
+                show_latest_fw_msg();
+                return;
+            }
+
+            var count;
+            var i;
+
+            count = site_count * 1;
+
+            for (i=0;i<count;i++) {
+                // update site information
+                var site_name = xml_doc.get_element_data("site_name"+i);
+                if( site_name == null) {
+                    show_latest_fw_msg();
+                        return;
+                }
+                var site_firmware = xml_doc.get_element_data("site_firmware"+i);
+                if( site_firmware == null) {
+                    show_latest_fw_msg();
+                        return;
+                }
+
+                // 2007.08.21
+                // filter sitename
+                site_name = site_name.replace(/Area/g,"");
+                site_name = site_name.replace(/_/g," ");
+
+                FW_INFO[i].site = site_name;
+                FW_INFO[i].URL = site_firmware;
+            }
+
+            // maybe need check latest
+            var fw_major_version = "1";
+            var fw_minor_version = "21";
+
+            var current_version = fw_major_version * 100 + fw_minor_version * 1 ;
+            var latest_version = major * 100 + minor * 1;
+
+            if (latest_version <= current_version) {
+                // no lastest firmware
+                show_latest_fw_msg();
+                return;
+            }
+
+            // update date, not consider date format
+            document.getElementById("fw_date").innerHTML = fw_date;
+
+            // update date and firmware information
+            //<span id="fw_major"></span>
+            document.getElementById("fw_major").innerHTML = major;
+
+            var fw_minor = minor;
+            if(fw_minor < 10) {
+                    fw_minor = "0" + fw_minor;
+            } else {
+                    fw_minor = fw_minor;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            fw_minor = fw_minor + fw_extend_ver;
+
+
+            
+            //1.<span id="fw_minor_latest"></span>
+            document.getElementById("fw_minor_latest").innerHTML = fw_minor;
+            
+
+            // show it
+            FW_INFO_Count = count;
+            update_CheckNow();
+        }
+
+        function fw_query_xml_timeout()
+        {
+            // enable checknow buton
+            document.getElementById("check_on_line").disabled = false;
+
+            // 2007.08.21
+            // refresh http maybe good!!
+            top.location = "Firmware.html";
+        }
+
+        function xml_load()
+        {
+            fw_query_xml_loader.retrieve_xml();
+        }
+
+        function Check_OnLine()
+        {
+            // 2007.08.20
+            // disable checknow buton
+            document.getElementById("check_on_line").disabled = true;
+            // not display last firmware
+            document.getElementById("check_lastest_firmware").style.display = "none";
+            document.getElementById("show_latest_fw").style.display = "none";
+            xml_load();
+            return;
+
+            // below is static version
+            // 2007.08.15
+            /*
+            if( fw_update_avail == "false") {
+                //document.getElementById("check_on_line").disabled = true;
+                // refresh this page will get new information
+                document.getElementById("check_on_line").disabled = true;
+                setTimeout(enable_check_on_line, 3000);
+                top.location = "Firmware.html";
+
+                return;
+            }
+            */
+
+            document.getElementById("check_on_line").disabled = true;
+
+            // 2007.08.16
+            document.forms["checkform"].checkform_submitted.value = "1";
+            document.forms["checkform"].submit();
+            return;
+        }
+
+        function update_CheckNow()
+        {
+            // update
+            var count;
+            var i;
+
+            count = FW_INFO_Count;
+            count = count * 1;
+
+
+            document.getElementById("download_site_select").options.length = 0;
+            for (i=0;i<count;i++) {
+                document.getElementById("download_site_select").options.add( new Option(FW_INFO[i].site,i) );
+            }
+
+            // display last firmware
+            document.getElementById("check_lastest_firmware").style.display = "block";
+            document.getElementById("show_latest_fw").style.display = "none";
+        }
+
+        function doDownload()
+        {
+            window.open(FW_INFO[document.getElementById("download_site_select").value].URL);
+
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+            uf = document.forms.uploadform;
+
+             if (local_debug) {
+                 hide_all_ssi_tr();
+                 fw_notify_enable_selector(true);
+                 fw_notify_email_enable_selector(true);
+                 return;
+             }
+
+             
+
+             fw_notify_enable_selector(mf.fw_notify_enable.value == "true");
+             fw_notify_email_enable_selector(mf.fw_notify_email_enable.value == "true");
+
+             // 2007/06/25
+             //
+             document.getElementById("fw_minor_latest").innerHTML = global_fw_minor_version;
+             
+
+            if (!is_admin) {
+                disable_form_field(document.getElementById("button_save"), true);
+                disable_form_field(document.getElementById("button_cancel"), true);
+                do_block_enable(mf, false);
+                do_block_enable(uf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            save_form_default_values("mainform");
+
+            /*
+             * Check for validation errors.
+             */
+            var verify_failed = "";
+            if (verify_failed != "") {
+                    alert(verify_failed);
+                    verify_failed = "";
+            }
+
+            // 2007.08.16
+            // 
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.32NA
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Firmware</h2>
+                                                                                        <p>
+There may be new firmware for your DIR-655 to improve functionality and
+performance. </p>
+                                                                                        
+                                                                                                <p>
+To upgrade the firmware, locate the upgrade file on the local hard
+drive with the Browse button. Once you have found the file to be used,
+click the Upload button below to start the firmware upgrade. </p>
+                                                                                        
+                                                                                        <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to some of these functionalities.</p>
+                                                                                        <input id="button_save" class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                                                        <input id="button_cancel" class="button_submit" value="Don't Save Settings" onclick="page_cancel();" type="button">
+                                                                                </div><!-- section_head -->
+                                                                                <div class="box">
+                                                                                        <h3>Firmware Information</h3>
+                                                                                        <fieldset>
+                                                                                                <p>
+                                                                                                        <label class="duple">Current Firmware Version&nbsp;:</label>
+                                                                                                        <strong class="output">1.32NA</strong>
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        <label class="duple">Current Firmware Date&nbsp;:</label>
+                                                                                                        <strong class="output">2009/08/27</strong>
+                                                                                                </p>
+                                                                                                <p>
+                                                                                                        </p><center>
+                                                                                                        <strong>
+Check Online Now for Latest Firmware Version&nbsp;: </strong>
+                                                                                                        <input class="button_submit" id="check_on_line" value="Check Now" onclick=";" type="button">
+                                                                                                        </center>
+                                                                                                
+                                                                                                <p>
+                                                                                                        <strong>
+                                                                                                            <span id="show_latest_fw" style="display: none;">
+&nbsp; &nbsp; &nbsp; &nbsp; This firmware is the latest version. </span>
+                                                                                                        </strong>
+                                                                                                </p>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div id="check_lastest_firmware" class="box" style="display: none;">
+                                                                                        <h3>Check Latest Firmware Version</h3>
+                                                                                        <fieldset>
+                                                                                                
+                                                                                                        <p>
+                                                                                                                <label class="duple">Latest Firmware Version&nbsp;:</label>
+                                                                                                                <strong class="output">
+                                                                                                                
+                                                                                                                        <span id="fw_major"></span>.<span id="fw_minor_latest">21</span>
+                                                                                                                
+                                                                                                                </strong>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple">Latest Firmware Date&nbsp;:</label>
+                                                                                                                <strong class="output"><span id="fw_date"></span></strong>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple">Available Download Site&nbsp;:</label>
+                                                                                                                <select id="download_site_select">
+                                                                                                                </select>
+                                                                                                        </p>
+                                                                                                        <p class="centered">
+                                                                                                                <input class="button_submit" id="download_button" value="Download" onclick="doDownload()" type="button">
+                                                                                                        </p>
+                                                                                                
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>Firmware Upgrade</h3>
+                                                                                        <p class="box_alert">
+                                                                                                <strong>Note:</strong>
+Some firmware upgrades reset the configuration options to the factory
+defaults. Before performing an upgrade, be sure to save the current
+configuration from the <a href="System.html" onclick="return jump_if();">Tools → System</a> screen.
+                                                                                                
+                                                                                        </p>
+                                                                                        <p class="box_msg">
+To upgrade the firmware, your PC must have a wired connection to the
+router. Enter the name of the firmware upgrade file, and click on the
+Upload button. </p>
+                                                                                        <form id="uploadform" method="post" enctype="multipart/form-data" action="/upload.cgi">
+                                                                                                <fieldset>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="upfile">Upload :</label>
+                                                                                                                <img src="browse.jpg"></img>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple">&nbsp;</label>
+                                                                                                                <input class="button_submit" id="upgrade_button" value="Upload" onclick=";" type="button">
+                                                                                                        </p>
+                                                                                                        <p class="msg_inprogress" id="msg_upload" style="display: none;">
+                                                                                                                <label class="duple">&nbsp;</label>
+Note: Now uploading. The upload may take up to 1 minute. </p>
+                                                                                                </fieldset>
+                                                                                        </form>
+                                                                                </div>
+                                                                                
+                                                                                        <div class="box" style="display: none;">
+                                                                                                <h3>Firmware Upgrade Notification Options</h3>
+                                                                                                        <fieldset>
+                                                                                                                <p>
+                                                                                                                        <label class="duple" for="fw_notify_email_enable_select">
+Email Notification of Newer Firmware Version : </label>
+                                                                                                                        <strong>
+                                                                                                                                <a href="http://wrpd.dlink.com.tw/register.asp" target="_blank">Email me if a newer Firmware is available</a>
+                                                                                                                        </strong>
+                                                                                                                </p>
+                                                                                                        </fieldset>
+                                                                                        </div>
+                                                                                
+                                                                                
+
+                                                                                <!-- 2007.08.16 -->
+                                                                                        <div class="box" style="display: none;">
+                                                                                                <form id="checkform" action="/Tools/Firmware.html" method="post">
+                                                                                                                <input name="checkform_submitted" value="0" type="hidden">
+                                                                                                </form>
+                                                                                        </div>
+
+                                                                                        <div class="box">
+                                                                                                <h3>Firmware Upgrade Notification Options</h3>
+                                                                                                <form saved="true" id="mainform" action="/Tools/Firmware.html" method="post">
+
+                                                                                                        <!-- 2007.08.15 -->
+                                                                                                                <input default="0" name="form_submitted" value="0" type="hidden">
+
+                                                                                                        <fieldset>
+                                                                                                                <p>
+                                                                                                                        <label class="duple" for="fw_notify_enable_select">Automatically Check Online for Latest Firmware Version :</label>
+                                                                                                                        <input default="true" id="fw_notify_enable" name="config.fw_notify_enable" value="true" type="hidden">
+                                                                                                                        <input default="true" id="fw_notify_enable_select" onclick="fw_notify_enable_selector(this.checked);" type="checkbox">
+                                                                                                                </p>
+                                                                                                                <p>
+                                                                                                                        <label class="duple" for="fw_notify_email_enable_select">Email Notification of Newer Firmware Version :</label>
+                                                                                                                        <input default="false" id="fw_notify_email_enable" name="config.fw_notify_email_enable" value="false" type="hidden">
+                                                                                                                        <input default="false" id="fw_notify_email_enable_select" onclick="fw_notify_email_enable_selector(this.checked);" type="checkbox">
+                                                                                                                </p>
+                                                                                                        </fieldset>
+                                                                                                </form>
+                                                                                        </div>
+                                                                                
+                                                                        </div>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                        <p>Firmware
+updates are released periodically to improve the functionality of your
+router and to add features. If you run into a problem with a specific
+feature of the router, check if updated firmware is available for your
+router.</p>
+                                                                                <p class="more">
+                                                                                        <!-- Link to more help -->
+                                                                                        <a href="Tools.html#Firmware" onclick="return jump_if();">More...</a>                                                                           </p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td>
+                                                                <img src="img_wireless_bottom.gif" alt="" width="114" height="35">
+                                                        </td>
+                                                        <td>&nbsp;
+
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

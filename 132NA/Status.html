@@ -1,0 +1,912 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Setup / Internet 
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        #sidehelp_container {
+                display: none;
+        }
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Help/Status.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+
+        <script type="text/javascript">
+        //<![CDATA[
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            if (local_debug) {
+                hide_all_ssi_tr();
+            }
+
+            radio_count = parseInt(document.getElementById("radio_count").value, 10);
+
+            if (radio_count < 2) {
+                return;
+            }
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.32NA
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <!-- 2007.05.25
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                -->
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Status Help</h2>
+                                                                                        <ul>
+                                                                                                <li>
+                                                                                                        <a href="Status.html#Device_Info">Device Info</a>
+                                                                                                </li>
+                                                                                                                                
+                                                                                                <li>
+                                                                                                        <a href="Status.html#Wireless">Wireless</a>
+                                                                                                </li>
+<li>
+                                                                                                        <a href="Status.html#Logs">Logs</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                        <a href="Status.html#Statistics">Statistics</a>
+                                                                                                </li>
+                                                                                                
+                                                                                                <li>
+                                                                                                        <a href="Status.html#Internet_Sessions">Internet Sessions</a>
+                                                                                                </li>
+                                                                                                
+                                                                                                
+                                                                                                <li>
+                                                                                                        <a href="Status.html#WISH_Sessions">WISH Sessions</a>
+                                                                                                </li>
+                                                                                                
+                                                                                        </ul>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                                <a name="Device_Info">Device Info</a>
+                                                                                        </h3>
+                                                                                        <p>All
+of your Internet and network connection details are displayed on the
+Device Info page. The firmware version is also displayed here. </p>
+                                                                                                                
+                                                                                        <p class="box_alert">
+Note: Some browsers have limitations that make it impossible to update
+the WAN status display when the status changes. Some browsers require
+that you refresh the display to obtain updated status. Some browsers
+report an error condition when trying to obtain WAN status. </p>
+                                                                                        <p>
+Depending on the type of WAN connection, you can take one of the
+following sets of actions: </p>
+                                                                                        <dl>
+                                                                                                <dt>DHCP Connection</dt>
+                                                                                                <dd>
+                                                Clicking the <span class="button_ref">DHCP Release</span> button unassigns the router's IP address. The router will not respond to IP messages from the WAN side until you click the <span class="button_ref">DHCP Renew</span> button or power-up the router again.
+                                                Clicking the <span class="button_ref">DHCP Renew</span> button causes the router to request a new IP address from the ISP's server. 
+                                                </dd>
+                                                                                                <dt>PPPoE, PPTP, L2TP Connection</dt>
+                                                                                                <dd>
+Depending on whether the WAN connection is currently established, you
+can click either the <span class="button_ref">Connect</span> to attempt to establish the WAN connection or the <span class="button_ref">Disconnect</span> to break the WAN connection.
+                                                </dd>
+                                                
+                                                                                                <dt>Static IP</dt>
+                                                                                                <dd>
+                                                Static IP mode is always on, so no action buttons are available.
+                                                </dd>
+                                                                                        </dl>
+                                                                                                                
+
+                                                                                        <dl>
+                                                                                        
+                                                                                                <dt>Wireless LAN
+                                                                                                </dt>
+                                                                                                <dd>
+This area of the screen reflects configuration settings from the <a href="Wireless.html">Setup → Wireless Settings</a> page, the <a href="WISH.html">Advanced → WISH</a> page and the <a href="Protected_Setup.html">Advanced → Wi-Fi Protected Setup</a> page. The <span class="option">MAC Address</span> is the factory-assigned identifier of the wireless card.
+                                                                                                        
+                                                                                                
+                                                                                                </dd>
+                                                                                        
+                                                                                                <dt>LAN Computers</dt>
+                                                                                                <dd>
+This area of the screen continually updates to show all DHCP enabled
+computers and devices connected to the LAN side of your router. The
+detection "range" is limited to the address range as configured in DHCP
+Server. Computers that have an address outside of this range will not
+show. If the DHCP Client (i.e. a computer configured to "Automatically
+obtain an address") supplies a Host Name then that will also be shown.
+Any computer or device that has a static IP address that lies within
+the detection "range" may show, however its host name will not. </dd>
+                                                                                                                
+                                                                                                <dt>IGMP Multicast memberships</dt>
+                                                                                                <dd>If IGMP is enabled, this area of the screen shows all multicast groups of which any LAN devices are members.</dd>
+                                                                                                                
+                                                                                        </dl>
+                                                                                </div>
+                                                                                
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                                <a name="Wireless">Wireless</a>
+                                                                                        </h3>
+                                                                                        <p>The wireless section allows you to view the wireless clients that are connected to your wireless router.</p>
+                                                                                        <dl>
+                                                                                                <dt>MAC Address</dt>
+                                                                                                <dd>
+                                                The Ethernet ID (MAC address) of the wireless client.
+                                                </dd>
+                                                                                                <dt>IP Address</dt>
+                                                                                                <dd>
+                                                The LAN-side IP address of the client.
+                                                </dd>
+                                                                                                <dt>Mode</dt>
+                                                                                                <dd>
+The transmission standard being used by the client. Values are 11a,
+11b, 11g, or 11n for 802.11a, 802.11b, 802.11g, or 802.11n
+respectively. </dd>
+                                                                                                <dt>Rate</dt>
+                                                                                                <dd>
+                                                The actual transmission rate of the client in megabits per second.
+                                                </dd>
+                                                                                                <dt>Signal</dt>
+                                                                                                <dd>
+This is a relative measure of signal quality. The value is expressed as
+a percentage of theoretical best quality. Signal quality can be reduced
+by distance, by interference from other radio-frequency sources (such
+as cordless telephones or neighboring wireless networks), and by
+obstacles between the router and the wireless device. </dd>
+                                                                                        </dl>
+                                                                                </div>
+                                                                                
+                                                                                
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                                <a name="WISH_Sessions">WISH Sessions</a>
+                                                                                        </h3>
+                                                                                        <p>The
+WISH Sessions page displays full details of active local wireless
+sessions through your router when WISH has been enabled. A WISH session
+is a conversation between a program or application on a wirelessly
+connected LAN-side computer and another computer, however connected. </p>
+                                                                                        <dl>
+                                                                                                <dt>Originator</dt>
+                                                                                                <dd>
+The IP address and, where appropriate, port number of the computer that
+originated a network connection. </dd>
+                                                                                                <dt>Target</dt>
+                                                                                                <dd>
+The IP address and, where appropriate, port number of the computer to
+which a network connection has been made. </dd>
+                                                                                                <dt>Protocol</dt>
+                                                                                                <dd>
+The communications protocol used for the conversation. </dd>
+                                                                                                <dt>State</dt>
+                                                                                                <dd>
+State for sessions that use the TCP protocol. <ul>
+                                                                                                                <li>NO: None -- This entry is used as a placeholder for a future connection that may occur.</li>
+                                                                                                                <li>SS: SYN Sent -- One of the systems is attempting to start a connection.</li>
+                                                                                                                <li>EST: Established -- the connection is passing data.</li>
+                                                                                                                <li>FW: FIN Wait -- The client system has requested that the connection be stopped.</li>
+                                                                                                                <li>CW: Close Wait -- the server system has requested that the connection be stopped.</li>
+                                                                                                                <li>TW: Time Wait -- Waiting for a short time while a connection that was in FIN Wait is fully closed.</li>
+                                                                                                                <li>LA: Last ACK -- Waiting for a short time while a connection that was in Close Wait is fully closed.</li>
+                                                                                                                <li>CL:
+Closed -- The connection is no longer active but the session is being
+tracked in case there are any retransmitted packets still pending.</li>
+                                                                                                        </ul>
+                                                                                                </dd>
+                                                                                                <dt>Priority</dt>
+                                                                                                <dd>
+The priority given to packets sent wirelessly over this conversation by
+the WISH logic. The priorities are: <ul>
+                                                                                                                <li>BK: Background (least urgent).</li>
+                                                                                                                <li>BE: Best Effort.</li>
+                                                                                                                <li>VI: Video.</li>
+                                                                                                                <li>VO: Voice (most urgent).</li>
+                                                                                                        </ul>
+                                                                                                </dd>
+                                                                                                <dt>Time Out</dt>
+                                                                                                <dd>
+The number of seconds of idle time until the router considers the
+session terminated. The initial value of Time Out depends on the type
+and state of the connection. <dl>
+                                                                                                                <dt>300 seconds</dt>
+                                                                                                                <dd>UDP connections.</dd>
+                                                                                                                <dt>240 seconds</dt>
+                                                                                                                <dd>Reset
+or closed TCP connections. The connection does not close instantly so
+that lingering packets can pass or the connection can be re-established.</dd>
+                                                                                                                <dt>7800 seconds</dt>
+                                                                                                                <dd>Established or closing TCP connections.</dd>
+                                                                                                        </dl>
+                                                                                                </dd>
+                                                                                        </dl>
+                                                                                </div><!-- box -->
+                                                                                
+                                                
+                                                                                                                
+                                                                                                                
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                                <a name="Logs">Logs</a>
+                                                                                        </h3>
+                                                                                        <p>
+The router automatically logs (records) events of possible interest in
+its internal memory. If there is not enough internal memory for all
+events, logs of older events are deleted, but logs of the latest events
+are retained. The Logs option allows you to view the router logs. You
+can define what types of events you want to view and the level of
+events to view. This router also has internal Syslog Server support so
+you can send the log files to a computer on your network that is
+running a Syslog utility. </p>
+                                                
+                                                                                        <dl>
+                                                                                                <dt>What to View</dt>
+                                                                                                <dd>Select the kinds of events that you want to view.
+                                                <ul>
+                                                
+                                                                                                                <li>Firewall and Security</li>
+                                                
+                                                                                                                <li>System</li>
+                                                
+                                                                                                                <li>Router Status</li>
+                                                
+                                                                                                        </ul>
+                                                                                                </dd>
+                                                                                                <dt>View Levels</dt>
+                                                                                                <dd>Select the level of events that you want to view.
+                                                <ul>
+                                                                                                                <li>Critical</li>
+                                                                                                                <li>Warning</li>
+                                                                                                                <li>Informational</li>
+                                                                                                        </ul>
+                                                                                                </dd>
+                                                                                                <dt>Apply Log Settings Now</dt>
+                                                                                                <dd>Click this button after changing Log Options to make them effective and permanent.</dd>
+                                                                                                <dt>Refresh</dt>
+                                                                                                <dd>Clicking this button refreshes the display of log entries. There may be new events since the last time you accessed the log.</dd>
+                                                                                                <dt>Clear</dt>
+                                                                                                <dd>Clicking this button erases all log entries. </dd>
+                                                        
+                                                                                                <dt>Email Now</dt>
+                                                                                                <dd>If you provided email information with the <a href="EMail.html">Tools → Email</a> screen,
+                                                clicking the <span class="button_ref">Email Now</span> button sends the router log to the configured email address. 
+                                                                                                </dd>
+                                                
+                                                                                                <dt>Save Log</dt>
+                                                                                                <dd>Select this option to save the router log to a file on your computer.</dd>
+                                                                                        </dl>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                                <a name="Statistics">Statistics</a>
+                                                                                        </h3>
+                                                
+                                                                                        <p>The Statistics page displays all of the LAN, WAN, and Wireless packet transmit and receive statistics.</p>
+                                                
+                                                
+                                                
+                                                                                        <dl>
+                                                                                                <dt>Sent</dt>
+                                                                                                <dd>
+                                                The number of packets sent from the router.
+                                                </dd>
+                                                                                                <dt>Received</dt>
+                                                                                                <dd>
+                                                The number of packets received by the router.
+                                                </dd>
+                                                                                                <dt>TX Packets Dropped</dt>
+                                                                                                <dd>
+The number of packets that were dropped while being sent, due to
+errors, collisions, or router resource limitations. </dd>
+                                                                                                <dt>RX Packets Dropped</dt>
+                                                                                                <dd>
+The number of packets that were dropped while being received, due to
+errors, collisions, or router resource limitations. </dd>
+                                                                                                <dt>Collisions</dt>
+                                                                                                <dd>
+The number of packets that were dropped due to Ethernet collisions (two
+or more devices attempting to use an Ethernet circuit at the same
+time). </dd>
+                                                                                                <dt>Errors</dt>
+                                                                                                <dd>
+The number of transmission failures that cause loss of a packet. A
+noisy radio-frequency environment can cause a high error rate on the
+wireless LAN. </dd>
+                                                                                        </dl>
+                                                                                </div>
+                                                                                                                
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                                <a name="Internet_Sessions">Internet Sessions</a>
+                                                                                        </h3>
+                                                                                        <p>The
+Internet Sessions page displays full details of active Internet
+sessions through your router. An Internet session is a conversation
+between a program or application on a LAN-side computer and a program
+or application on a WAN-side computer. </p>
+                                                                                        <dl>
+                                                                                                <dt>Local</dt>
+                                                                                                <dd>
+The IP address and, where appropriate, port number of the local
+application. </dd>
+                                                                                                <dt>NAT</dt>
+                                                                                                <dd>
+The port number of the LAN-side application as viewed by the WAN-side
+application. </dd>
+                                                                                                <dt>Internet</dt>
+                                                                                                <dd>
+The IP address and, where appropriate, port number of the application
+on the Internet. </dd>
+                                                                                                <dt>Protocol</dt>
+                                                                                                <dd>
+The communications protocol used for the conversation. </dd>
+                                                                                                <dt>State</dt>
+                                                                                                <dd>
+State for sessions that use the TCP protocol. <ul>
+                                                                                                                <li>NO: None -- This entry is used as a placeholder for a future connection that may occur.</li>
+                                                                                                                <li>SS: SYN Sent -- One of the systems is attempting to start a connection.</li>
+                                                                                                                <li>EST: Established -- the connection is passing data.</li>
+                                                                                                                <li>FW: FIN Wait -- The client system has requested that the connection be stopped.</li>
+                                                                                                                <li>CW: Close Wait -- the server system has requested that the connection be stopped.</li>
+                                                                                                                <li>TW: Time Wait -- Waiting for a short time while a connection that was in FIN Wait is fully closed.</li>
+                                                                                                                <li>LA: Last ACK -- Waiting for a short time while a connection that was in Close Wait is fully closed.</li>
+                                                                                                                <li>CL:
+Closed -- The connection is no longer active but the session is being
+tracked in case there are any retransmitted packets still pending.</li>
+                                                                                                        </ul>
+                                                                                                </dd>
+                                                                                                <dt>Dir</dt>
+                                                                                                <dd>
+The direction of initiation of the conversation: <dl>
+                                                                                                                <dt>Out</dt>
+                                                                                                                <dd>Initiated from LAN to WAN.</dd>
+                                                                                                                <dt>In</dt>
+                                                                                                                <dd>Initiated from WAN to LAN.</dd>
+                                                                                                        </dl>
+                                                                                                </dd>
+                                                                                                <dt>Priority</dt>
+                                                                                                <dd>
+The preference given to outbound packets of this conversation by the
+QoS Engine logic. Smaller numbers represent higher priority. </dd>
+                                                                                                <dt>Time Out</dt>
+                                                                                                <dd>
+The number of seconds of idle time until the router considers the
+session terminated. The initial value of Time Out depends on the type
+and state of the connection. <dl>
+                                                                                                                <dt>300 seconds</dt>
+                                                                                                                <dd>UDP connections.</dd>
+                                                                                                                <dt>240 seconds</dt>
+                                                                                                                <dd>Reset
+or closed TCP connections. The connection does not close instantly so
+that lingering packets can pass or the connection can be re-established.</dd>
+                                                                                                                <dt>7800 seconds</dt>
+                                                                                                                <dd>Established or closing TCP connections.</dd>
+                                                                                                        </dl>
+                                                                                                </dd>
+                                                                                        </dl>
+                                                                                </div>
+                                                
+                                                                        </div>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                                                        <td>&nbsp;</td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2007 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

@@ -1,0 +1,2840 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Setup / WAN
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Basic/USB.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+                //document.getElementById("fw_minor_head").innerHTML = global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+        //
+		/*
+		 * General array editor (AE) functions
+		 */
+
+		/*extern add_class, remove_class */
+
+		/*
+		 * The currently selected AE row, or null
+		 */
+		var ae_selected_row = null;
+
+		/*
+		 * Call this function when you are finished
+		 *  with a specific row of the array.
+		 */
+		function deselect_ae_row()
+		{
+			if (ae_selected_row !== null) {
+				remove_class(ae_selected_row, 'ae_selected_row');
+				ae_selected_row = null;
+			}
+		}
+
+		/*
+		 * Call this function anytime you want to talk to the user
+		 *  about a specific row of the array (i.e. edit or delete it).
+		 */
+		function select_ae_row(child_element)
+		{
+			deselect_ae_row();
+
+			/*
+			 * Find the table row that contains the given element.
+			 * Allowing caller to specify a row by passing
+			 *  a child element of the row is simply a convenience,
+			 *  so you don't have to add an ID to the TR element.
+			 * Follow the parent chain up the tree, but stop if you leave the table.
+			 * The child_element parameter can be either an element id or element object.
+			 */
+
+			var el = child_element;
+			if (typeof(el) === 'string') {
+				el = document.getElementById(el);
+				if (el === null) {
+					//alert('select_ae_row: Element "' + child_element + '" does not exist.');
+					return;
+				}
+			}
+			if (typeof(el) !== 'object') {
+				//alert('select_ae_row: Invalid parameter: ' + child_element);
+				return;
+			}
+			if (el === null) {
+				//alert('select_ae_row: Invalid null parameter');
+				return;
+			}
+			if ('' === el.getAttribute('tagName'))  {
+				//alert('select_ae_row: Parameter has no attribute "tagName": ' + child_element);
+				return;
+			}
+
+			while (el.tagName !== 'TR') {
+				if (el.tagName === 'TABLE') {
+					return;
+				}
+				el = el.parentNode;
+			}
+			/*
+			 * Highlight the row with CSS properties
+			 *  so the user is sure which row will be operated on.
+			 */
+			add_class(el, 'ae_selected_row');
+			/*
+			 * Remember which row it is, so we don't have to look it up later.
+			 */
+			ae_selected_row = el;
+		}
+
+
+        //
+/*
+ * This script is to be SSI included in an HTML page.
+ *	It defines ingress filter options to be added to a select list, provides a function
+ *	to populate <select>'s and a function that return a filter's details.
+ */
+
+var ingress_filter_options = [
+	{ value: "Allow All", text: "Allow All", action: "" },
+	{ value: "Deny All", text: "Deny All", action: "" },
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+];
+
+/*
+ * ingress_filter_populate_select()
+ *	Add options from the ingress_filter_options array to a specified <select>.
+ */
+function ingress_filter_populate_select(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = ingress_filter_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!ingress_filter_options[k - 1]) {
+		k--;
+	}
+
+	for (var i = 0; i < k; i++) {
+		select_id.options.add(new Option(ingress_filter_options[i].text, ingress_filter_options[i].value));
+	}
+}
+
+/*
+ * ingress_filter_details()
+ *	Return a string describing the currently selected ingress filter in a specified <select>.
+ */
+function ingress_filter_details(select_id)
+{
+	var str = "";
+	var idx = select_id.selectedIndex;
+
+	/* If the input is disabled, set index to zero. */
+	if (idx == -1) {
+		idx = 0;
+	}
+
+	if (idx == 0 || idx == 1) {
+		return select_id.options[idx].text;
+	}
+
+	/* 0=Allow, 1=Deny */
+	if (ingress_filter_options[idx].action === "0") {
+		str = "Allow ";
+	} else {
+		str = "Deny ";
+	}
+
+	for (var i = 0; i < ingress_filter_options[idx].ipranges.length; i++) {
+		/* Overrun may occurs in an array if there is a comma but no ending elements. */
+		if (!ingress_filter_options[idx].ipranges[i]) {
+			break;
+		}
+		ipstart = ingress_filter_options[idx].ipranges[i].ipstart;
+		ipend = ingress_filter_options[idx].ipranges[i].ipend;
+		if (i > 0) {
+			str += ", ";
+		}
+		if (ipstart == "0.0.0.0" && ipend == "255.255.255.255") {
+			str += "All";
+		} else if (ipstart == ipend) {
+			str += ipstart;
+		} else {
+			str += ingress_filter_options[idx].ipranges[i].ipstart + "-" + ingress_filter_options[idx].ipranges[i].ipend;
+		}
+	}
+
+	return str;
+}
+
+
+
+        var verify_failed = "";
+
+        /*
+         * Handle for document forms.
+         */
+        var mf, ef, rf;
+
+        /*
+         * WAN Modes
+         */
+        var STATIC = 0;
+        var DHCP = 1;
+        var PPPOE = 2;
+        var PPTP = 3;
+        var L2TP = 4;
+        var MPPPOE = 5;
+        var RussiaPPTP = 7;
+        var RussiaPPPoE = 8;
+
+	// 
+        var WWAN_MODE = 10;
+        //
+
+
+        var pcmac = "00:05:5d:ce:b3:8d";
+        var remote_login = false;
+
+
+        /*
+         * Default MTU values for each of the different WAN modes.
+         */
+        var mtu_default_values = [];
+        mtu_default_values[STATIC] = local_debug ? "1500" : 1500;
+        mtu_default_values[DHCP] = local_debug ? "1500" : 1500;
+        mtu_default_values[PPPOE] = local_debug ? "1492" : 1492;
+        mtu_default_values[PPTP] = local_debug ? "1400" : 1400;
+        mtu_default_values[L2TP] = local_debug ? "1400" : 1400;
+        mtu_default_values[RussiaPPTP] = mtu_default_values[PPTP];
+        mtu_default_values[RussiaPPPoE] = mtu_default_values[PPPOE];
+
+	// 
+        mtu_default_values[WWAN_MODE] = 1400;
+        //
+
+
+        var IDLE_TIME_DEFAULT_VALUE = "5";
+
+        /*
+         * Default Routing protocol list
+         */
+        var p_table_size = parseInt("", 10);
+
+
+        /*
+         * clone_mac()
+         */
+        function clone_mac()
+        {
+            mf.mac_cloning_address.value = pcmac;
+            mf.mac_cloning_enabled.value = "true";
+        }
+
+        /*
+         * Show/Hide WAN settings according to WAN mode
+         */
+        function show_wan_settings(mode)
+        {
+            document.getElementById("box_wan_static_body").style.display = mode == STATIC ? "block" : "none";
+            document.getElementById("box_wan_dhcp_body").style.display = mode == DHCP ? "block" : "none";
+            document.getElementById("box_wan_pppoe_body").style.display = mode == PPPOE? "block" : "none";
+            document.getElementById("box_wan_pptp_body").style.display = mode == PPTP? "block" : "none";
+            document.getElementById("box_wan_l2tp_body").style.display = mode == L2TP? "block" : "none";
+            document.getElementById("box_wan_static").style.display = mode == STATIC ? "block" : "none";
+            document.getElementById("box_wan_dhcp").style.display = mode == DHCP ? "block" : "none";
+            document.getElementById("box_wan_pppoe").style.display = mode == PPPOE? "block" : "none";
+            document.getElementById("box_wan_pptp").style.display = mode == PPTP? "block" : "none";
+            document.getElementById("box_wan_l2tp").style.display = mode == L2TP? "block" : "none";
+            document.getElementById("wan_mtu_default").innerHTML = mtu_default_values[mode];
+            //
+            
+	// 
+            document.getElementById("box_wan_wwan_body").style.display = mode == WWAN_MODE ? "block" : "none";
+            document.getElementById("box_wan_wwan").style.display = mode == WWAN_MODE ? "block" : "none";
+	
+            document.getElementById("box_wan_mac_info_body").style.display = mode == WWAN_MODE ? "none" : "block";
+            document.getElementById("box_wan_general_body_dns").style.display = mode == WWAN_MODE ? "none" : "block";
+            document.getElementById("box_wan_general_body").style.display = mode == WWAN_MODE ? "none" : "block";
+	
+        //
+            
+            
+        }
+
+        /*
+		 * Show/Hide WAN settings according to WAN mode
+         */
+		function show_wan_settings_dsl(mode)
+        {
+			document.getElementById("box_wan_static_body").style.display = "none";
+			document.getElementById("box_wan_dhcp_body").style.display = "none";
+			document.getElementById("box_wan_pppoe_body").style.display = "block";
+			document.getElementById("box_wan_pptp_body").style.display = "none";
+			document.getElementById("box_wan_l2tp_body").style.display = "none";
+			document.getElementById("wan_mtu_default").innerHTML = mtu_default_values[mode];
+			document.getElementById("box_main_field").style.display = "block";
+			//
+		}
+
+            /*
+		 * get_wan_ip_mode()
+             */
+		function get_wan_ip_mode()
+		{
+			mode = document.getElementById("wan_ip_mode_select").value;
+			return +mode;
+		}
+
+            /*
+		 * wan_ip_mode_selector()
+		 *	Hide or show WAN settings according to selected WAN mode.
+		 */
+		function wan_ip_mode_selector(mode)
+		{
+			
+//            if (mode != mf.wan_ip_mode.value) {
+//			usb_device
+
+// network usb
+        }
+
+        /*
+         * wan_dhcp_use_unicasting_selector()
+         */
+        function wan_dhcp_use_unicasting_selector(mode)
+        {
+            mf.wan_dhcp_use_unicasting.value = mode;
+            mf.wan_dhcp_use_unicasting_select.checked = mode;
+        }
+
+
+        function network_usb_enable_selector(mode)
+        {
+            mf.network_usb_enable.value = mode;
+            mf.network_usb_enable_select.checked = mode;
+        }
+
+
+        /*
+		 * dslpppoe_encapsulation_selector()
+		 */
+		function dslpppoe_encapsulation_selector(mode)
+		{
+			mf.dslpppoe_encapsulation.value = mode;
+			if (mode == "0") {
+				mf.dslpppoe_encapsulation_radio_0.checked = true;
+			} else {
+				mf.dslpppoe_encapsulation_radio_1.checked = true;
+			}
+		}
+
+		/*
+         * pppoe_use_dynamic_address_selector()
+         */
+        function pppoe_use_dynamic_address_selector(mode)
+        {
+            mf.pppoe_use_dynamic_address.value = mode;
+            if(mode == "true") {
+                mf.pppoe_use_dynamic_address_radio_1.checked = true;
+                disable_form_field(mf.pppoe_ip_address, true);
+            } else {
+                mf.pppoe_use_dynamic_address_radio_0.checked = true;
+                disable_form_field(mf.pppoe_ip_address, false);
+            }
+        }
+
+        /*
+         * wan_pptp_use_dynamic_carrier_selector()
+         */
+        function wan_pptp_use_dynamic_carrier_selector(mode)
+        {
+            mf.wan_pptp_use_dynamic_carrier.value = mode;
+            if(mode == "true") {
+                mf.wan_pptp_use_dynamic_carrier_radio_1.checked = true;
+                disable_form_field(mf.wan_pptp_ip_address, true);
+                disable_form_field(mf.wan_pptp_subnet_mask, true);
+                disable_form_field(mf.wan_pptp_gateway, true);
+            } else {
+                mf.wan_pptp_use_dynamic_carrier_radio_0.checked = true;
+                disable_form_field(mf.wan_pptp_ip_address, false);
+                disable_form_field(mf.wan_pptp_subnet_mask, false);
+                disable_form_field(mf.wan_pptp_gateway, false);
+            }
+        }
+
+        /*
+         * wan_l2tp_use_dynamic_carrier_selector()
+         */
+        function wan_l2tp_use_dynamic_carrier_selector(mode)
+        {
+            mf.wan_l2tp_use_dynamic_carrier.value = mode;
+            if(mode == "true") {
+                mf.wan_l2tp_use_dynamic_carrier_radio_1.checked = true;
+                disable_form_field(mf.wan_l2tp_ip_address, true);
+                disable_form_field(mf.wan_l2tp_subnet_mask, true);
+                disable_form_field(mf.wan_l2tp_gateway, true);
+            } else {
+                mf.wan_l2tp_use_dynamic_carrier_radio_0.checked = true;
+                disable_form_field(mf.wan_l2tp_ip_address, false);
+                disable_form_field(mf.wan_l2tp_subnet_mask, false);
+                disable_form_field(mf.wan_l2tp_gateway, false);
+            }
+        }
+
+        /*
+         * wan_russia_pppoe_use_dynamic_address_selector()
+         */
+        function wan_russia_pppoe_use_dynamic_address_selector(mode){
+            mf.wan_russia_pppoe_use_dynamic_address.value = mode;
+            if(mode == "true") {
+                mf.wan_russia_pppoe_use_dynamic_address_radio_1.checked = true;
+                mf.wan_russia_pppoe_ip_address.disabled = true;
+                mf.wan_russia_pppoe_subnet_mask.disabled = true;
+                mf.wan_russia_pppoe_gateway.disabled = true;
+                mf.wan_russia_pppoe_primary_dns.disabled = true;
+                mf.wan_russia_pppoe_secondary_dns.disabled = true;
+            } else {
+                mf.wan_russia_pppoe_use_dynamic_address_radio_0.checked = true;
+                mf.wan_russia_pppoe_ip_address.disabled = false;
+                mf.wan_russia_pppoe_subnet_mask.disabled = false;
+                mf.wan_russia_pppoe_gateway.disabled = false;
+                mf.wan_russia_pppoe_primary_dns.disabled = false;
+                mf.wan_russia_pppoe_secondary_dns.disabled = false;
+            }
+        }
+
+        /*
+         * pppoe_reconnect_selector()
+         *      Enable or disable PPPoE settings according to selected PPPoE Reconnect mode.
+         *  mode: 0 = Always on, 1 = On demand, 2 = Manual.
+         */
+        function pppoe_reconnect_selector(mode)
+        {
+            mode = +mode;
+            mf.pppoe_reconnect_mode.value = mode;
+            // 2007.08.02
+            disable_form_field(mf.pppoe_max_idle_time, mode == 1 ? false : true);
+            switch (mode) {
+                case 0:
+                    mf.pppoe_reconnect_mode_radio_0.checked = true;
+                    mf.pppoe_max_idle_time.value = 0; //infinite
+                break;
+                case 1:
+                    mf.pppoe_reconnect_mode_radio_1.checked = true;
+                break;
+                case 2:
+                    mf.pppoe_reconnect_mode_radio_2.checked = true;
+                    mf.pppoe_max_idle_time.value = 0; //infinite
+                break;
+            }
+            // 2008.03.27
+            //if (mode !=0 && mf.pppoe_max_idle_time.value == 0) {
+            //    mf.pppoe_max_idle_time.value = "5";
+            //}
+        }
+
+
+// 2008.07.09
+	// 
+        /*
+         * wwan_reconnect_selector()
+         *      Enable or disable PPPoE settings according to selected PPPoE Reconnect mode.
+         *  mode: 0 = Always on, 1 = On demand, 2 = Manual.
+         */
+        function wwan_reconnect_selector(mode)
+        {
+            mode = +mode;
+            mf.wwan_reconnect_mode.value = mode;
+            // 2007.08.02
+            disable_form_field(mf.wwan_max_idle_time, mode == 1 ? false : true);
+            switch (mode) {
+                case 0:
+                    mf.wwan_reconnect_mode_radio_0.checked = true;
+                    mf.wwan_max_idle_time.value = 0; //infinite
+                break;
+                case 1:
+                    mf.wwan_reconnect_mode_radio_1.checked = true;
+                break;
+                case 2:
+                    mf.wwan_reconnect_mode_radio_2.checked = true;
+                    mf.wwan_max_idle_time.value = 0; //infinite
+                break;
+            }
+            // 2008.03.27
+            //if (mode !=0 && mf.pppoe_max_idle_time.value == 0) {
+            //    mf.pppoe_max_idle_time.value = "5";
+            //}
+        }
+
+        //
+
+
+        function disable_route_protocol_table()
+        {
+            var route_protocol_table_size = parseInt("", 10);
+            for (var i = 0; i < 10; i++) {
+                mf["p_enabled_select_" + i].disabled = true;
+                mf["p_entry_name_" + i].disabled = true;
+                mf["p_dest_port_start_" + i].disabled = true;
+                mf["p_dest_port_end_" + i].disabled = true;
+                mf["p_traffic_type_select_" + i].disabled = true;
+            }
+        }
+
+        /*
+         * pptp_reconnect_selector()
+         *      Enable or disable PPTP settings according to selected PPTP Reconnect mode.
+         *      mode: 0 = Always on, 1 = On demand, 2 = Manual.
+         */
+        function pptp_reconnect_selector(mode)
+        {
+            mode = +mode;
+            mf.wan_pptp_reconnect_mode.value = mode;
+            // 2007.08.02
+            disable_form_field(mf.wan_pptp_max_idle_time, mode == 1 ?  false : true);
+            switch (mode) {
+                case 0:
+                    mf.pptp_reconnect_mode_radio_0.checked = true;
+                    mf.wan_pptp_max_idle_time.value = 0; //infinite
+                break;
+                case 1:
+                    mf.pptp_reconnect_mode_radio_1.checked = true;
+                break;
+                case 2:
+                    mf.pptp_reconnect_mode_radio_2.checked = true;
+                break;
+            }
+            if (mode !=0 && mf.wan_pptp_max_idle_time.value == 0) {
+                mf.wan_pptp_max_idle_time.value = "5";
+            }
+        }
+
+        /*
+         * l2tp_reconnect_selector()
+         *      Enable or disable l2tp settings according to selected l2tp Reconnect mode.
+         *  mode: 0 = Always on, 1 = On demand, 2 = Manual.
+         */
+        function l2tp_reconnect_selector(mode)
+        {
+            mode = +mode;
+            mf.wan_l2tp_reconnect_mode.value = mode;
+            // 2007.08.02
+            disable_form_field(mf.wan_l2tp_max_idle_time, mode == 1 ?  false : true);
+            switch (mode) {
+                case 0:
+                    mf.l2tp_reconnect_mode_radio_0.checked = true;
+                    mf.wan_l2tp_max_idle_time.value = 0; //infinite
+                break;
+                case 1:
+                    mf.l2tp_reconnect_mode_radio_1.checked = true;
+                break;
+                case 2:
+                    mf.l2tp_reconnect_mode_radio_2.checked = true;
+                break;
+            }
+            if (mode !=0 && mf.wan_l2tp_max_idle_time.value == 0) {
+                mf.wan_l2tp_max_idle_time.value = "5";
+            }
+        }
+
+        /*
+         * wan_static_use_rip_selector()
+         */
+        function wan_static_use_rip_selector(value)
+        {
+            mf.wan_static_use_rip.value = value;
+            mf.wan_static_use_rip_select.checked = value;
+
+            do_block_enable(document.getElementById("wan_static_rip_settings"), value);
+            wan_static_rip_mode_selector(mf.wan_static_rip_mode.value);
+        }
+
+        /*
+         * wan_static_rip_mode_selector()
+         */
+        function wan_static_rip_mode_selector(mode)
+        {
+            mf.wan_static_rip_mode.value = mode;
+            set_radio(mf.wan_static_rip_mode_radio, mode);
+
+            /*
+             * Enable or disable the password depending on whether version 2 is selected.
+             */
+            if ((mode == "0") || (mf.wan_static_use_rip.value == "false")) {
+                do_block_enable(document.getElementById("wan_static_rip_settings_2"), false);
+            } else {
+                do_block_enable(document.getElementById("wan_static_rip_settings_2"), true);
+            }
+        }
+
+        /*
+         * wan_dhcp_use_rip_selector()
+         */
+        function wan_dhcp_use_rip_selector(value)
+        {
+            mf.wan_dhcp_use_rip.value = value;
+            mf.wan_dhcp_use_rip_select.checked = value;
+
+            do_block_enable(document.getElementById("wan_dhcp_rip_settings"), value);
+            wan_dhcp_rip_mode_selector(mf.wan_dhcp_rip_mode.value);
+        }
+
+        /*
+         * wan_dhcp_rip_mode_selector()
+         */
+        function wan_dhcp_rip_mode_selector(mode)
+        {
+            mf.wan_dhcp_rip_mode.value = mode;
+            set_radio(mf.wan_dhcp_rip_mode_radio, mode);
+
+            /*
+             * Enable or disable the password depending on whether version 2 is selected.
+             */
+            if ((mode == "0") || (mf.wan_dhcp_use_rip.value == "false")) {
+                do_block_enable(document.getElementById("wan_dhcp_rip_settings_2"), false);
+            } else {
+                do_block_enable(document.getElementById("wan_dhcp_rip_settings_2"), true);
+            }
+        }
+
+        /*
+         * wan_pppoe_use_rip_selector()
+         */
+        function wan_pppoe_use_rip_selector(value)
+        {
+            mf.wan_pppoe_use_rip.value = value;
+            mf.wan_pppoe_use_rip_select.checked = value;
+
+            do_block_enable(document.getElementById("wan_pppoe_rip_settings"), value);
+            wan_pppoe_rip_mode_selector(mf.wan_pppoe_rip_mode.value);
+        }
+
+        /*
+         * wan_pppoe_rip_mode_selector()
+         */
+        function wan_pppoe_rip_mode_selector(mode)
+        {
+            mf.wan_pppoe_rip_mode.value = mode;
+            set_radio(mf.wan_pppoe_rip_mode_radio, mode);
+
+            /*
+             * Enable or disable the password depending on whether version 2 is selected.
+             */
+            if ((mode == "0") || (mf.wan_pppoe_use_rip.value == "false")) {
+                do_block_enable(document.getElementById("wan_pppoe_rip_settings_2"), false);
+            } else {
+                do_block_enable(document.getElementById("wan_pppoe_rip_settings_2"), true);
+            }
+        }
+
+        /*
+         * wan_pptp_use_rip_selector()
+         */
+        function wan_pptp_use_rip_selector(value)
+        {
+            mf.wan_pptp_use_rip.value = value;
+            mf.wan_pptp_use_rip_select.checked = value;
+
+            do_block_enable(document.getElementById("wan_pptp_rip_settings"), value);
+            wan_pptp_rip_mode_selector(mf.wan_pptp_rip_mode.value);
+        }
+
+        /*
+         * wan_pptp_rip_mode_selector()
+         */
+        function wan_pptp_rip_mode_selector(mode)
+        {
+            mf.wan_pptp_rip_mode.value = mode;
+            set_radio(mf.wan_pptp_rip_mode_radio, mode);
+
+            /*
+             * Enable or disable the password depending on whether version 2 is selected.
+             */
+            if ((mode == "0") || (mf.wan_pptp_use_rip.value == "false")) {
+                do_block_enable(document.getElementById("wan_pptp_rip_settings_2"), false);
+            } else {
+                do_block_enable(document.getElementById("wan_pptp_rip_settings_2"), true);
+            }
+        }
+
+        /*
+         * wan_l2tp_use_rip_selector()
+         */
+        function wan_l2tp_use_rip_selector(value)
+        {
+            mf.wan_l2tp_use_rip.value = value;
+            mf.wan_l2tp_use_rip_select.checked = value;
+
+            do_block_enable(document.getElementById("wan_l2tp_rip_settings"), value);
+            wan_l2tp_rip_mode_selector(mf.wan_l2tp_rip_mode.value);
+        }
+
+        /*
+         * wan_l2tp_rip_mode_selector()
+         */
+        function wan_l2tp_rip_mode_selector(mode)
+        {
+            mf.wan_l2tp_rip_mode.value = mode;
+            set_radio(mf.wan_l2tp_rip_mode_radio, mode);
+
+            /*
+             * Enable or disable the password depending on whether version 2 is selected.
+             */
+            if ((mode == "0") || (mf.wan_l2tp_use_rip.value == "false")) {
+                do_block_enable(document.getElementById("wan_l2tp_rip_settings_2"), false);
+            } else {
+                do_block_enable(document.getElementById("wan_l2tp_rip_settings_2"), true);
+            }
+        }
+
+
+        /*
+         * allow_wan_ping_selector()
+         */
+        function allow_wan_ping_selector(value)
+        {
+            mf.allow_wan_ping.value = value;
+            mf.allow_wan_ping_select.checked = value;
+            disable_form_field(mf.wan_ping_ingress_filter_name_select, !value);
+        }
+
+        /*
+         * wan_ping_ingress_filter_name_selector()
+         */
+        function wan_ping_ingress_filter_name_selector(value)
+        {
+            mf.wan_ping_ingress_filter_name.value = value;
+            mf.wan_ping_ingress_filter_name_select.value = value;
+            mf.filtext.value = ingress_filter_details(mf.wan_ping_ingress_filter_name_select);
+        }
+
+        /*
+         * lan_use_igmp_proxy_selector()
+         */
+        function lan_use_igmp_proxy_selector(value)
+        {
+            mf.lan_use_igmp_proxy.value = value;
+            mf.lan_use_igmp_proxy_select.checked = value;
+        }
+
+        //
+
+
+
+	// 
+
+        var usb3g_isp_xml_loader = new ajax_xmlhttp("./wan_info.xml", usb3g_isp_xml_ready, usb3g_isp_xml_timeout, 5000);
+
+
+	var country_info = [];
+	//var 
+
+	function country_selector( value)
+	{
+		if( value == -1) {
+			mf.isp_select.options.length = 1;			
+		}
+		
+		// update isp
+		mf.isp_select.options.length = 1;			
+
+		var size;
+					
+		size = country_info[value].isp.length;
+		
+		for(i=0;i<size;i++) 
+			mf.isp_select.options.add(new Option(country_info[value].isp[i].isp_name, i));
+		
+		
+		
+	}
+
+	function isp_selector( value)
+	{
+		if( value == -1) {
+			// do nothing
+			return;
+		}
+	
+		var id; // country id
+		
+		id = mf.country_select.value;
+		
+		if( id == -1) {
+			// do nothing
+			return;
+		}
+	// update information	
+	
+		mf.wwan_dial_num.value = country_info[id].isp[value].dial_number;
+		mf.wwan_apn_name.value = country_info[id].isp[value].apn;
+		mf.wwan_username.value = country_info[id].isp[value].username;
+		mf.wwan_password.value = country_info[id].isp[value].password;
+		mf.confirm_wwan_password.value = country_info[id].isp[value].password;
+				
+	}
+
+
+	function get_xml_node_value(childnode)
+	{
+		if( childnode == null)
+			return "";
+		else 
+			return childnode.nodeValue;
+	}	
+
+	function usb3g_isp_xml_item(node,new_isp)
+	{
+		
+					// get isp	
+		var tmp_node = node.getElementsByTagName("isp_list")[0];		
+		//alert(tmp_node.childNodes.length);
+		
+		for(var j =0; j<tmp_node.childNodes.length; j++) {
+			var tmp_isp_node = tmp_node.childNodes[j];
+			if (tmp_isp_node.nodeType != 3){	// NS6/Mozilla will treat space as an element, so we need to ingore it	
+				if (tmp_isp_node.childNodes.length > 1){
+					var elts = tmp_isp_node.getElementsByTagName("isp_name");
+					var isp_name = get_xml_node_value(elts[0].firstChild);
+					
+					elts = tmp_isp_node.getElementsByTagName("dial_number");				
+					var dial_number = get_xml_node_value(elts[0].firstChild);
+
+					elts = tmp_isp_node.getElementsByTagName("apn");
+					var apn = get_xml_node_value(elts[0].firstChild);
+
+					elts = tmp_isp_node.getElementsByTagName("username");
+					var username = get_xml_node_value(elts[0].firstChild);
+
+					elts = tmp_isp_node.getElementsByTagName("password");
+					var password = get_xml_node_value(elts[0].firstChild);
+					
+					var isp = [];
+					isp.isp_name = isp_name;
+					isp.dial_number = dial_number;
+					isp.apn = apn;
+					isp.username = username;
+					isp.password = password;
+					
+					new_isp.push(isp);
+				}
+			}	 					
+		}
+		
+		//alert(new_isp.length);
+	}	
+	
+
+        function usb3g_isp_xml_ready(xml_doc)
+        {
+        	// only get once
+        	//alert(2);
+		country_info.length = 0; // clear array
+
+
+		// direct access xmldoc
+        	var root = xml_doc.xmldoc.getElementsByTagName("root")[0];
+		for (var i = 0; i < root.childNodes.length; i++){
+			var node = root.childNodes[i];	// get "wan_info" element
+			
+			if (node.nodeType != 3){	// NS6/Mozilla will treat space as an element, so we need to ingore it	
+				if (node.childNodes.length > 1){
+				
+					// get country name	
+					var elts = node.getElementsByTagName("country");
+					//alert(elts[0].firstChild.nodeValue);
+					// get country id
+					//var elts = node.getElementsByTagName("country_provider");
+					
+					var new_country = [];
+					var new_isp = [];
+					new_country.country = get_xml_node_value(elts[0].firstChild);
+					new_country.isp = new_isp;
+					
+					country_info.push(new_country);
+					
+					usb3g_isp_xml_item(node,new_isp);
+				}
+			}	
+        	}
+
+            
+            //  update per 5 second
+            //window.setTimeout(usb3g_stat_xml_loader.retrieve_xml, 5000);
+
+		var user_name;
+		var password;
+		var i;
+		
+		// we should update
+		//alert(country_info.length);
+		mf.country_select.options.length = 1;
+		mf.isp_select.options.length = 1;
+		
+		for(i=0;i<country_info.length;i++)
+			mf.country_select.options.add(new Option(country_info[i].country, i));
+
+
+
+		for(i=1;i<mf.country_select.options.length;i++) {
+			if( mf.wwan_country.value == mf.country_select.options[i].text ) {
+			        mf.country_select.options[i].selected = 1;
+			        country_selector(mf.country_select.options[i].value);
+			        break;			    
+			}			
+		}
+
+		for(i=1;i<mf.isp_select.options.length;i++) {
+			if( mf.wwan_isp.value == mf.isp_select.options[i].text ) {
+			        mf.isp_select.options[i].selected = 1;
+			        break;			    
+			}			
+		}
+	        
+
+	        save_form_default_values("mainform");
+
+        }
+
+
+        function usb3g_isp_xml_timeout()
+        {
+        //	alert("2");
+//            window.setTimeout(wan_action_status_xml_loader.retrieve_xml, 20000);
+
+//        	window.location.reload();
+
+        }
+
+
+        //
+
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+            //
+            remote_login = false;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                wan_ip_mode_selector(DHCP);
+                mf.wan_dhcp_gw_name.value = "SE5000";
+                mf.wan_primary_dns.value = "0.0.0.0";
+                mf.wan_secondary_dns.value = "0.0.0.0";
+                mf.mac_cloning_address.value = "00:00:00:00:00:00";
+                remote_login = false;
+                pcmac = "AA:BB:CC:DD:EE:FF";
+                mf.wan_russia_pppoe_primary_dns.value = mf.wan_primary_dns.value;
+                mf.wan_russia_pppoe_secondary_dns.value = mf.wan_secondary_dns.value;
+
+                wan_dhcp_use_unicasting_selector(true);
+                pppoe_use_dynamic_address_selector(1);
+                wan_pptp_use_dynamic_carrier_selector(1);
+                wan_l2tp_use_dynamic_carrier_selector(1);
+                wan_russia_pppoe_use_dynamic_address_selector(1);
+				dslpppoe_encapsulation_selector(0);
+
+                mf.pppoe_max_idle_time.value = 20;
+                mf.wan_pptp_max_idle_time.value = 20;
+                mf.wan_l2tp_max_idle_time.value = 20;
+
+                pppoe_reconnect_selector(1);
+                pptp_reconnect_selector(1);
+                l2tp_reconnect_selector(1);
+
+                wan_static_use_rip_selector(true);
+                wan_dhcp_use_rip_selector(true);
+                wan_pppoe_use_rip_selector(true);
+                wan_pptp_use_rip_selector(true);
+                wan_l2tp_use_rip_selector(true);
+
+                //
+                return;
+            }
+
+            // 2007.08.02
+            var v1 = mf.pppoe_max_idle_time.value;
+            var v2 = mf.wan_pptp_max_idle_time.value;
+            var v3 = mf.wan_l2tp_max_idle_time.value;
+
+            remote_login = (pcmac == "00:00:00:00:00:00") ? true : false;
+
+			//
+
+            var unicast = mf.wan_dhcp_use_unicasting.value == "true" ? true : false;
+            wan_dhcp_use_unicasting_selector(unicast);
+//            wan_ip_mode_selector(mf.wan_ip_mode.value);
+	    wan_ip_mode_selector(mf.usb_device.value);
+   
+
+            pppoe_use_dynamic_address_selector(mf.pppoe_use_dynamic_address.value);
+
+			//
+
+            wan_pptp_use_dynamic_carrier_selector(mf.wan_pptp_use_dynamic_carrier.value);
+            wan_l2tp_use_dynamic_carrier_selector(mf.wan_l2tp_use_dynamic_carrier.value);
+
+            pppoe_reconnect_selector(mf.pppoe_reconnect_mode.value);
+            pptp_reconnect_selector(mf.wan_pptp_reconnect_mode.value);
+            l2tp_reconnect_selector(mf.wan_l2tp_reconnect_mode.value);
+
+            allow_wan_ping_selector(mf.allow_wan_ping.value == "true");
+            lan_use_igmp_proxy_selector(mf.lan_use_igmp_proxy.value*1);
+
+            wan_static_use_rip_selector(mf.wan_static_use_rip.value == "true" ? true : false);
+            wan_dhcp_use_rip_selector(mf.wan_dhcp_use_rip.value == "true" ? true : false);
+            wan_pppoe_use_rip_selector(mf.wan_pppoe_use_rip.value == "true" ? true : false);
+            wan_pptp_use_rip_selector(mf.wan_pptp_use_rip.value == "true" ? true : false);
+            wan_l2tp_use_rip_selector(mf.wan_l2tp_use_rip.value == "true" ? true : false);
+
+            // 2007.08.02
+            mf.pppoe_max_idle_time.value = v1;
+            mf.wan_pptp_max_idle_time.value = v2;
+            mf.wan_l2tp_max_idle_time.value = v3;
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                //
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            save_form_default_values("mainform");
+
+            //
+
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed != "") {
+                set_form_always_modified("mainform");
+                alert(verify_failed);
+            }
+            
+            return;
+    // 
+            
+             usb3g_isp_xml_loader.retrieve_xml();
+
+	if( "" == "wwan" ) {
+		wan_ip_mode_selector(WWAN_MODE);
+	}
+    //
+            
+        }
+
+        /*
+         * Validate MAC and activate cloning if necessary
+         */
+        function validate_mac_address()
+        {
+            mf.mac_cloning_address.value = mf.mac_cloning_address.value.trim();
+            if(!is_mac_valid(mf.mac_cloning_address.value, true)) {
+                alert ("Invalid MAC Address" + ": " + mf.mac_cloning_address.value + ".");
+                mf.mac_cloning_address.select();
+                mf.mac_cloning_address.focus();
+                return false;
+            }
+            if(mf.mac_cloning_address.value == "00:00:00:00:00:00") {
+                mf.mac_cloning_enabled.value = "false";
+            } else {
+                mf.mac_cloning_enabled.value = "true";
+            }
+            return true;
+        }
+
+        function clone_primary_mac() {
+            mf.mpppoe_primary_mac_cloning_address.value = pcmac;
+            mf.mpppoe_primary_mac_cloning_enabled.value = "true";
+        }
+
+        function clone_secondary_mac() {
+            mf.mpppoe_secondary_mac_cloning_address.value = pcmac;
+            mf.mpppoe_secondary_mac_cloning_enabled.value = "true";
+        }
+
+        function d_enabled_selector(index, value) {
+            mf["d_enabled_" + index].value = value;
+            mf["d_enabled_select_" + index].checked = value;
+        }
+
+        function p_enabled_selector(index, checked)
+        {
+            mf["p_enabled_" + index].value = checked;
+            mf["p_enabled_select_" + index].checked = checked;
+        }
+
+        function p_traffic_type_selector(index, val)
+        {
+            mf["p_traffic_type_" + index].value = val;
+            mf["p_traffic_type_select_" + index].value = val;
+        }
+
+        function routing_protocol_verify()
+        {
+            for (var i = 0; i < 10; i++) {
+                var d_dest_ip = mf["d_dest_ip_" + i].value;
+                var d_name = mf["d_name_" + i].value;
+                if(d_dest_ip)
+                {
+                    if (!is_ipv4_valid(d_dest_ip)) {
+                        alert("Only support IP address for route");
+                        return 0;
+                    }
+                }else{
+                    if(d_name){
+                        alert("Please enter IP address for route");
+                        return 0;
+                    }
+                }
+            }
+            return 1;
+        }
+
+	function go_3G_Internet_page(mode)
+	{
+		var newurl;
+		
+		newurl = 'WAN.html?mywanmode=wwan' + '&myusbmode=' + mode;
+		window.location= newurl;
+	}
+	
+        /*
+         * page_submit()
+         */
+		function page_submit()
+        {
+            /*
+             * Check if any changes have been made
+             */
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+
+	    mode = get_wan_ip_mode();
+
+	// mode 0,1,2 <-- USB mode
+	// internet mode
+	    var internet_3G;
+	    
+	    internet_3G = false;
+       	    internet_3G = mf.wan_ip_mode.value == WWAN_MODE;
+	
+	    if( mode == 1) {
+	    	
+	    	
+	    	if( !is_number(mf.usb_kcode_timer.value) ||  (mf.usb_kcode_timer.value > 600) || (mf.usb_kcode_timer.value < 3)) {
+	    		alert("USB Dectection interval invalid");
+	    		return;
+	    	} 
+	    	
+	    	// Network USB 
+	    	if( internet_3G) {
+	    		go_3G_Internet_page(mode);
+	    		return;
+	    	}
+	    	
+	    }
+	    else if ( mode == 0) {
+	    	// 3G USB Adapter
+	    	if( !internet_3G) {
+	    		go_3G_Internet_page(mode);
+	    		return;
+	    	}
+	    
+	    }
+	    else if( mode == 2) {
+	    	// WCN
+	    	if( internet_3G) {
+	    		go_3G_Internet_page(mode);
+	    		return;
+	    	}
+	    }
+
+
+            mf.submit();
+            
+            
+            return;
+
+
+            /*
+             * Handle mode specific fields
+             */
+            switch (mode) {
+            case STATIC:
+                if (!is_ipv4_valid(mf.wan_ip_address.value)) {
+                    alert("Invalid WAN IP address: " + mf.wan_ip_address.value);
+                        mf.wan_ip_address.select();
+                        mf.wan_ip_address.focus();
+                    return;
+                }
+                if (!is_ipv4_valid(mf.wan_subnet_mask.value)) {
+                    alert("Invalid WAN subnet mask: " + mf.wan_subnet_mask.value);
+                        mf.wan_subnet_mask.select();
+                        mf.wan_subnet_mask.focus();
+                    return;
+                }
+                if (!is_ipv4_valid(mf.wan_gateway.value)) {
+                    alert("Invalid WAN gateway IP address: " + mf.wan_gateway.value);
+                        mf.wan_gateway.select();
+                        mf.wan_gateway.focus();
+                    return;
+                }
+				if (mf.wan_static_use_rip_select.checked  && !mf.wan_static_rip_mode_radio_0.checked && (mf.wan_static_rip_password.value != mf.confirm_wan_static_rip_password.value)) {
+					alert("The entered passwords do not match");
+					mf.wan_static_rip_password.select();
+					mf.wan_static_rip_password.focus();
+					return;
+				}
+				break;
+			case DHCP:
+				if (mf.wan_dhcp_use_rip_select.checked  && !mf.wan_dhcp_rip_mode_radio_0.checked && (mf.wan_dhcp_rip_password.value != mf.confirm_wan_dhcp_rip_password.value)) {
+					alert("The entered passwords do not match");
+					mf.wan_dhcp_rip_password.select();
+					mf.wan_dhcp_rip_password.focus();
+					return;
+				}
+                break;
+            case PPPOE:
+                if (mf.pppoe_password.value != mf.confirm_pppoe_password.value) {
+                    alert("The entered passwords do not match");
+                        mf.pppoe_password.select();
+                        mf.pppoe_password.focus();
+                    return;
+                }
+                if(mf.pppoe_use_dynamic_address.value == "false" ) {
+                    if (!is_ipv4_valid(mf.pppoe_ip_address.value)) {
+                        alert("Invalid PPPoE IP address: " + mf.pppoe_ip_address.value);
+                            mf.wan_pptp_ip_address.select();
+                            mf.wan_pptp_ip_address.focus();
+                        return;
+                    }
+                }
+                mf.pppoe_max_idle_time.value = parseInt(mf.pppoe_max_idle_time.value, 10);
+                var idle_time = mf.pppoe_max_idle_time.value;
+                // 0~65535 2008.03.27
+                if (mf.pppoe_reconnect_mode.value != "0" && (!is_number(idle_time) || idle_time < 0 || idle_time > 65535)) {
+                    alert("Invalid Idle Time");
+                        mf.pppoe_max_idle_time.select();
+                        mf.pppoe_max_idle_time.focus();
+                    return;
+                }
+                if (mf.wan_pppoe_use_rip_select.checked  && !mf.wan_pppoe_rip_mode_radio_0.checked && (mf.wan_pppoe_rip_password.value != mf.confirm_wan_pppoe_rip_password.value)) {
+					alert("The entered passwords do not match");
+					mf.wan_pppoe_rip_password.select();
+					mf.wan_pppoe_rip_password.focus();
+					return;
+				}
+                break;
+            case RussiaPPPoE:
+                if (mf.pppoe_password.value != mf.confirm_pppoe_password.value) {
+                    alert("The entered passwords do not match.");
+                        mf.pppoe_password.select();
+                        mf.confirm_pppoe_password.select();
+                        mf.pppoe_password.focus();
+                    return;
+                }
+                if(mf.pppoe_use_dynamic_address.value == "false" ) {
+                    if (!is_ipv4_valid(mf.pppoe_ip_address.value)) {
+                        alert("Invalid PPPoE IP address: " + mf.pppoe_ip_address.value);
+                            mf.wan_pptp_ip_address.select();
+                            mf.wan_pptp_ip_address.focus();
+                        return;
+                    }
+                }
+                if (!is_number(mf.pppoe_max_idle_time.value)) {
+                    alert("Invalid Idle Time");
+                        mf.pppoe_max_idle_time.select();
+                        mf.pppoe_max_idle_time.focus();
+                    return;
+                }
+                /* Force PPPoE to use dynamic IP address. */
+                if(mf.wan_russia_pppoe_use_dynamic_address.value == "false" ) {
+                    if (!is_ipv4_valid(mf.wan_russia_pppoe_ip_address.value)) {
+                        alert("Invalid PPPoE IP address: " + mf.wan_russia_pppoe_ip_address.value);
+                            mf.wan_russia_pppoe_ip_address.select();
+                            mf.wan_russia_pppoe_ip_address.focus();
+                        return;
+                    }
+                    if (!is_ipv4_valid(mf.wan_russia_pppoe_subnet_mask.value)) {
+                        alert("Invalid PPPoE subnet mask: " + mf.wan_russia_pppoe_subnet_mask.value);
+                            mf.wan_russia_pppoe_subnet_mask.select();
+                            mf.wan_russia_pppoe_subnet_mask.focus();
+                        return;
+                    }
+                    if (!is_ipv4_valid(mf.wan_russia_pppoe_gateway.value)) {
+                        alert("Invalid PPPoE gateway IP address: " + mf.wan_pptp_gateway.value);
+                            mf.wan_russia_pppoe_gateway.select();
+                            mf.wan_russia_pppoe_gateway.focus();
+                        return;
+                    }
+                    /*
+                     * Check DNS IP's for well-formed-ness
+                     */
+                    mf.wan_russia_pppoe_primary_dns.value = trim_string(mf.wan_russia_pppoe_primary_dns.value);
+                    mf.wan_russia_pppoe_secondary_dns.value = trim_string(mf.wan_russia_pppoe_secondary_dns.value);
+
+                    /*
+                     * Allow blank as wel as 0.0.0.0 for primary and secondary
+                     */
+                    mf.wan_russia_pppoe_primary_dns.value = mf.wan_russia_pppoe_primary_dns.value == "" ? "0.0.0.0" : mf.wan_russia_pppoe_primary_dns.value;
+                    mf.wan_russia_pppoe_secondary_dns.value = mf.wan_russia_pppoe_secondary_dns.value == "" ? "0.0.0.0" : mf.wan_russia_pppoe_secondary_dns.value;
+
+                    if (!is_ipv4_valid(mf.wan_russia_pppoe_primary_dns.value)) {
+                        alert("Invalid primary DNS server IP address: " +  mf.wan_russia_pppoe_primary_dns.value);
+                            mf.wan_russia_pppoe_primary_dns.select();
+                            mf.wan_russia_pppoe_primary_dns.focus();
+                        return;
+                    }
+                    if (!is_ipv4_valid(mf.wan_russia_pppoe_secondary_dns.value)) {
+                        alert("Invalid secondary DNS server IP address: " +  mf.wan_russia_pppoe_secondary_dns.value);
+                            mf.wan_russia_pppoe_secondary_dns.select();
+                            mf.wan_russia_pppoe_secondary_dns.focus();
+                        return;
+                    }
+                    mf.wan_primary_dns.value = mf.wan_russia_pppoe_primary_dns.value;
+                    mf.wan_secondary_dns.value = mf.wan_russia_pppoe_secondary_dns.value;
+                }
+                /* WAN Physical check */
+                break;
+             case PPTP:
+            case RussiaPPTP:
+                if (mf.wan_pptp_password.value != mf.confirm_wan_pptp_password.value) {
+                    alert("The entered passwords do not match");
+                            mf.wan_pptp_password.select();
+                            mf.wan_pptp_password.focus();
+                    return;
+                }
+                if(mf.wan_pptp_use_dynamic_carrier.value == "false" ) {
+                    if (!is_ipv4_valid(mf.wan_pptp_ip_address.value)) {
+                        alert("Invalid PPTP IP address: " + mf.wan_pptp_ip_address.value);
+                        mf.wan_pptp_ip_address.select();
+                        mf.wan_pptp_ip_address.focus();
+                        return;
+                    }
+                    if (!is_ipv4_valid(mf.wan_pptp_subnet_mask.value)) {
+                        alert("Invalid PPTP subnet mask: " + mf.wan_pptp_subnet_mask.value);
+                        mf.wan_pptp_subnet_mask.select();
+                        mf.wan_pptp_subnet_mask.focus();
+                        return;
+                    }
+                    if (!is_ipv4_valid(mf.wan_pptp_gateway.value)) {
+                        alert("Invalid PPTP gateway IP address: " + mf.wan_pptp_gateway.value);
+                        mf.wan_pptp_gateway.select();
+                        mf.wan_pptp_gateway.focus();
+                        return;
+                    }
+                }
+                if (!is_ipv4_valid(mf.wan_pptp_server.value)) {
+                    alert("Invalid PPTP server IP address: " + mf.wan_pptp_server.value);
+                    mf.wan_pptp_server.select();
+                    mf.wan_pptp_server.focus();
+                    return;
+                }
+                mf.wan_pptp_max_idle_time.value = parseInt(mf.wan_pptp_max_idle_time.value, 10);
+                idle_time = mf.wan_pptp_max_idle_time.value;
+                if (mf.wan_pptp_reconnect_mode.value != "0" && (!is_number(idle_time) || idle_time < 1 || idle_time > 65535)) {
+                    alert("Invalid Idle Time");
+                    mf.wan_pptp_max_idle_time.select();
+                    mf.wan_pptp_max_idle_time.focus();
+                    return;
+                }
+				if (mf.wan_pptp_use_rip_select.checked  && !mf.wan_pptp_rip_mode_radio_0.checked && (mf.wan_pptp_rip_password.value != mf.confirm_wan_pptp_rip_password.value)) {
+					alert("The entered passwords do not match");
+					mf.wan_pptp_rip_password.select();
+					mf.wan_pptp_rip_password.focus();
+					return;
+				}
+                /* Force PPTP to use static IP address. */
+                break;
+            case L2TP:
+                if (mf.wan_l2tp_password.value != mf.confirm_wan_l2tp_password.value) {
+                    alert("The entered passwords do not match");
+                    mf.wan_l2tp_password.select();
+                    mf.wan_l2tp_password.focus();
+                    return;
+                }
+                if(mf.wan_l2tp_use_dynamic_carrier.value == "false" ) {
+                    if (!is_ipv4_valid(mf.wan_l2tp_ip_address.value)) {
+                        alert("Invalid L2TP IP address: " + mf.wan_l2tp_ip_address.value);
+                        mf.wan_l2tp_ip_address.select();
+                        mf.wan_l2tp_ip_address.focus();
+                        return;
+                    }
+                    if (!is_ipv4_valid(mf.wan_l2tp_subnet_mask.value)) {
+                        alert("Invalid L2TP subnet mask: " + mf.wan_l2tp_subnet_mask.value);
+                        mf.wan_l2tp_subnet_mask.select();
+                        mf.wan_l2tp_subnet_mask.focus();
+                        return;
+                    }
+                    if (!is_ipv4_valid(mf.wan_l2tp_gateway.value)) {
+                        alert("Invalid L2TP gateway IP address: " + mf.wan_l2tp_gateway.value);
+                        mf.wan_l2tp_gateway.select();
+                        mf.wan_l2tp_gateway.focus();
+                        return;
+                    }
+                }
+                if (!is_ipv4_valid(mf.wan_l2tp_server.value)) {
+                    alert("Invalid L2TP server IP address: " + mf.wan_l2tp_server.value);
+                    mf.wan_l2tp_server.select();
+                    mf.wan_l2tp_server.focus();
+                    return;
+                }
+                mf.wan_l2tp_max_idle_time.value = parseInt(mf.wan_l2tp_max_idle_time.value, 10);
+                idle_time = mf.wan_l2tp_max_idle_time.value;
+                if (mf.wan_l2tp_reconnect_mode.value != "0" && (!is_number(idle_time) || idle_time < 1 || idle_time > 65535)) {
+                    alert("Invalid Idle Time");
+                    mf.wan_l2tp_max_idle_time.select();
+                    mf.wan_l2tp_max_idle_time.focus();
+                    return;
+                }
+				if (mf.wan_l2tp_use_rip_select.checked  && !mf.wan_l2tp_rip_mode_radio_0.checked && (mf.wan_l2tp_rip_password.value != mf.confirm_wan_l2tp_rip_password.value)) {
+					alert("The entered passwords do not match");
+					mf.wan_l2tp_rip_password.select();
+					mf.wan_l2tp_rip_password.focus();
+					return;
+				}
+                break;
+                
+// 2008.07.11                
+            case WWAN_MODE:
+
+                if (mf.wwan_password.value != mf.confirm_wwan_password.value) {
+                    alert("The entered passwords do not match");
+                        mf.wwan_password.select();
+                        mf.wwan_password.focus();
+                    return;
+                }
+                mf.wwan_max_idle_time.value = parseInt(mf.wwan_max_idle_time.value, 10);
+                var idle_time = mf.wwan_max_idle_time.value;
+                // 0~65535 2008.03.27
+                if (mf.wwan_reconnect_mode.value != "0" && (!is_number(idle_time) || idle_time < 0 || idle_time > 65535)) {
+                    alert("Invalid Idle Time");
+                        mf.wwan_max_idle_time.select();
+                        mf.wwan_max_idle_time.focus();
+                    return;
+                }
+
+		
+		
+
+                if (!is_number(mf.wwan_wan_mtu.value) || ( mf.wwan_wan_mtu.value > 1492) || ( mf.wwan_wan_mtu.value < 128) ) {
+                    alert("Invalid MTU Size");
+                    mf.wwan_wan_mtu.select();
+                    mf.wwan_wan_mtu.focus();
+                    return;
+                }
+
+
+		// find country
+		var i;
+		
+		// from --None-- start
+		for(i=1;i<mf.country_select.options.length;i++) {
+			if( mf.country_select.options[i].selected) {
+				mf.wwan_country.value = mf.country_select.options[i].text;
+				break;
+			}
+		}
+
+		for(i=1;i<mf.isp_select.options.length;i++) {
+			if( mf.isp_select.options[i].selected) {
+				mf.wwan_isp.value = mf.isp_select.options[i].text;
+				break;
+			}
+		}
+
+//		alert(mf.wwan_isp.value);
+//		alert(mf.wwan_country.value); 
+
+//mf.isp_select.options
+//mf.country_select.options[2]
+		//return;
+
+		break;
+            }
+
+            /*
+             * Check for well formed-ness and also process any UI artifacts of non-mode related configuration
+             */
+
+            /*
+             * Check DNS IP's for well-formed-ness
+             */
+            mf.wan_primary_dns.value = mf.wan_primary_dns.value.trim();
+            mf.wan_secondary_dns.value = mf.wan_secondary_dns.value.trim();
+
+            /*
+             * Allow blank as well as 0.0.0.0 for primary and secondary
+             */
+            mf.wan_primary_dns.value = mf.wan_primary_dns.value == "" ? "0.0.0.0" : mf.wan_primary_dns.value;
+            mf.wan_secondary_dns.value = mf.wan_secondary_dns.value == "" ? "0.0.0.0" : mf.wan_secondary_dns.value;
+
+            if (!is_ipv4_valid(mf.wan_primary_dns.value)) {
+                alert("Invalid primary DNS server IP address: " +  mf.wan_primary_dns.value);
+                mf.wan_primary_dns.select();
+                mf.wan_primary_dns.focus();
+                return;
+            }
+            if (!is_ipv4_valid(mf.wan_secondary_dns.value)) {
+                alert("Invalid secondary DNS server IP address: " +  mf.wan_secondary_dns.value);
+                mf.wan_secondary_dns.select();
+                mf.wan_secondary_dns.focus();
+                return;
+            }
+            if ((mf.wan_primary_dns.value != "0.0.0.0") || (mf.wan_secondary_dns.value != "0.0.0.0")) {
+                    mf.wan_force_static_dns_servers.value = "true";
+            } else {
+                    mf.wan_force_static_dns_servers.value = "false";
+            }
+
+            if (mode != MPPPOE) {
+                /*
+                 * MTU
+                 */
+                if (!is_number(mf.wan_mtu.value)) {
+                    alert("Invalid MTU Size");
+                    mf.wan_mtu.select();
+                    mf.wan_mtu.focus();
+                    return;
+                }
+                /*
+                 * Internet session index is always zero for all WAN mode except MPPPoE.
+                 */
+                mf.internet_session_index.value = 0;
+            }
+
+            /*
+             * Activate MTU defaulting if necessary
+             */
+            if (mf.wan_mtu.value == mtu_default_values[mode]) {
+                mf.wan_mtu_use_default.value = "true";
+            } else {
+                mf.wan_mtu_use_default.value = "false";
+            }
+
+            /*
+             * Validate MAC and activate cloning if necessary
+             */
+            if (!validate_mac_address()) {
+                return;
+            }
+
+            // 2007.08.03 fix read-only cannot submit issue
+            // we enable field, and submit it
+            switch (mode) {
+            case PPPOE:
+            case RussiaPPPoE:
+                mf.pppoe_max_idle_time.disabled = false;
+                break;
+            case PPTP:
+            case RussiaPPTP:
+                mf.wan_pptp_max_idle_time.disabled = false;
+                break;
+            case L2TP:
+                mf.wan_l2tp_max_idle_time.disabled = false;
+                break;
+            }
+
+            mf.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") && confirm ("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed != "") {
+                    top.location = "/Basic/USB.html";
+                } else {
+                    reset_form("mainform");
+                    page_load();
+                }
+            }
+        }
+
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.32NA
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul style="display: block;" id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Basic_Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                        
+                                        <li class="here">
+                                            <div>
+                                                <a id="Basic_USB_nav_link" href="USB.html" onclick="return jump_if();">USB Settings</a>
+                                            </div>
+                                        </li>
+                                        
+                                                                                
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic_Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <div class="section">
+                                                                        <form saved="true" id="mainform" action="/Basic/USB.html" method="post" onsubmit="return false;">
+                                                                        <div class="section_head">
+                                                                        <h2>USB Settings</h2>
+                                                                        <p>Use this section to configure your USB port. There are several configurations to choose from: Shareport and WCN Configuration.</p>
+                                                                        <p><strong>Note&nbsp;:</strong>
+If using the Shareport option, users will need to install the Shareport Utility into their computers to share the USB device through the router.</p>
+                                                                        <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to some of these functionalities.</p>
+                                                                        <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                                        <input class="button_submit" value="Don't Save Settings" onclick="page_cancel();" type="button">
+                                                                        </div>
+
+					<input default="1" name="config.wan_ip_mode" id="wan_ip_mode" value="1" type="hidden">
+					<input default="1" name="config.usb_device" id="usb_device" value="1" type="hidden">
+
+                                        <div class="box">
+                                            <h3>USB Settings</h3>
+                                            <p class="box_msg"> Choose the type of USB device to be plugged into the USB port. </p>
+                                            <fieldset>
+                                                <p>
+                                                        <input default="false" name="config.wan_force_static_dns_servers" id="wan_force_static_dns_servers" value="false" type="hidden">
+                                                        <input default="0" id="internet_session_index" name="config.internet_session_index" value="0" type="hidden">
+                                                        <label class="duple" for="wan_ip_mode_select">My plug of USB type is&nbsp;:</label>
+                                                        <select id="wan_ip_mode_select" onchange="wan_ip_mode_selector(this.value);">
+                                                                <option default="true" value="1">Shareport</option>
+                                                                <option default="false" value="2">WCN Configuration</option>
+                                                                
+                                                                
+                                                        </select>
+                                                </p>
+                                            </fieldset>
+                                        </div><!-- box -->
+                                        
+                                            <div id="box_wan_dhcp" style="display: none;">
+                                                <h3>Dynamic IP (DHCP) Internet Connection Type&nbsp;:</h3>
+                                                <p class="box_msg">Use
+this Internet connection type if your Internet Service Provider (ISP)
+didn't provide you with IP Address information and/or a username and
+password.</p>
+                                            </div>
+                                            
+                                            
+                                            <div id="box_wan_wwan" style="display: none;">
+                                                <h3>WWAN Internet Connection Type&nbsp;:</h3>
+                                                <p class="box_msg"> Enter the information provided by your Internet Service Provider (ISP). </p>
+                                            </div>
+                                            
+
+                                            
+
+                                            <div id="box_3g_usb" style="display: none;">
+                                                <h3>WWAN Internet Connection Type&nbsp;:</h3>
+                                                <p class="box_msg"> Enter the information provided by your Internet Service Provider (ISP). </p>
+                                            </div>
+
+
+                                            
+                                            <div id="box_wan_pppoe" style="display: none;">
+                                                <h3>PPPoE Internet Connection Type&nbsp;:</h3>
+                                                <p class="box_msg"> Enter the information provided by your Internet Service Provider (ISP). </p>
+                                            </div>
+                                            <div id="box_wan_pptp" style="display: none;">
+                                                <h3>PPTP Internet Connection Type&nbsp;:</h3>
+                                                <p class="box_msg"> Enter the information provided by your Internet Service Provider (ISP). </p>
+                                            </div>
+                                            <div id="box_wan_l2tp" style="display: none;">
+                                                <h3>L2TP Internet Connection Type&nbsp;:</h3>
+                                                <p class="box_msg"> Enter the information provided by your Internet Service Provider (ISP). </p>
+                                            </div>
+                                            <fieldset>
+                                                <div id="box_wan_static_body" style="display: none;">
+                                                    <p>
+                                                        <label class="duple" for="wan_ip_address">IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" id="wan_ip_address" size="20" maxlength="15" value="0.0.0.0" name="config.wan_ip_address" type="text">
+                                                     </p>
+                                                     <p>
+                                                        <label class="duple" for="wan_subnet_mask">Subnet Mask&nbsp;:</label>
+                                                        <input autocomplete="off" default="255.255.255.0" id="wan_subnet_mask" size="20" maxlength="15" value="255.255.255.0" name="config.wan_subnet_mask" type="text">
+                                                     </p>
+                                                     <p>
+                                                        <label class="duple" for="wan_gateway">Default Gateway&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" id="wan_gateway" size="20" maxlength="15" value="0.0.0.0" name="config.wan_gateway" type="text">
+                                                     </p>
+                                                    <div class="box" id="wan_static_use_rip_section" style="display: none;">
+                                                        <h3>
+                                                            RIP (Routing Information Protocol)
+                                                        </h3>
+                                                        <p>
+Allows RIP to accept updates from this connection. Note that private
+routing information is never sent to this connection. </p>
+                                                        <p>
+                                                            <label class="duple" for="wan_static_use_rip_select">
+                                                                Enable RIP&nbsp;:
+                                                            </label>
+                                                            <input default="false" id="wan_static_use_rip" name="config.wan_static_rip_config[0].enabled" value="false" type="hidden">
+                                                            <input default="false" id="wan_static_use_rip_select" onclick="wan_static_use_rip_selector(this.checked);" type="checkbox">
+                                                        </p>
+                                                        <div id="wan_static_rip_settings">
+                                                            <input default="1" class="disabled" disabled="disabled" name="config.wan_static_rip_config[0].accept_updates" id="wan_static_rip_accept_updates" value="1" type="hidden">
+                                                            <p>
+                                                                <label class="duple" for="wan_static_rip_mode">RIP Operating mode&nbsp;:</label>
+                                                                <input default="1" class="disabled" disabled="disabled" name="config.wan_static_rip_config[0].mode" id="wan_static_rip_mode" value="1" type="hidden">
+                                                                <input default="false" class="disabled" disabled="disabled" id="wan_static_rip_mode_radio_0" name="wan_static_rip_mode_radio" value="0" onclick="wan_static_rip_mode_selector(this.value);" type="radio">
+                                                                <label for="wan_static_rip_mode_radio_0">V1</label>
+                                                                <input default="true" class="disabled" disabled="disabled" id="wan_static_rip_mode_radio_1" name="wan_static_rip_mode_radio" value="1" onclick="wan_static_rip_mode_selector(this.value);" type="radio">
+                                                                <label for="wan_static_rip_mode_radio_1">V2 Broadcast </label>
+                                                                <input default="false" class="disabled" disabled="disabled" id="wan_static_rip_mode_radio_2" name="wan_static_rip_mode_radio" value="2" onclick="wan_static_rip_mode_selector(this.value);" type="radio">
+                                                                <label for="wan_static_rip_mode_radio_2">V2 Multicast </label>
+                                                            </p>
+                                                            <p>
+                                                                <label class="duple" for="wan_static_rip_metric">Router Metric&nbsp;:</label>
+                                                                <input autocomplete="off" default="1" class="disabled" disabled="disabled" id="wan_static_rip_metric" size="15" maxlength="15" value="1" name="config.wan_static_rip_config[0].metric" type="text">
+                                                            </p>
+                                                            <div id="wan_static_rip_settings_2">
+                                                                <p>
+                                                                    <label class="duple" for="wan_static_rip_password">
+                                                                        RIP Password&nbsp;:
+                                                                    </label>
+                                                                    <input default="" class="disabled" disabled="disabled" id="wan_static_rip_password" name="config.wan_static_rip_config[0].password" value="" size="20" maxlength="16" type="password">
+                                                                </p>
+                                                                <p>
+                                                                    <label class="duple" for="confirm_wan_static_rip_password">
+                                                                        Confirm RIP Password&nbsp;:
+                                                                    </label>
+                                                                    <input default="" class="disabled" disabled="disabled" id="confirm_wan_static_rip_password" name="confirm_wan_static_rip_password" value="" size="20" maxlength="16" type="password">
+                                                                </p>
+                                                            </div><!-- wan_static_rip_settings_2 -->
+                                                        </div><!-- wan_static_rip_settings -->
+                                                    </div><!-- wan_static_use_rip_section -->
+                                                </div><!-- box_wan_static_body -->
+                                                <div id="box_wan_dhcp_body" style="display: none;">
+                                                    <p>
+                                                        <label class="duple" for="wan_dhcp_gw_name">Host Name&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="wan_dhcp_gw_name" size="25" maxlength="39" value="" name="config.wan_dhcp_gw_name" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_dhcp_use_unicasting_select">Use Unicasting&nbsp;:</label>
+                                                        <input default="true" id="wan_dhcp_use_unicasting" name="config.wan_dhcp_use_unicasting" value="true" type="hidden">
+                                                        <input default="true" id="wan_dhcp_use_unicasting_select" onclick="wan_dhcp_use_unicasting_selector(this.checked);" type="checkbox">(compatibility for some DHCP Servers)
+                                                    </p>
+                                                    <div class="box" id="wan_dhcp_use_rip_section" style="display: none;">
+                                                        <h3>
+                                                            RIP (Routing Information Protocol)
+                                                        </h3>
+                                                        <p>
+Allows RIP to accept updates from this connection. Note that private
+routing information is never sent to this connection. </p>
+                                                            <p>
+                                                                <label class="duple" for="wan_dhcp_use_rip_select">
+                                                                    Enable RIP&nbsp;:
+                                                                </label>
+                                                                <input default="false" id="wan_dhcp_use_rip" name="config.wan_dhcp_rip_config[0].enabled" value="false" type="hidden">
+                                                                <input default="false" id="wan_dhcp_use_rip_select" onclick="wan_dhcp_use_rip_selector(this.checked);" type="checkbox">
+                                                            </p>
+                                                            <div id="wan_dhcp_rip_settings">
+                                                                <input default="1" class="disabled" disabled="disabled" name="config.wan_dhcp_rip_config[0].accept_updates" id="wan_dhcp_rip_accept_updates" value="1" type="hidden">
+                                                                <p>
+                                                                    <label class="duple" for="wan_dhcp_rip_mode">RIP Operating mode&nbsp;:</label>
+                                                                    <input default="1" class="disabled" disabled="disabled" name="config.wan_dhcp_rip_config[0].mode" id="wan_dhcp_rip_mode" value="1" type="hidden">
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_dhcp_rip_mode_radio_0" name="wan_dhcp_rip_mode_radio" value="0" onclick="wan_dhcp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_dhcp_rip_mode_radio_0">V1</label>
+                                                                    <input default="true" class="disabled" disabled="disabled" id="wan_dhcp_rip_mode_radio_1" name="wan_dhcp_rip_mode_radio" value="1" onclick="wan_dhcp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_dhcp_rip_mode_radio_1">V2 Broadcast </label>
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_dhcp_rip_mode_radio_2" name="wan_dhcp_rip_mode_radio" value="2" onclick="wan_dhcp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_dhcp_rip_mode_radio_2">V2 Multicast </label>
+                                                                </p>
+                                                                <p>
+                                                                    <label class="duple" for="wan_dhcp_rip_metric">Router Metric&nbsp;:</label>
+                                                                    <input autocomplete="off" default="1" class="disabled" disabled="disabled" id="wan_dhcp_rip_metric" size="15" maxlength="15" value="1" name="config.wan_dhcp_rip_config[0].metric" type="text">
+                                                                </p>
+                                                                <div id="wan_dhcp_rip_settings_2">
+                                                                    <p>
+                                                                        <label class="duple" for="wan_dhcp_rip_password">
+                                                                            RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="wan_dhcp_rip_password" name="config.wan_dhcp_rip_config[0].password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                    <p>
+                                                                        <label class="duple" for="confirm_wan_dhcp_rip_password">
+                                                                            Confirm RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="confirm_wan_dhcp_rip_password" name="confirm_wan_dhcp_rip_password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                </div><!-- wan_dhcp_rip_settings_2 -->
+                                                            </div><!-- wan_dhcp_rip_settings -->
+                                                    </div><!-- wan_dhcp_use_rip_section -->
+                                                </div><!-- box_wan_dhcp_body -->
+                                                
+
+                                                
+                                                <div id="box_wan_wwan_body" style="display: none;">
+                                                	
+                                                	
+                                                	
+                                                    <p>
+                                                        <label class="duple" for="country_select">Country :</label>
+                                                        <input default="" name="config.wwan_country" id="wwan_country" value="" type="hidden">
+                                                        <select id="country_select" onchange="country_selector(this.value);">
+                                                                <option default="true" value="-1">-- Select your country --</option>
+
+                                                                
+                                                        </select>
+                                                    </p>
+
+                                                    <p>
+                                                        <label class="duple" for="isp_select">ISP :</label>
+                                                        <input default="" name="config.wwan_isp" id="wwan_isp" value="" type="hidden">
+                                                        <select id="isp_select" onchange="isp_selector(this.value);">
+                                                                <option default="true" value="-1">-- Select your ISP --</option>
+
+                                                                
+                                                        </select>
+                                                    </p>
+                                                	
+                                                	
+                                                	
+                                                    <p>
+                                                        <label class="duple" for="wwan_username">Username&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="wwan_username" size="20" maxlength="63" value="" name="config.wwan_username" type="text">
+                                                        (optional)
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wwan_password">Password&nbsp;:</label>
+                                                        <input default="" id="wwan_password" size="20" maxlength="63" onfocus="select();" value="" name="config.wwan_password" type="password">
+                                                        (optional)
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="confirm_wwan_password">Verify Password&nbsp;:</label>
+                                                        <input default="" id="confirm_wwan_password" size="20" maxlength="63" onfocus="select();" value="" type="password">
+                                                        (optional)
+                                                    </p>
+                                                    
+                                                    <p>
+                                                        <label class="duple" for="wwan_dial_num">Dial Number&nbsp;:</label>
+                                                        <input autocomplete="off" default="*99***1#" id="wwan_dial_num" size="20" maxlength="63" name="config.usb3g_dial_num" value="*99***1#" type="text">
+                                                    </p>
+                                                    
+                                                    <p>
+                                                        <label class="duple" for="wwan_apn_name">APN&nbsp;:</label>
+                                                        <input autocomplete="off" default="vibo" id="wwan_apn_name" size="20" maxlength="63" name="config.usb3g_apn_name" value="vibo" type="text">
+                                                    </p>
+                                                    
+                                                    
+                                                    
+                                                    <p>
+                                                        <label class="duple">Reconnect Mode&nbsp;:</label>
+                                                        <input default="0" name="config.usb3g_reconnect_mode" id="wwan_reconnect_mode" value="0" type="hidden">
+                                                        <input default="false" id="wwan_reconnect_mode_radio_0" name="wwan_reconnect_mode_radio" value="0" onclick="wwan_reconnect_selector(this.value);" type="radio">
+                                                        <label for="wwan_reconnect_mode_radio_0">Always on</label>
+                                                        <input default="false" id="wwan_reconnect_mode_radio_1" name="wwan_reconnect_mode_radio" value="1" onclick="wwan_reconnect_selector(this.value);" type="radio">
+                                                        <label for="wwan_reconnect_mode_radio_1">On demand</label>
+                                                        <input default="false" id="wwan_reconnect_mode_radio_2" name="wwan_reconnect_mode_radio" value="2" onclick="wwan_reconnect_selector(this.value);" type="radio">
+                                                        <label for="wwan_reconnect_mode_radio_2">Manual</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wwan_max_idle_time">Maximum Idle Time&nbsp;:</label>
+                                                        <input autocomplete="off" default="5" id="wwan_max_idle_time" size="10" maxlength="5" value="5" name="config.usb3g_max_idle_time" type="text">
+                                                        (minutes, 0=infinite)
+                                                    </p>
+                                                    
+                                                    <p>
+                                                        <label class="duple" for="wwan_wan_mtu">MTU&nbsp;:</label>
+                                                        <input autocomplete="off" default="1400" id="wwan_wan_mtu" size="10" maxlength="5" value="1400" name="config.usb3g_mtu" type="text">
+                                                        (bytes) (128~1492)
+                                                    </p>
+                                                    
+                                                    
+						</div>
+                                                
+                                                
+                                                
+                                                
+                                                <div id="box_wan_pppoe_body" style="display: none;">
+                                                    <p>
+                                                        <label class="duple">Address Mode&nbsp;:</label>
+                                                        <input default="true" name="config.pppoe_use_dynamic_address" id="pppoe_use_dynamic_address" value="true" type="hidden">
+                                                        <input default="true" id="pppoe_use_dynamic_address_radio_1" name="pppoe_use_dynamic_address_radio" value="true" onclick="pppoe_use_dynamic_address_selector(this.value);" type="radio">
+                                                        <label for="pppoe_use_dynamic_address_radio_1">Dynamic IP</label>
+                                                        <input default="false" id="pppoe_use_dynamic_address_radio_0" name="pppoe_use_dynamic_address_radio" value="false" onclick="pppoe_use_dynamic_address_selector(this.value);" type="radio">
+                                                        <label for="pppoe_use_dynamic_address_radio_0">Static IP </label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="pppoe_ip_address">IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" disabled="disabled" class="disabled" id="pppoe_ip_address" size="20" maxlength="15" value="0.0.0.0" name="config.pppoe_ip_address" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="pppoe_username">Username&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="pppoe_username" size="20" maxlength="63" value="" name="config.pppoe_username" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="pppoe_password">Password&nbsp;:</label>
+                                                        <input default="admin" id="pppoe_password" size="20" maxlength="63" onfocus="select();" value="admin" name="config.pppoe_password" type="password">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="confirm_pppoe_password">Verify Password&nbsp;:</label>
+                                                        <input default="admin" id="confirm_pppoe_password" size="20" maxlength="63" onfocus="select();" value="admin" type="password">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="pppoe_service_name">Service Name&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="pppoe_service_name" size="30" maxlength="39" value="" name="config.pppoe_service_name" type="text">
+                                                        (optional)
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple">Reconnect Mode&nbsp;:</label>
+                                                        <input default="1" name="config.pppoe_reconnect_mode" id="pppoe_reconnect_mode" value="1" type="hidden">
+                                                        <input default="false" id="pppoe_reconnect_mode_radio_0" name="pppoe_reconnect_mode_radio" value="0" onclick="pppoe_reconnect_selector(this.value);" type="radio">
+                                                        <label for="pppoe_reconnect_mode_radio_0">Always on</label>
+                                                        <input default="true" id="pppoe_reconnect_mode_radio_1" name="pppoe_reconnect_mode_radio" value="1" onclick="pppoe_reconnect_selector(this.value);" type="radio">
+                                                        <label for="pppoe_reconnect_mode_radio_1">On demand</label>
+                                                        <input default="false" id="pppoe_reconnect_mode_radio_2" name="pppoe_reconnect_mode_radio" value="2" onclick="pppoe_reconnect_selector(this.value);" type="radio">
+                                                        <label for="pppoe_reconnect_mode_radio_2">Manual</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="pppoe_max_idle_time">Maximum Idle Time&nbsp;:</label>
+                                                        <input autocomplete="off" default="5" class="" id="pppoe_max_idle_time" size="10" maxlength="5" value="5" name="config.pppoe_max_idle_time" type="text">
+                                                        (minutes, 0=infinite)
+                                                    </p>
+	
+                                                    <div class="box" id="wan_pppoe_use_rip_section" style="display: none;">
+                                                        <h3>
+                                                            RIP (Routing Information Protocol)
+                                                        </h3>
+                                                        <p>
+Allows RIP to accept updates from this connection. Note that private
+routing information is never sent to this connection. </p>
+                                                            <p>
+                                                                <label class="duple" for="wan_pppoe_use_rip_select">
+                                                                    Enable RIP&nbsp;:
+                                                                </label>
+                                                                <input default="false" id="wan_pppoe_use_rip" name="config.wan_pppoe_rip_config[0].enabled" value="false" type="hidden">
+                                                                <input default="false" id="wan_pppoe_use_rip_select" onclick="wan_pppoe_use_rip_selector(this.checked);" type="checkbox">
+                                                            </p>
+                                                            <div id="wan_pppoe_rip_settings">
+                                                                <input default="1" class="disabled" disabled="disabled" name="config.wan_pppoe_rip_config[0].accept_updates" id="wan_pppoe_rip_accept_updates" value="1" type="hidden">
+                                                                <p>
+                                                                    <label class="duple" for="wan_pppoe_rip_mode">RIP Operating mode&nbsp;:</label>
+                                                                    <input default="1" class="disabled" disabled="disabled" name="config.wan_pppoe_rip_config[0].mode" id="wan_pppoe_rip_mode" value="1" type="hidden">
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_pppoe_rip_mode_radio_0" name="wan_pppoe_rip_mode_radio" value="0" onclick="wan_pppoe_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_pppoe_rip_mode_radio_0">V1</label>
+                                                                    <input default="true" class="disabled" disabled="disabled" id="wan_pppoe_rip_mode_radio_1" name="wan_pppoe_rip_mode_radio" value="1" onclick="wan_pppoe_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_pppoe_rip_mode_radio_1">V2 Broadcast </label>
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_pppoe_rip_mode_radio_2" name="wan_pppoe_rip_mode_radio" value="2" onclick="wan_pppoe_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_pppoe_rip_mode_radio_2">V2 Multicast </label>
+                                                                </p>
+                                                                <p>
+                                                                    <label class="duple" for="wan_pppoe_rip_metric">Router Metric&nbsp;:</label>
+                                                                    <input autocomplete="off" default="1" class="disabled" disabled="disabled" id="wan_pppoe_rip_metric" size="15" maxlength="15" value="1" name="config.wan_pppoe_rip_config[0].metric" type="text">
+                                                                </p>
+                                                                <div id="wan_pppoe_rip_settings_2">
+                                                                    <p>
+                                                                        <label class="duple" for="wan_pppoe_rip_password">
+                                                                            RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="wan_pppoe_rip_password" name="config.wan_pppoe_rip_config[0].password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                    <p>
+                                                                        <label class="duple" for="confirm_wan_pppoe_rip_password">
+                                                                            Confirm RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="confirm_wan_pppoe_rip_password" name="confirm_wan_pppoe_rip_password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                </div><!-- wan_pppoe_rip_settings_2 -->
+                                                            </div><!-- wan_pppoe_rip_settings -->
+                                                    </div><!-- wan_pppoe_use_rip_section -->
+                                                </div><!-- box_wan_pppoe_body -->
+                                                <div id="box_wan_pptp_body" style="display: none;">
+                                                    <p>
+                                                        <label class="duple">Address Mode&nbsp;:</label>
+                                                        <input default="false" name="config.wan_pptp_use_dynamic_carrier" id="wan_pptp_use_dynamic_carrier" value="false" type="hidden">
+                                                        <input default="false" id="wan_pptp_use_dynamic_carrier_radio_1" name="wan_pptp_use_dynamic_carrier_radio" value="true" onclick="wan_pptp_use_dynamic_carrier_selector(this.value);" type="radio">
+                                                        <label for="wan_pptp_use_dynamic_carrier_radio_1">Dynamic IP</label>
+                                                        <input default="true" id="wan_pptp_use_dynamic_carrier_radio_0" name="wan_pptp_use_dynamic_carrier_radio" value="false" onclick="wan_pptp_use_dynamic_carrier_selector(this.value);" type="radio">
+                                                        <label for="wan_pptp_use_dynamic_carrier_radio_0">Static IP</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_ip_address">PPTP IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" class="" id="wan_pptp_ip_address" size="20" maxlength="15" value="0.0.0.0" name="config.wan_pptp_ip_address" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_subnet_mask">PPTP Subnet Mask&nbsp;:</label>
+                                                        <input autocomplete="off" default="255.255.255.0" class="" id="wan_pptp_subnet_mask" size="20" maxlength="15" value="255.255.255.0" name="config.wan_pptp_subnet_mask" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_gateway">PPTP Gateway IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" class="" id="wan_pptp_gateway" size="20" maxlength="15" value="0.0.0.0" name="config.wan_pptp_gateway" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_server">PPTP Server IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" id="wan_pptp_server" size="20" maxlength="15" value="0.0.0.0" name="config.wan_pptp_server" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_username">Username&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="wan_pptp_username" size="20" maxlength="63" value="" name="config.wan_pptp_username" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_password">Password&nbsp;:</label>
+                                                        <input default="admin" id="wan_pptp_password" size="20" maxlength="63" onfocus="select();" value="admin" name="config.wan_pptp_password" type="password">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="confirm_wan_pptp_password">Verify Password&nbsp;:</label>
+                                                        <input default="admin" id="confirm_wan_pptp_password" size="20" maxlength="63" onfocus="select();" value="admin" type="password">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_reconnect_mode">Reconnect Mode&nbsp;:</label>
+                                                        <input default="1" name="config.wan_pptp_reconnect_mode" id="wan_pptp_reconnect_mode" value="1" type="hidden">
+                                                        <input default="false" id="pptp_reconnect_mode_radio_0" name="pptp_reconnect_mode_radio" value="0" onclick="pptp_reconnect_selector(this.value);" type="radio">
+                                                        <label for="pptp_reconnect_mode_radio_0">Always on</label>
+                                                        <input default="true" id="pptp_reconnect_mode_radio_1" name="pptp_reconnect_mode_radio" value="1" onclick="pptp_reconnect_selector(this.value);" type="radio">
+                                                        <label for="pptp_reconnect_mode_radio_1">On demand</label>
+                                                        <input default="false" id="pptp_reconnect_mode_radio_2" name="pptp_reconnect_mode_radio" value="2" onclick="pptp_reconnect_selector(this.value);" type="radio">
+                                                        <label for="pptp_reconnect_mode_radio_2">Manual</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_pptp_max_idle_time">Maximum Idle Time&nbsp;:</label>
+                                                        <input autocomplete="off" default="5" class="" id="wan_pptp_max_idle_time" maxlength="5" size="10" value="5" name="config.wan_pptp_max_idle_time" type="text">
+                                                        (minutes, 0=infinite)
+                                                    </p>
+                                                    <div class="box" id="wan_pptp_use_rip_section" style="display: none;">
+                                                        <h3>
+                                                            RIP (Routing Information Protocol)
+                                                        </h3>
+                                                        <p>
+Allows RIP to accept updates from this connection. Note that private
+routing information is never sent to this connection. </p>
+                                                            <p>
+                                                                <label class="duple" for="wan_pptp_use_rip_select">
+                                                                    Enable RIP&nbsp;:
+                                                                </label>
+                                                                <input default="false" id="wan_pptp_use_rip" name="config.wan_pptp_rip_config[0].enabled" value="false" type="hidden">
+                                                                <input default="false" id="wan_pptp_use_rip_select" onclick="wan_pptp_use_rip_selector(this.checked);" type="checkbox">
+                                                            </p>
+                                                            <div id="wan_pptp_rip_settings">
+                                                                <input default="1" class="disabled" disabled="disabled" name="config.wan_pptp_rip_config[0].accept_updates" id="wan_pptp_rip_accept_updates" value="1" type="hidden">
+                                                                <p>
+                                                                    <label class="duple" for="wan_pptp_rip_mode">RIP Operating mode&nbsp;:</label>
+                                                                    <input default="1" class="disabled" disabled="disabled" name="config.wan_pptp_rip_config[0].mode" id="wan_pptp_rip_mode" value="1" type="hidden">
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_pptp_rip_mode_radio_0" name="wan_pptp_rip_mode_radio" value="0" onclick="wan_pptp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_pptp_rip_mode_radio_0">V1</label>
+                                                                    <input default="true" class="disabled" disabled="disabled" id="wan_pptp_rip_mode_radio_1" name="wan_pptp_rip_mode_radio" value="1" onclick="wan_pptp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_pptp_rip_mode_radio_1">V2 Broadcast </label>
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_pptp_rip_mode_radio_2" name="wan_pptp_rip_mode_radio" value="2" onclick="wan_pptp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_pptp_rip_mode_radio_2">V2 Multicast </label>
+                                                                </p>
+                                                                <p>
+                                                                    <label class="duple" for="wan_pptp_rip_metric">Router Metric&nbsp;:</label>
+                                                                    <input autocomplete="off" default="1" class="disabled" disabled="disabled" id="wan_pptp_rip_metric" size="15" maxlength="15" value="1" name="config.wan_pptp_rip_config[0].metric" type="text">
+                                                                </p>
+                                                                <div id="wan_pptp_rip_settings_2">
+                                                                    <p>
+                                                                        <label class="duple" for="wan_pptp_rip_password">
+                                                                            RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="wan_pptp_rip_password" name="config.wan_pptp_rip_config[0].password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                    <p>
+                                                                        <label class="duple" for="confirm_wan_pptp_rip_password">
+                                                                            Confirm RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="confirm_wan_pptp_rip_password" name="confirm_wan_pptp_rip_password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                </div><!-- wan_pptp_rip_settings_2 -->
+                                                            </div><!-- wan_pptp_rip_settings -->
+                                                    </div><!-- wan_pptp_use_rip_section -->
+                                                </div><!-- box_wan_pptp_body -->
+                                                <div id="box_wan_l2tp_body" style="display: none;">
+                                                    <p>
+                                                        <label class="duple">Address Mode&nbsp;:</label>
+                                                        <input default="false" name="config.wan_l2tp_use_dynamic_carrier" id="wan_l2tp_use_dynamic_carrier" value="false" type="hidden">
+                                                        <input default="false" id="wan_l2tp_use_dynamic_carrier_radio_1" name="wan_l2tp_use_dynamic_carrier_radio" value="true" onclick="wan_l2tp_use_dynamic_carrier_selector(this.value);" type="radio">
+                                                        <label for="wan_l2tp_use_dynamic_carrier_radio_1">Dynamic IP</label>
+                                                        <input default="true" id="wan_l2tp_use_dynamic_carrier_radio_0" name="wan_l2tp_use_dynamic_carrier_radio" value="false" onclick="wan_l2tp_use_dynamic_carrier_selector(this.value);" type="radio">
+                                                        <label for="wan_l2tp_use_dynamic_carrier_radio_0">Static IP</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_ip_address">L2TP IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" class="" id="wan_l2tp_ip_address" size="20" maxlength="15" value="0.0.0.0" name="config.wan_l2tp_ip_address" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_subnet_mask">L2TP Subnet Mask&nbsp;:</label>
+                                                        <input autocomplete="off" default="255.255.255.0" class="" id="wan_l2tp_subnet_mask" size="20" maxlength="15" value="255.255.255.0" name="config.wan_l2tp_subnet_mask" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_gateway">L2TP Gateway IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" class="" id="wan_l2tp_gateway" size="20" maxlength="15" value="0.0.0.0" name="config.wan_l2tp_gateway" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_server">L2TP Server IP Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" id="wan_l2tp_server" size="20" maxlength="15" value="0.0.0.0" name="config.wan_l2tp_server" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_username">Username&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="wan_l2tp_username" size="20" maxlength="63" value="" name="config.wan_l2tp_username" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_password">Password&nbsp;:</label>
+                                                        <input default="admin" id="wan_l2tp_password" size="20" maxlength="63" onfocus="select();" value="admin" name="config.wan_l2tp_password" type="password">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="confirm_wan_l2tp_password">Verify Password&nbsp;:</label>
+                                                        <input default="admin" id="confirm_wan_l2tp_password" size="20" maxlength="63" onfocus="select();" value="admin" type="password">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_reconnect_mode">Reconnect Mode&nbsp;:</label>
+                                                        <input default="1" name="config.wan_l2tp_reconnect_mode" id="wan_l2tp_reconnect_mode" value="1" type="hidden">
+                                                        <input default="false" id="l2tp_reconnect_mode_radio_0" name="l2tp_reconnect_mode_radio" value="0" onclick="l2tp_reconnect_selector(this.value);" type="radio">
+                                                        <label for="l2tp_reconnect_mode_radio_0">Always on</label>
+                                                        <input default="true" id="l2tp_reconnect_mode_radio_1" name="l2tp_reconnect_mode_radio" value="1" onclick="l2tp_reconnect_selector(this.value);" type="radio">
+                                                        <label for="l2tp_reconnect_mode_radio_1">On demand</label>
+                                                        <input default="false" id="l2tp_reconnect_mode_radio_2" name="l2tp_reconnect_mode_radio" value="2" onclick="l2tp_reconnect_selector(this.value);" type="radio">
+                                                        <label for="l2tp_reconnect_mode_radio_2">Manual</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_l2tp_max_idle_time">Maximum Idle Time&nbsp;:</label>
+                                                        <input autocomplete="off" default="5" class="" id="wan_l2tp_max_idle_time" maxlength="5" size="10" value="5" name="config.wan_l2tp_max_idle_time" type="text">
+                                                        (minutes, 0=infinite)
+                                                    </p>
+                                                    <div class="box" id="wan_l2tp_use_rip_section" style="display: none;">
+                                                        <h3>
+                                                            RIP (Routing Information Protocol)
+                                                        </h3>
+                                                        <p>
+Allows RIP to accept updates from this connection. Note that private
+routing information is never sent to this connection. </p>
+                                                            <p>
+                                                                <label class="duple" for="wan_l2tp_use_rip_select">
+                                                                    Enable RIP&nbsp;:
+                                                                </label>
+                                                                <input default="false" id="wan_l2tp_use_rip" name="config.wan_l2tp_rip_config[0].enabled" value="false" type="hidden">
+                                                                <input default="false" id="wan_l2tp_use_rip_select" onclick="wan_l2tp_use_rip_selector(this.checked);" type="checkbox">
+                                                            </p>
+                                                            <div id="wan_l2tp_rip_settings">
+                                                                <input default="1" class="disabled" disabled="disabled" name="config.wan_l2tp_rip_config[0].accept_updates" id="wan_l2tp_rip_accept_updates" value="1" type="hidden">
+                                                                <p>
+                                                                    <label class="duple" for="wan_l2tp_rip_mode">RIP Operating mode&nbsp;:</label>
+                                                                    <input default="1" class="disabled" disabled="disabled" name="config.wan_l2tp_rip_config[0].mode" id="wan_l2tp_rip_mode" value="1" type="hidden">
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_l2tp_rip_mode_radio_0" name="wan_l2tp_rip_mode_radio" value="0" onclick="wan_l2tp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_l2tp_rip_mode_radio_0">V1</label>
+                                                                    <input default="true" class="disabled" disabled="disabled" id="wan_l2tp_rip_mode_radio_1" name="wan_l2tp_rip_mode_radio" value="1" onclick="wan_l2tp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_l2tp_rip_mode_radio_1">V2 Broadcast </label>
+                                                                    <input default="false" class="disabled" disabled="disabled" id="wan_l2tp_rip_mode_radio_2" name="wan_l2tp_rip_mode_radio" value="2" onclick="wan_l2tp_rip_mode_selector(this.value);" type="radio">
+                                                                    <label for="wan_l2tp_rip_mode_radio_2">V2 Multicast </label>
+                                                                </p>
+                                                                <p>
+                                                                    <label class="duple" for="wan_l2tp_rip_metric">Router Metric&nbsp;:</label>
+                                                                    <input autocomplete="off" default="1" class="disabled" disabled="disabled" id="wan_l2tp_rip_metric" size="15" maxlength="15" value="1" name="config.wan_l2tp_rip_config[0].metric" type="text">
+                                                                </p>
+                                                                <div id="wan_l2tp_rip_settings_2">
+                                                                    <p>
+                                                                        <label class="duple" for="wan_l2tp_rip_password">
+                                                                            RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="wan_l2tp_rip_password" name="config.wan_l2tp_rip_config[0].password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                    <p>
+                                                                        <label class="duple" for="confirm_wan_l2tp_rip_password">
+                                                                            Confirm RIP Password&nbsp;:
+                                                                        </label>
+                                                                        <input default="" class="disabled" disabled="disabled" id="confirm_wan_l2tp_rip_password" name="confirm_wan_l2tp_rip_password" value="" size="20" maxlength="16" type="password">
+                                                                    </p>
+                                                                </div><!-- wan_l2tp_rip_settings_2 -->
+                                                            </div><!-- wan_l2tp_rip_settings -->
+                                                    </div><!-- wan_l2tp_use_rip_section -->
+                                                </div><!-- box_wan_l2tp_body -->
+                                                <div id="box_wan_general_body_dns" style="display: none;">
+                                                    <p>
+                                                        <label class="duple" for="wan_primary_dns">Primary DNS Server&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" id="wan_primary_dns" size="20" maxlength="15" value="0.0.0.0" name="config.wan_primary_dns" type="text">
+                                                        <!--2007.04.16 --><label for="wan_primary_dns" id="wan_primary_dns_optional" style="display: none;">(optional)</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="wan_secondary_dns">Secondary DNS Server&nbsp;:</label>
+                                                        <input autocomplete="off" default="0.0.0.0" id="wan_secondary_dns" size="20" maxlength="15" value="0.0.0.0" name="config.wan_secondary_dns" type="text">
+                                                        <!--2007.04.16 --><label for="wan_primary_dns" id="wan_secondary_dns_optional" style="display: none;">(optional)</label>
+                                                    </p>
+                                                </div><!-- box_wan_general_body_dns -->
+                                                <div id="box_wan_general_body" style="display: none;">
+                                                    <p>
+                                                        <label class="duple" for="wan_mtu">MTU&nbsp;:</label>
+                                                        <input default="true" name="config.wan_mtu_use_default" id="wan_mtu_use_default" value="true" type="hidden">
+                                                        <input autocomplete="off" default="1500" id="wan_mtu" size="10" maxlength="5" value="1500" name="config.wan_mtu" type="text">
+                                                        (bytes)
+                                                        MTU default = 
+                                                        <span id="wan_mtu_default"></span>
+                                                    </p>
+                                                </div><!-- box_wan_general_body -->
+                                                <div id="box_wan_mac_info_body" style="display: none;">
+                                                    <p>
+                                                        <label class="duple" for="mac_cloning_address">MAC Address&nbsp;:</label>
+                                                        <input autocomplete="off" default="00:00:00:00:00:00" id="mac_cloning_address" size="20" maxlength="17" value="00:00:00:00:00:00" name="config.mac_cloning_address" type="text">
+                                                        <input default="false" id="mac_cloning_enabled" name="config.mac_cloning_enabled" value="false" type="hidden">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple">&nbsp;</label>
+                                                        <input class="button_submit" value="Clone Your PC's MAC Address" onclick="clone_mac();" type="button">
+                                                    </p>
+                                                </div><!-- box_wan_mac_info_body -->
+                                            </fieldset>
+                                        </div><!-- box_main_field -->
+
+                    <div class="box" id="box_wan_ping" style="display: none;">
+                        <h3>WAN Ping</h3>
+                        <p class="box_msg">If
+you enable this feature, the WAN port of your router will respond to
+ping requests from the Internet that are sent to the WAN IP Address.</p>
+                        <fieldset>
+                            <p>
+                                <label class="duple" for="allow_wan_ping_select">Enable WAN Ping Respond&nbsp;:</label>
+                                <input default="false" id="allow_wan_ping" name="config.allow_wan_ping" value="false" type="hidden">
+                                <input default="false" id="allow_wan_ping_select" onclick="allow_wan_ping_selector(this.checked);" type="checkbox">
+                            </p>
+                            <p>
+                                <label class="duple" for="wan_ping_ingress_filter_name_select">WAN Ping <a href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>&nbsp;:</label>
+                                <input default="Allow All" id="wan_ping_ingress_filter_name" name="config.wan_ping_ingress_filter_name" value="Allow All" type="hidden">
+                                <select disabled="disabled" class="disabled" id="wan_ping_ingress_filter_name_select" onchange="wan_ping_ingress_filter_name_selector(this.value);">
+                                    <option default="true" value="dummy">&nbsp;</option>
+                                </select>
+                            </p>
+                            <p>
+                                <label class="duple" for="filtext">Details&nbsp;:</label>
+                                <input autocomplete="off" default="" id="filtext" name="filtext" class="rule_details" size="48" maxlength="48" readonly="readonly" value="" type="text">
+                            </p>
+                        </fieldset>
+                    </div>
+                    <div class="box" id="box_multicast_streams" style="display: none;">
+                        <h3>Multicast Streams</h3>
+                        <fieldset>
+                            <p>
+                                <label class="duple" for="lan_use_igmp_proxy_select">Enable Multicast Streams&nbsp;:</label>
+                                <input default="0" id="lan_use_igmp_proxy" name="config.lan_use_igmp_proxy" value="0" type="hidden">
+                                <input default="false" id="lan_use_igmp_proxy_select" onclick="lan_use_igmp_proxy_selector(this.checked);" type="checkbox">
+                            </p>
+                        </fieldset>
+                    </div>
+                <div class="box" id="box_wan_RuPPPoE_body" style="display: none;">
+                    <h3>WAN Physical setting&nbsp;:</h3>
+                    <fieldset>
+                        <p>
+                            <label class="duple">Address Mode&nbsp;:</label>
+                            <input default="" name="config.wan_russia_pppoe_use_dynamic_address" id="wan_russia_pppoe_use_dynamic_address" value="" type="hidden">
+                            <input default="false" id="wan_russia_pppoe_use_dynamic_address_radio_1" name="wan_russia_pppoe_use_dynamic_address_radio" value="true" onclick="wan_russia_pppoe_use_dynamic_address_selector(this.value);" type="radio">
+                            <label for="wan_russia_pppoe_use_dynamic_address_radio_1">Dynamic IP</label>
+                            <input default="false" id="wan_russia_pppoe_use_dynamic_address_radio_0" name="wan_russia_pppoe_use_dynamic_address_radio" value="false" onclick="wan_russia_pppoe_use_dynamic_address_selector(this.value);" type="radio">
+                            <label for="wan_russia_pppoe_use_dynamic_address_radio_0">Static IP</label>
+                        </p>
+                        <p>
+                            <label class="duple" for="wan_russia_pppoe_ip_address">IP Address&nbsp;:</label>
+                            <input autocomplete="off" default="" id="wan_russia_pppoe_ip_address" size="20" maxlength="15" value="" name="config.wan_russia_pppoe_ip_address" type="text">
+                        </p>
+                        <p>
+                            <label class="duple" for="wan_russia_pppoe_subnet_mask">Subnet Mask&nbsp;:</label>
+                            <input autocomplete="off" default="" id="wan_russia_pppoe_subnet_mask" size="20" maxlength="15" value="" name="config.wan_russia_pppoe_subnet_mask" type="text">
+                        </p>
+                        <p>
+                            <label class="duple" for="wan_russia_pppoe_gateway">Default Gateway&nbsp;:</label>
+                            <input autocomplete="off" default="" id="wan_russia_pppoe_gateway" size="20" maxlength="15" value="" name="config.wan_russia_pppoe_gateway" type="text">
+                        </p>
+                        <p>
+                            <label class="duple" for="wan_russia_pppoe_primary_dns">Primary DNS Server&nbsp;:</label>
+                            <input autocomplete="off" default="0.0.0.0" id="wan_russia_pppoe_primary_dns" size="20" maxlength="15" value="0.0.0.0" name="config.wan_russia_pppoe_primary_dns" type="text">
+                            (optional)
+
+                        </p>
+                        <p>
+                            <label class="duple" for="wan_russia_pppoe_secondary_dns">Secondary DNS Server&nbsp;:</label>
+                            <input autocomplete="off" default="0.0.0.0" id="wan_russia_pppoe_secondary_dns" size="20" maxlength="15" value="0.0.0.0" name="config.wan_russia_pppoe_secondary_dns" type="text">
+                            (optional)
+                        </p>
+                    </fieldset>
+                </div><!-- box -->
+                        </form>
+            
+
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </div></td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                                                                                <p>Device drivers and the D-Link USB Network Utility must be installed on each computer that will use the device. </p>
+                                                                                <p>If
+you have trouble accessing the Internet through the router. Double
+check the settings you entered on this page and verify with your
+Internet Service Provider (ISP) if needed. </p>
+                                                                                <p style="display: none;">For
+added security, it is recommended that you disable the WAN Ping Respond
+option. Ping is often used by malicious Internet users to locate active
+networks or PCs.</p>
+                                                                                <p style="display: none;">If you are having trouble receiving multicast streams from the Internet, make sure the Multicast Streams option is enabled.</p>
+                                                                                <p class="more">
+                                                                 <!-- Link to more help -->
+                                                                                        <a href="Basic.html#USB" onclick="return jump_if();">More...</a>
+                                                                                </p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                            <tbody><tr>
+                                                <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                                                <td>&nbsp;</td>
+                                            </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

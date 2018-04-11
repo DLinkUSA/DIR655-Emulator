@@ -1,0 +1,891 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  : Status / Logs</title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Status/Logs.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * Handle for document form .
+         */
+        var mf;
+
+        /*
+         * Email config settings.
+         */
+        var smtp_notification = "true";
+        var smtp_email_addr = "";
+
+        var retry_count=0;
+        var xml_loader = new ajax_xmlhttp("../wifi_log.xml?retry=" + retry_count, xml_ready, xml_timeout);
+        var xsl_loader = new ajax_xslproc("../Status/logs.sxsl", xsl_ready, xsl_timeout);
+        var xml_data_ready = false;
+        var xsl_data_ready = false;
+        var xml_data;
+        var progress;
+
+        /*
+         * log_opt_firewall_selector()
+         */
+        function log_opt_firewall_selector(mode)
+        {
+            mf.log_opt_firewall.value = mode;
+            mf.log_opt_firewall_select.checked = mode;
+        }
+
+        /*
+         * log_opt_firewall_selector()
+         */
+        function log_opt_system_selector(mode)
+        {
+            mf.log_opt_system.value = mode;
+            mf.log_opt_system_select.checked = mode;
+        }
+
+        /*
+         * log_opt_firewall_selector()
+         */
+        function log_opt_status_selector(mode)
+        {
+            mf.log_opt_status.value = mode;
+            mf.log_opt_status_select.checked = mode;
+        }
+
+        /*
+         * log_level_critical_selector()
+         */
+        function log_level_critical_selector(mode)
+        {
+            mf.log_level_critical.value = mode;
+            mf.log_level_critical_select.checked = mode;
+        }
+
+        /*
+         * log_opt_firewall_selector()
+         */
+        function log_level_warning_selector(mode)
+        {
+            mf.log_level_warning.value = mode;
+            mf.log_level_warning_select.checked = mode;
+        }
+
+        /*
+         * log_opt_firewall_selector()
+         */
+        function log_level_info_selector(mode)
+        {
+            mf.log_level_info.value = mode;
+            mf.log_level_info_select.checked = mode;
+        }
+
+        /*
+         * xsl_timeout()
+         */
+        function xsl_timeout()
+        {
+            window.setTimeout(xsl_loader.retrieve_xsl, 20000);
+        }
+
+        /*
+         * xml_timeout()
+         */
+        function xml_timeout()
+        {
+            retry_count++;
+            if (retry_count <= 3) {
+                progress.innerHTML = "<center>Memory may be too low to display all logs.<\/center><\/center>";
+                xml_loader.xmlhttp_url = "../wifi_log.xml?retry=" + retry_count;
+                window.setTimeout(xml_loader.retrieve_xml, 0);
+            } else {
+                progress.innerHTML = "<center>Problem in receiving logs! Memory is too low to display logs or there is a problem with the connection.<\/center>";
+            }
+        }
+
+        /*
+         * xsl_ready()
+         */
+        function xsl_ready()
+        {
+            xsl_data_ready = true;
+            refresh_table();
+        }
+
+        /*
+         * xml_ready()
+         */
+        function xml_ready(xml_doc)
+        {
+            xml_data = xml_doc;
+            xml_data_ready = true;
+            refresh_table();
+        }
+
+        /*
+         * refresh_table()
+         */
+        function refresh_table()
+        {
+            if (!(xml_data_ready && xsl_data_ready)) {
+                return;
+            }
+
+            document.getElementById("log_field").innerHTML = "";
+
+            var parent = document.getElementById("logs_span");
+
+            if (parent.firstChild != null) {
+                parent.removeChild(parent.firstChild);
+            }
+
+            xsl_loader.transform(xml_data, window.document, parent);
+        }
+
+        /*
+         * xml_command_ready()
+         */
+        function xml_command_ready(xml_doc)
+        {
+            var status = xml_doc.get_element_data("log");
+            if (status == "clear") {
+                alert("All log entries were cleared.");
+                top.location="/Status/Logs.html";
+            } else if (status == "email") {
+                alert("This log will be sent to email address " + smtp_email_addr);
+            } else {
+                alert("Action failed to complete");
+            }
+        }
+
+        /*
+         * xml_command()
+         */
+        function xml_command(cmd)
+        {
+            var xml_command_loader = new ajax_xmlhttp("/log_cmd.xml?cmd=" + cmd, xml_command_ready);
+            xml_command_loader.retrieve_xml();
+        }
+
+        /*
+         * clear_log()
+         */
+        function clear_log()
+        {
+            if (!confirm("Are you sure you want to clear all log entries?")) {
+                return;
+            }
+            xml_command("clear");
+        }
+
+        /*
+         * email_log()
+         */
+        function email_log()
+        {
+            if (smtp_notification == "false") {
+                alert("Email notification is not enabled.");
+                return;
+            }
+            if (smtp_email_addr == "") {
+                alert("Email address is not configured.");
+                return;
+            }
+            xml_command("email");
+        }
+
+        // 2008.06.10
+        function save_log()
+        {
+            /* check if is IE6 */
+            var ua = window.navigator.userAgent;
+            var ie;
+            var findstr = "MSIE 6";
+
+            ie = ua.match(findstr);
+            if (ie == findstr) {
+                document.forms.saveform.ie6.value = 1;
+            }
+            document.forms.saveform.submit();
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                log_opt_firewall_selector(1);
+                log_opt_system_selector(1);
+                log_opt_status_selector(1);
+                log_level_critical_selector(1);
+                log_level_warning_selector(1);
+                log_level_info_selector(1);
+                return;
+            }
+
+            /*
+             * Set enabled/disabled, do not allow non_admin users to to "Clear" or "Email".
+             */
+            var disabled = !is_admin;
+            var disabled_email = "false" == "false";
+            disable_form_field(mf.button_email_log, disabled || disabled_email);
+            document.getElementById("user_only").style.display = disabled ? "block" : "none";
+            //document.getElementById("email_only").style.display = (is_admin && disabled_email) ? "block" : "none";
+            if (disabled) {
+                do_block_enable("log_options_fieldset", false);
+                disable_form_field(mf.button_clear_log, true);
+            }
+
+            var is_router_mode = "0" == "0";
+            /*
+             * If WAN port mode selected is Bridge mode, we hide  "Firewall & Security" option.
+             * Disable related element as we do not want to submit the element not used in the selected mode.
+             */
+             if (is_router_mode) {
+                log_opt_firewall_selector(mf.log_opt_firewall.value == "true");
+            } else {
+                disable_form_field(mf.log_opt_firewall, true);
+                document.getElementById("log_opt_firewall_cell").style.display = "none";
+            }
+
+            progress = document.getElementById("log_field");
+            progress.innerHTML = "<br/><center>please wait! while logs are being received...<\/center>";
+           
+
+            log_opt_system_selector(mf.log_opt_system.value == "true");
+            log_opt_status_selector(mf.log_opt_status.value == "true");
+            log_level_critical_selector(mf.log_level_critical.value == "true");
+            log_level_warning_selector(mf.log_level_warning.value == "true");
+            log_level_info_selector(mf.log_level_info.value == "true");
+
+            save_form_default_values("mainform");
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+            mf.submit();
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.<span id="fw_minor_head">21</span>
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <form id="saveform" method="get" action="/save_log_data.cgi">
+                                                                        <input id="ie6" name="ie6" value="0" type="hidden">
+                                                                        </form>
+                                                                        <form saved="true" id="mainform" action="/Status/Logs.html" method="post" onsubmit="return false;">
+                                                                                <div class="section">
+                                                                                        <div class="section_head">
+                                                                                                <h2>Logs</h2>
+                                                <p>Use
+this option to view the router logs. You can define what types of
+events you want to view and the event levels to view. This router also
+has internal syslog server support so you can send the log files to a
+computer on your network that is running a syslog utility.</p>
+                                                <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                                                     
+                                                                                        </div>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>Log Options</h3>
+                                                                                        <fieldset id="log_options_fieldset">
+                                                                                                <table class="formarea" id="status_logs_options" summary="" border="0" cellpadding="0" cellspacing="4">
+                                                                                                        <tbody><tr>
+                                                                                                                <td class="form_label">
+What to View&nbsp;: </td>
+                                                                                                                <td id="log_opt_firewall_cell">
+                                                                                                                        <input default="true" id="log_opt_firewall" name="config.log_opt_firewall" value="true" type="hidden">
+                                                                                                                        <input default="true" id="log_opt_firewall_select" onclick="log_opt_firewall_selector(this.checked);" type="checkbox">
+                                                                                                                        <label for="log_opt_firewall_select">Firewall &amp; Security</label>
+                                                                                                                </td>
+                                                                                                                <td>
+                                                                                                                        <input default="true" id="log_opt_system" name="config.log_opt_system" value="true" type="hidden">
+                                                                                                                        <input default="true" id="log_opt_system_select" onclick="log_opt_system_selector(this.checked);" type="checkbox">
+                                                                                                                        <label for="log_opt_system_select">System</label>
+                                                                                                                </td>
+                                                                                                                <td>
+                                                                                                                        <input default="true" id="log_opt_status" name="config.log_opt_status" value="true" type="hidden">
+                                                                                                                        <input default="true" id="log_opt_status_select" onclick="log_opt_status_selector(this.checked);" type="checkbox">
+                                                                                                                        <label for="log_opt_status_select">Router Status</label>
+                                                                                                                </td>
+                                                                                                        </tr>
+                                                                                                        <tr>
+                                                                                                                <td class="form_label">
+View Levels&nbsp;: </td>
+                                                                                                                        <td>
+                                                                                                                        <input default="true" id="log_level_critical" name="config.log_level_critical" value="true" type="hidden">
+                                                                                                                        <input default="true" id="log_level_critical_select" onclick="log_level_critical_selector(this.checked);" type="checkbox">
+                                                                                                                        <label for="log_level_critical_select">Critical</label>
+                                                                                                                </td>
+                                                                                                                <td>
+                                                                                                                        <input default="true" id="log_level_warning" name="config.log_level_warning" value="true" type="hidden">
+                                                                                                                        <input default="true" id="log_level_warning_select" onclick="log_level_warning_selector(this.checked);" type="checkbox">
+                                                                                                                        <label for="log_level_warning_select">Warning</label>
+                                                                                                                </td>
+                                                                                                                <td>
+                                                                                                                        <input default="true" id="log_level_info" name="config.log_level_info" value="true" type="hidden">
+                                                                                                                        <input default="true" id="log_level_info_select" onclick="log_level_info_selector(this.checked);" type="checkbox">
+                                                                                                                        <label for="log_level_info_select">Informational</label>
+                                                                                                                </td>
+                                                                                                        </tr>
+                                                                                                </tbody></table>
+                                                                                                <div class="centered">
+                                                    <input class="button_submit" value="Apply Log Settings Now" onclick=";" type="button">
+                                                                                                </div>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>Log Details</h3>
+                                                                                        <div class="centered" id="status_logs_details">
+                                                                                                <input class="button_submit" value="Refresh" onclick="top.location='Logs.html'" type="button">
+                                                                                                <input class="button_submit" id="button_clear_log" value="Clear" onclick=";" type="button">
+                                                                                                <input disabled="disabled" class="button_submit disabled" id="button_email_log" value="Email Now" onclick=";" type="button">
+                                                                                                <input class="button_submit" value="Save Log" onclick=";" type="button">
+                                                                                        </div>
+                                                                                        <div id="logs_span"><table class="formlisting" cellpadding="0" cellspacing="1"><caption align="top">10 
+				Log Entries:&nbsp;
+			</caption><thead><tr><th>Priority</th><th>Time</th><th>Message</th></tr></thead><tfoot></tfoot><tbody><tr><td>[INFO]</td><td>Sat Jan 31 10:43:23 2004</td><td>Wireless link is up</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:21 2004</td><td>Allowed configuration authentication by IP address 192.168.0.11</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:20 2004</td><td>Starting DHCP server</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:13 2004</td><td>LAN interface is up</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:13 2004</td><td>LAN Ethernet Carrier Detected</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:12 2004</td><td>Device initialized</td></tr><tr><td>[WARN]</td><td>Sat Jan 31 10:43:11 2004</td><td>Wireless schedule init</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:11 2004</td><td>guest: Unlock AP setup</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:11 2004</td><td>primary: Unlock AP setup</td></tr><tr><td>[INFO]</td><td>Sat Jan 31 10:43:11 2004</td><td>No Internet access policy is in effect. Unrestricted Internet access allowed to everyone</td></tr></tbody></table></div>
+                                                                                        <span id="log_field"></span>
+                                                                                </div>
+                                                                        </form>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div><!-- maincontent -->
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                                                                        <p>Check the log frequently to detect unauthorized network usage.</p>
+                                                                        <p>You can also have the log mailed to you periodically. Refer to <a href="EMail.html" onclick="return jump_if();">Tools → EMail</a>.</p>
+                                                                        <p class="more"><a href="Status.html#Logs" onclick="return jump_if();">More...</a></p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td>
+                                                                <img src="img_wireless_bottom.gif" alt="" width="114" height="35">
+                                                        </td>
+                                                        <td>&nbsp;
+
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

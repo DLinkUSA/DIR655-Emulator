@@ -1,0 +1,889 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Advanced / Web Filter
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        #url_list {
+                background-color: #DFDFDF;
+                text-align: center;
+        }
+        #url_list input {
+                background-color: #FFF;
+                padding: 0;
+                margin: 2px;
+        }
+        #url_list h4 {
+                padding: 6px 0 0px 0;
+        }
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Advanced/Web_Filter.html";
+        }
+
+       /*
+         * template_load()
+        * Perform initialization for items that belong to the DWT when page is loaded.
+        */
+       function template_load()
+       {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * Handle for document form.
+         */
+        var mf;
+
+        /*
+         * Check for validation errors.
+         */
+        var verify_failed = "";
+        var size = "40";
+
+        /*
+         * clear_list_URL()
+         */
+        function clear_list_URL()
+        {
+            for (var i = 0; i < size; i++) {
+                mf["entry" + i + "_url"].value = '';
+                mf["entry" + i + "_enabled"].value = "false";
+                mf["entry" + i + "_used"].value = "0";
+            }
+        }
+
+        /*
+         * filtering_mode_selector()
+         */
+        function filtering_mode_selector(val)
+        {
+            if (val == "0")
+                mf.web_filter_allow.value = 0;
+            else
+                mf.web_filter_allow.value = 1;
+        }
+
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                return;
+            }
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            save_form_default_values("mainform");
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed != "") {
+                set_form_always_modified("mainform");
+                alert(verify_failed);
+            }
+
+                        // 2007.09.17
+            mf.mode.value = mf.web_filter_allow.value;
+            mf.mode.setAttribute("modified", "ignore");
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+
+            for (var i = 0; i < size; i++) {
+                mf["entry" + i + "_url"].value = mf["entry" + i + "_url"].value.trim();
+                if (mf["entry" + i + "_url"].value != '') {
+                    mf["entry" + i + "_enabled"].value = "true";
+                    mf["entry" + i + "_used"].value = "1";
+                } else {
+                    mf["entry" + i + "_enabled"].value = "false";
+                    mf["entry" + i + "_used"].value = "0";
+                }
+            }
+
+            mf.submit();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") && confirm ("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed != "") {
+                    top.location = "/Advanced/Web_Filter.html";
+                } else {
+                    reset_form("mainform");
+                    page_load();
+                }
+            }
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.<span id="fw_minor_head">21</span>
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+
+
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                             										
+                                                            										<li>
+											                                                              <div>
+												                                                                      <a id="Advanced_Bsecure_nav_link" href="Bsecure.html" onclick="return jump_if();">securespot</a>
+											                                                               </div>
+										                                                           </li>
+										                                                           
+
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Guest_Zone.html" onclick="return jump_if();">Guest Zone</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                 
+                                                                        </ul>
+
+                                                                        <ul id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                    <div class="section">
+                                                                        <div class="section_head">
+                                                                            <h2>Reboot needed</h2>
+                                                                            <p>Your
+changes have been saved. The router must be rebooted for the changes to
+take effect. You can reboot now, or you can continue to make other
+changes and reboot later.</p>
+                                                                            <form id="rebootdummy" action="#" method="get">
+                                                                            <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                            <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                            </form>
+                                                                        </div>
+                                                                    </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                    <div class="section">
+                                                                        <div class="section_head">
+                                                                            <h2>Configuration Warnings</h2>
+                                                                            <div style="display: block;" id="warnings_section_content">
+                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                            </div><!-- box warnings_section_content -->
+                                                                        </div>
+                                                                    </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <form saved="true" id="mainform" action="/Advanced/Web_Filter.html" method="post" onsubmit="return false;">
+                                                                                <div class="section">
+                                                                                        <div class="section_head">
+                                                                                                <h2>Website Filter</h2>
+                                                                                                <p>The
+Website Filter option allows you to set up a list of Web sites you
+would like to allow or deny through your network. To use this feature,
+you must also select the "Apply Web Filter" checkbox in the Access
+Control section.</p>
+                                                                                                <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                                                                                <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                                                                <input class="button_submit" value="Don't Save Settings" onclick="page_cancel()" type="button">
+                                                                                        </div>
+                                                                                        <div class="box">
+                                                                                                <h3>40 -- Website Filtering Rules</h3>
+
+                                                                                                <!-- 2007.06.27 New Spec -->
+                                                                                                <table summary="">
+                                                                                                        <tbody><tr>
+                                                                                                                <td rowspan="1" colspan="1">Configure Website Filter below:</td>
+                                                                                                        </tr>
+                                                                                                        <tr>
+                                                                                                                <td rowspan="1" colspan="1">
+                                                                                                                        <input default="0" id="web_filter_allow" name="config.web_filter_allow" value="0" type="hidden">
+                                                                                                                        <select modified="ignore" name="mode" onchange="filtering_mode_selector(this.value)">
+                                                                                                                                <option default="true" value="0">DENY computers access to ONLY these sites</option>
+                                                                                                                                <option default="false" value="1">ALLOW computers access to ONLY these sites</option>
+                                                                                                                        </select>
+                                                                                                                </td>
+                                                                                                        </tr>
+                                                                                                </tbody></table>
+
+                                                                                                <p>
+                                                                                                    <input class="button_submit" value="Clear the list below..." onclick="clear_list_URL();" type="button">
+                                                                                                </p>
+                                                                                                <div id="url_list">
+                                                                                                    <h4>Website URL/Domain</h4>
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry0_url" maxlength="99" size="30" name="config.web_filter[0].url" value="" type="text">
+                                                                                                        <input default="true" id="entry0_enabled" name="config.web_filter[0].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry0_used" name="config.web_filter[0].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry1_url" maxlength="99" size="30" name="config.web_filter[1].url" value="" type="text">
+                                                                                                        <input default="true" id="entry1_enabled" name="config.web_filter[1].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry1_used" name="config.web_filter[1].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry2_url" maxlength="99" size="30" name="config.web_filter[2].url" value="" type="text">
+                                                                                                        <input default="true" id="entry2_enabled" name="config.web_filter[2].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry2_used" name="config.web_filter[2].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry3_url" maxlength="99" size="30" name="config.web_filter[3].url" value="" type="text">
+                                                                                                        <input default="true" id="entry3_enabled" name="config.web_filter[3].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry3_used" name="config.web_filter[3].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry4_url" maxlength="99" size="30" name="config.web_filter[4].url" value="" type="text">
+                                                                                                        <input default="true" id="entry4_enabled" name="config.web_filter[4].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry4_used" name="config.web_filter[4].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry5_url" maxlength="99" size="30" name="config.web_filter[5].url" value="" type="text">
+                                                                                                        <input default="true" id="entry5_enabled" name="config.web_filter[5].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry5_used" name="config.web_filter[5].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry6_url" maxlength="99" size="30" name="config.web_filter[6].url" value="" type="text">
+                                                                                                        <input default="true" id="entry6_enabled" name="config.web_filter[6].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry6_used" name="config.web_filter[6].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry7_url" maxlength="99" size="30" name="config.web_filter[7].url" value="" type="text">
+                                                                                                        <input default="true" id="entry7_enabled" name="config.web_filter[7].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry7_used" name="config.web_filter[7].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry8_url" maxlength="99" size="30" name="config.web_filter[8].url" value="" type="text">
+                                                                                                        <input default="true" id="entry8_enabled" name="config.web_filter[8].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry8_used" name="config.web_filter[8].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry9_url" maxlength="99" size="30" name="config.web_filter[9].url" value="" type="text">
+                                                                                                        <input default="true" id="entry9_enabled" name="config.web_filter[9].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry9_used" name="config.web_filter[9].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry10_url" maxlength="99" size="30" name="config.web_filter[10].url" value="" type="text">
+                                                                                                        <input default="true" id="entry10_enabled" name="config.web_filter[10].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry10_used" name="config.web_filter[10].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry11_url" maxlength="99" size="30" name="config.web_filter[11].url" value="" type="text">
+                                                                                                        <input default="true" id="entry11_enabled" name="config.web_filter[11].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry11_used" name="config.web_filter[11].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry12_url" maxlength="99" size="30" name="config.web_filter[12].url" value="" type="text">
+                                                                                                        <input default="true" id="entry12_enabled" name="config.web_filter[12].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry12_used" name="config.web_filter[12].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry13_url" maxlength="99" size="30" name="config.web_filter[13].url" value="" type="text">
+                                                                                                        <input default="true" id="entry13_enabled" name="config.web_filter[13].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry13_used" name="config.web_filter[13].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry14_url" maxlength="99" size="30" name="config.web_filter[14].url" value="" type="text">
+                                                                                                        <input default="true" id="entry14_enabled" name="config.web_filter[14].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry14_used" name="config.web_filter[14].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry15_url" maxlength="99" size="30" name="config.web_filter[15].url" value="" type="text">
+                                                                                                        <input default="true" id="entry15_enabled" name="config.web_filter[15].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry15_used" name="config.web_filter[15].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry16_url" maxlength="99" size="30" name="config.web_filter[16].url" value="" type="text">
+                                                                                                        <input default="true" id="entry16_enabled" name="config.web_filter[16].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry16_used" name="config.web_filter[16].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry17_url" maxlength="99" size="30" name="config.web_filter[17].url" value="" type="text">
+                                                                                                        <input default="true" id="entry17_enabled" name="config.web_filter[17].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry17_used" name="config.web_filter[17].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry18_url" maxlength="99" size="30" name="config.web_filter[18].url" value="" type="text">
+                                                                                                        <input default="true" id="entry18_enabled" name="config.web_filter[18].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry18_used" name="config.web_filter[18].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry19_url" maxlength="99" size="30" name="config.web_filter[19].url" value="" type="text">
+                                                                                                        <input default="true" id="entry19_enabled" name="config.web_filter[19].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry19_used" name="config.web_filter[19].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry20_url" maxlength="99" size="30" name="config.web_filter[20].url" value="" type="text">
+                                                                                                        <input default="true" id="entry20_enabled" name="config.web_filter[20].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry20_used" name="config.web_filter[20].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry21_url" maxlength="99" size="30" name="config.web_filter[21].url" value="" type="text">
+                                                                                                        <input default="true" id="entry21_enabled" name="config.web_filter[21].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry21_used" name="config.web_filter[21].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry22_url" maxlength="99" size="30" name="config.web_filter[22].url" value="" type="text">
+                                                                                                        <input default="true" id="entry22_enabled" name="config.web_filter[22].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry22_used" name="config.web_filter[22].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry23_url" maxlength="99" size="30" name="config.web_filter[23].url" value="" type="text">
+                                                                                                        <input default="true" id="entry23_enabled" name="config.web_filter[23].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry23_used" name="config.web_filter[23].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry24_url" maxlength="99" size="30" name="config.web_filter[24].url" value="" type="text">
+                                                                                                        <input default="true" id="entry24_enabled" name="config.web_filter[24].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry24_used" name="config.web_filter[24].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry25_url" maxlength="99" size="30" name="config.web_filter[25].url" value="" type="text">
+                                                                                                        <input default="true" id="entry25_enabled" name="config.web_filter[25].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry25_used" name="config.web_filter[25].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry26_url" maxlength="99" size="30" name="config.web_filter[26].url" value="" type="text">
+                                                                                                        <input default="true" id="entry26_enabled" name="config.web_filter[26].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry26_used" name="config.web_filter[26].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry27_url" maxlength="99" size="30" name="config.web_filter[27].url" value="" type="text">
+                                                                                                        <input default="true" id="entry27_enabled" name="config.web_filter[27].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry27_used" name="config.web_filter[27].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry28_url" maxlength="99" size="30" name="config.web_filter[28].url" value="" type="text">
+                                                                                                        <input default="true" id="entry28_enabled" name="config.web_filter[28].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry28_used" name="config.web_filter[28].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry29_url" maxlength="99" size="30" name="config.web_filter[29].url" value="" type="text">
+                                                                                                        <input default="true" id="entry29_enabled" name="config.web_filter[29].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry29_used" name="config.web_filter[29].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry30_url" maxlength="99" size="30" name="config.web_filter[30].url" value="" type="text">
+                                                                                                        <input default="true" id="entry30_enabled" name="config.web_filter[30].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry30_used" name="config.web_filter[30].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry31_url" maxlength="99" size="30" name="config.web_filter[31].url" value="" type="text">
+                                                                                                        <input default="true" id="entry31_enabled" name="config.web_filter[31].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry31_used" name="config.web_filter[31].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry32_url" maxlength="99" size="30" name="config.web_filter[32].url" value="" type="text">
+                                                                                                        <input default="true" id="entry32_enabled" name="config.web_filter[32].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry32_used" name="config.web_filter[32].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry33_url" maxlength="99" size="30" name="config.web_filter[33].url" value="" type="text">
+                                                                                                        <input default="true" id="entry33_enabled" name="config.web_filter[33].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry33_used" name="config.web_filter[33].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry34_url" maxlength="99" size="30" name="config.web_filter[34].url" value="" type="text">
+                                                                                                        <input default="true" id="entry34_enabled" name="config.web_filter[34].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry34_used" name="config.web_filter[34].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry35_url" maxlength="99" size="30" name="config.web_filter[35].url" value="" type="text">
+                                                                                                        <input default="true" id="entry35_enabled" name="config.web_filter[35].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry35_used" name="config.web_filter[35].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry36_url" maxlength="99" size="30" name="config.web_filter[36].url" value="" type="text">
+                                                                                                        <input default="true" id="entry36_enabled" name="config.web_filter[36].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry36_used" name="config.web_filter[36].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry37_url" maxlength="99" size="30" name="config.web_filter[37].url" value="" type="text">
+                                                                                                        <input default="true" id="entry37_enabled" name="config.web_filter[37].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry37_used" name="config.web_filter[37].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry38_url" maxlength="99" size="30" name="config.web_filter[38].url" value="" type="text">
+                                                                                                        <input default="true" id="entry38_enabled" name="config.web_filter[38].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry38_used" name="config.web_filter[38].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                        <input autocomplete="off" default="" id="entry39_url" maxlength="99" size="30" name="config.web_filter[39].url" value="" type="text">
+                                                                                                        <input default="true" id="entry39_enabled" name="config.web_filter[39].enabled" value="true" type="hidden">
+                                                                                                        <input default="0" id="entry39_used" name="config.web_filter[39].used" value="0" type="hidden">
+                                                                                                    
+                                                                                                </div><!-- url_list -->
+                                                                                        </div><!-- box -->
+                                                                                </div><!-- section -->
+                                                                        </form>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                <strong>Helpful Hints...</strong>
+                                                                <p>Create a list of Web sites to which you would like to deny or allow through the network.</p>
+                                                                <p>Use with <a href="Access_Control.html" onclick="return jump_if();">Advanced → Access&nbsp;Control</a>.</p>
+                                                                <p class="more">
+                                                                    <!-- Link to more help -->
+                                                                    <a href="Advanced.html#Web_Filter" onclick="return jump_if();">More...</a>
+                                                                </p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td>
+                                                                <img src="img_wireless_bottom.gif" alt="" width="114" height="35">
+                                                        </td>
+                                                        <td>&nbsp;
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

@@ -1,0 +1,928 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>
+                D-LINK SYSTEMS, INC. | WIRELESS ROUTER :
+                Tools/Dynamic DNS
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+           /*
+            * Styles used only on this page.
+            */
+           /*
+            * Make labels a little narrower
+            */
+           fieldset label.duple {
+               width: 168px;
+           }
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Tools/Dynamic_DNS.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * Handle for document form.
+         */
+        var mf;
+
+        var verify_failed = "";
+
+        /*
+         * Do we support the DynDNS server entered by the user?
+         */
+        var is_user_server_supported = true;
+
+        /*
+         * List of supported Dynamic DNS service providers.
+         */
+        var dyndns_servers_list = [
+            "",
+            "www.changeip.com",
+            "www.DynDNS.com (Free)",
+            "www.EuroDynDNS.org",
+            "",
+            "www.no-ip.com",
+            "www.ods.org",
+            "www.ovh.com",
+            "www.regfish.com",
+            "www.tzo.com",
+            "",
+            "www.easyDNS.com",
+            "www.DynDNS.com (Custom)",
+            "www.DynDNS.com (Static)",
+            "www.zoneedit.com",
+			"www.DLinkDDNS.com",
+			"",
+			"dlinkddns.com.cn", // 2008.01.31
+			"",
+			"",
+			"www.oray.cn", // index 20 for Oray 2007.10.08
+			"www.oray.net" // index 21 for Oray 2007.10.08
+        ];
+
+        var ddns_status_xml_loader = new ajax_xmlhttp("/get_ddns_status.xml", ddns_status_xml_ready, ddns_status_xml_timeout, 6000);
+
+        /*
+         * dyndns_enabled_selector()
+         */
+        function dyndns_enabled_selector(checked)
+        {
+            mf.dyndns_enabled.value = checked;
+            mf.dyndns_enabled_select.checked = checked;
+            var disabled = !checked;
+            disable_form_field(mf.dyndns_server_select, disabled);
+            disable_form_field(mf.dyndns_host, disabled);
+            disable_form_field(mf.dyndns_user, disabled);
+            disable_form_field(mf.dyndns_pass, disabled);
+            disable_form_field(mf.confirm_dyndns_pass, disabled);
+            disable_form_field(mf.dyndns_timeout, disabled);
+
+            mf.dyndns_server_user.disabled = disabled;
+            // 2007.05.07 DDNS
+            mf.dyndns_server_user2.disabled = disabled;
+        }
+
+        function dyndns_server_user_selector(user_server)
+        {
+            user_server = user_server.toLowerCase().replace(/\s/g, "");
+            for (var i = 0, len = dyndns_servers_list.length; i < len; i++) {
+                if (user_server == dyndns_servers_list[i].toLowerCase().replace(/\s/g, "")) {
+                    mf.dyndns_server.value = i;
+                    mf.dyndns_server_user.value = dyndns_servers_list[i];
+                    mf.dyndns_server_select.value = -1;
+                    is_user_server_supported = true;
+                    return;
+                }
+            }
+            is_user_server_supported = false;
+            alert("The specified Dynamic DNS Service Provider is not supported.");
+        }
+
+        /*
+         * dyndns_server_selector()
+         */
+        function dyndns_server_selector(value)
+        {
+            mf.dyndns_server_select.value = value;
+            mf.dyndns_server.value = value;
+
+            /*
+             * Only update the list's selected option if it exists.
+             */
+            var select = mf.dyndns_server_select;
+            select.value = -1;
+            for (var i = 0, len = select.options.length; i < len; i++) {
+                if (select.options[i].value == value) {
+                    select.value = value;
+                    mf.dyndns_server_user2.value = select.options[i].text;
+                    break;
+                }
+            }
+
+            select.value = -1;
+        }
+
+        /*
+         * page_reload()
+         */
+        function page_reload()
+        {
+            top.location = "/Tools/Dynamic_DNS.html";
+        }
+
+        /*
+         * verify_password()
+         */
+        function verify_password(f1, f2)
+        {
+            if (f1.value != f2.value) {
+                 alert("passwords do not match, please re-enter");
+                 f1.value = "";
+                 f2.value = "";
+                 f1.select();
+                 f1.focus();
+                 return false;
+            }
+            return true;
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+
+            if (!is_user_server_supported) {
+                alert("The specified Dynamic DNS Service Provider is not supported.");
+                return;
+            }
+
+            if (!verify_password(mf.dyndns_pass, mf.confirm_dyndns_pass)) {
+                return;
+            }
+
+            var timeout = mf.dyndns_timeout.value;
+            if (!is_uinteger(timeout) || timeout > 8760) {
+                alert("You must enter a numeric value between 0 and 8760 inclusive.");
+                mf.dyndns_timeout.select();
+                mf.dyndns_timeout.focus();
+                return;
+            }
+
+            // 2007.05.09 DDNS
+            // mf.dyndns_server.value = 99;
+            // change to 99 for manual issue
+
+            // determine dyndns_server.value
+            {
+                var user_server;
+
+                // default value to userinput/99
+                mf.dyndns_server.value = 99;
+                user_server = mf.dyndns_server_user2.value;
+
+                user_server = user_server.toLowerCase().replace(/\s/g, "");
+                for (var i = 0, len = dyndns_servers_list.length; i < len; i++) {
+                    if (user_server == dyndns_servers_list[i].toLowerCase().replace(/\s/g, "")) {
+                        mf.dyndns_server.value = i;
+                        break;
+                    }
+                }
+            }
+
+            mf.form_submitted.value = "1";
+            mf.submit();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") && confirm("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed != "") {
+                    top.location = "/Tools/Dynamic_DNS.html";
+                } else {
+                    reset_form("mainform");
+                    page_load();
+                }
+            }
+        }
+
+// 2007.05.10
+//      DYNDNS_OK,
+//      DYNDNS_EMEMORY,
+//      DYNDNS_EDNS,
+//      DYNDNS_EBADPARAM,
+//      DYNDNS_EHTTP,
+//      DYNDNS_EDYNDNS,
+//      DYNDNS_ECONN,
+//      DYNDNS_ERETRY,
+// -1 Connecting
+        var mystatus = "128";
+
+        function ddns_status_xml_ready(xml_doc)
+        {
+
+            var ddns = xml_doc.get_element_data("ddns");
+            var sConnected = "Connected";
+            var sDisConnect = "Disconnect";
+            var sConnecting = "Connecting";
+
+            if (ddns) {
+                //document.getElementById("offline").style.display = "none";
+                //document.getElementById("online").style.display = "block";
+                // 2007.04.25 skip wan online issue
+                // wanonline = 1;
+            }
+            var s;
+            s = "";
+
+            if (ddns == 250) {
+                //s = "Fail, WAN no IP Adress";
+                s = sDisConnect;
+            }
+            else if (ddns == 5) {
+                //s = "Fail, Please check ddns configuration setting";
+                s = sDisConnect;
+            }
+            else if (ddns == 0) {
+                //s = "Connected";
+                s = sConnected;
+            }
+            else if (ddns == 129) {
+                //s = "DDNS Disabled";
+                s = sDisConnect;
+            }
+            else if (ddns == 100) {
+                //s = "Connected Update";
+                s = sConnected;
+            }
+            else {
+                s = sDisConnect;
+            }
+
+            // 
+
+            document.getElementById("dyndns_status").innerHTML = s;
+
+            // this should try next
+            window.setTimeout(ddns_status_xml_loader.retrieve_xml, 6000);
+        }
+
+        function ddns_status_xml_timeout()
+        {
+            window.setTimeout(ddns_status_xml_loader.retrieve_xml, 6000);
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                dyndns_enabled_selector(false);
+                dyndns_server_selector(1);
+                return;
+            }
+
+            dyndns_enabled_selector(mf.dyndns_enabled.value == "true");
+            dyndns_server_selector(mf.dyndns_server.value);
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            // 2007.05.07
+            // 99 is user input, only support dyndns (because no dyndns/static/custom information)
+            if (mf.dyndns_server.value != "99" ) {
+                dyndns_server_selector(mf.dyndns_server.value);
+                mf.dyndns_server_user.value = dyndns_servers_list[mf.dyndns_server.value];
+            }
+
+            save_form_default_values("mainform");
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed != "") {
+                set_form_always_modified("mainform");
+                alert(verify_failed);
+                return;
+            }
+
+            /*
+             * Only add the following code after the submit and DynDNS is enabled.
+             */
+            // 
+
+            // 2007.05.10
+            
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.32NA
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                                                 </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <form saved="true" id="mainform" action="/Tools/Dynamic_DNS.html" method="post" onsubmit="return false;">
+                                                                                <div class="section">
+                                                                                        <div class="section_head">
+                                                                                                <h2>Dynamic DNS</h2>
+                                                                                                <p>
+The DDNS feature allows you to host a server (Web, FTP, Game Server,
+etc...) using a domain name that you have purchased
+(www.whateveryournameis.com) with your dynamically assigned IP address.
+Most broadband Internet Service Providers assign dynamic (changing) IP
+addresses. Using a DDNS service provider, your friends can enter your
+host name to connect to your game server no matter what your IP address
+is. <br><br>
+Sign up for D-Link's Free DDNS service at <a href="http://www.dlinkddns.com/"> www.DLinkDDNS.com</a>.
+                                                                                                </p>
+                                                                                                <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                                                                                <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                                                                <input class="button_submit" value="Don't Save Settings" onclick="page_cancel();" type="button">
+                                                                                        </div>
+                                                                                        <div class="box">
+                                                                                                <h3>Dynamic DNS</h3>
+                                                                                                <fieldset>
+                                                                                                        <p>
+                                                                                                                <input default="0" name="form_submitted" value="0" type="hidden">
+                                                                                                                <label class="duple" for="dyndns_enabled_select">Enable Dynamic DNS:</label>
+                                                                                                                <input default="false" id="dyndns_enabled" name="config.dyndns_enabled" value="false" type="hidden">
+                                                                                                                <input default="false" id="dyndns_enabled_select" onclick="dyndns_enabled_selector(this.checked);" type="checkbox">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <input default="99" id="dyndns_server" name="config.dyndns_server" value="99" type="hidden">
+                                                                                                                <label class="duple" for="dyndns_server_user">Server Address:</label>
+                                                                                                                <!-- Support DDNS 2007.05.07 -->
+                                                                                                                <input autocomplete="off" default="" disabled="disabled" id="dyndns_server_user2" name="config.dyndns_cameo_name" size="20" maxlength="63" value="" type="text">
+                                                                                                                <input default="" disabled="disabled" id="dyndns_server_user" size="25" maxlength="255" onchange="dyndns_server_user_selector(this.value);" type="hidden">
+                                                                                                                <input id="dns_button" name="dns_button" value="&lt;&lt;" size="3" onclick="dyndns_server_selector(document.getElementById('dyndns_server_select').value);" type="button">
+                                                                                                                <select disabled="disabled" class="disabled" id="dyndns_server_select" onchange="">
+                                                                                                                        <option default="true" value="-1">Select Dynamic DNS Server</option>
+                                                                                                                        <option default="false" value="15">www.DLinkDDNS.com</option>
+                                                                                                                        <option default="false" value="12">www.DynDNS.com (Custom)</option>
+                                                                                                                        <option default="false" value="2">www.DynDNS.com (Free)</option>
+                                                                                                                </select>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="dyndns_host">Host Name:</label>
+                                                                                                                <input autocomplete="off" default="" disabled="disabled" class="disabled" size="30" maxlength="255" id="dyndns_host" name="config.dyndns_host" value="" type="text">
+(e.g.: me.mydomain.net) </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="dyndns_user">Username or Key:</label>
+                                                                                                                <input autocomplete="off" default="" disabled="disabled" class="disabled" size="20" maxlength="32" id="dyndns_user" name="config.dyndns_user" value="" type="text">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="dyndns_pass">Password or Key:</label>
+                                                                                                                <input default="" disabled="disabled" class="disabled" size="20" maxlength="32" id="dyndns_pass" name="config.dyndns_pass" value="" onfocus="select();" type="password">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="confirm_dyndns_pass">Verify Password or Key:</label>
+                                                                                                                <input default="" disabled="disabled" class="disabled" size="20" maxlength="32" id="confirm_dyndns_pass" value="" onfocus="select();" type="password">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="dyndns_timeout">Timeout:</label>
+                                                                                                                <input autocomplete="off" default="576" disabled="disabled" class="disabled" size="10" maxlength="5" id="dyndns_timeout" name="config.dyndns_timeout" value="576" type="text">
+                                                                                                                (hours)
+                                                                                                        </p>
+                                                                                                        <!-- Status issue -->
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="dyndns_status">Status:</label>
+                                                                                                                <span id="dyndns_status">Disconnect</span>
+                                                                                                        </p>
+                                                                                                </fieldset>
+                                                                                        </div>
+                                                                                </div>
+                                                                        </form>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                                                                        <p>To use this feature, you must first have a Dynamic DNS account from one of the providers in the drop down menu.</p>
+                                                                        <p class="more">
+                                                                                <!-- Link to more help -->
+                                                                                <a href="Tools.html#Dynamic_DNS" onclick="return jump_if();">More...</a>
+                                                                        </p>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                                                        <td>&nbsp;</td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

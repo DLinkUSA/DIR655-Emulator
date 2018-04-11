@@ -1,0 +1,2379 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Setup / Internet 
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        #sidehelp_container {
+                display: none;
+        }
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *     Used by navigation.js.
+         *     You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Help/Advanced.html";
+        }
+
+        /*
+         * template_load()
+        * Perform initialization for items that belong to the DWT when page is loaded.
+        */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+
+        /*
+         * page_load()
+         */
+        function page_load() {
+            if (local_debug) {
+                hide_all_ssi_tr();
+            }
+
+            radio_count = parseInt(document.getElementById("radio_count").value, 10);
+
+            if (radio_count < 2) {
+                return;
+            }
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.32NA
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <!-- 2007.05.25
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                -->
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <!-- File "wlan_radio_inc.html" -->
+<!-- This file replaces the old gateway_radio.lua file which controlled cooker -->
+<!-- The ATHEROS part of the lua code has been translated into SSI -->
+<!-- FALSE is the empty string; TRUE is a nonempty string -->
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+		
+	
+	<!-- If either radio supports 11A, we display 11A related Help text -->
+	<!-- These variables are used only in the Help section of the UI -->
+	
+	
+
+
+
+
+
+
+<!-- If either radio needs extra ui config, we display the Help text on extra ui config -->
+
+
+<script type="text/javascript">
+//<![CDATA[
+/*
+ * Default channel
+ */
+var DEFAULT_CHANNEL_A = 40;
+var DEFAULT_CHANNEL_G = 6;
+
+/*
+ *  802.11 band
+ *  On some UI, we split phy modes into two drop down list for the user to select
+ *	2.4GHz
+ * 		11b only
+ * 		11g only
+ *		11n only
+ *		mixed 11g, 11b
+ *		mixed 11n, 11g
+ * 		mixed 11n, 11g, and 11b
+ * 	5Ghz
+ * 		11a only
+ *		11n only
+ *		mixed 11n and 11a
+ */
+ var DEFAULT_BAND = "2";	// 2.4GHz or 5GHz or both, used for the UIs that do not need to split the drop down list.
+ var G_BAND_ONLY = "0";		// 2.4GHz
+ var A_BAND_ONLY = "1";		// 5GHz
+
+/*
+ * Default phy mode to be selected
+ */
+ var DEFAULT_PHY_MODE_G_BAND = "11";
+ var DEFAULT_PHY_MODE_A_BAND = "20";
+ var DEFAULT_PHY_MODE_A_AND_G_BAND = "31";
+
+/*
+ * This defines a Radio object with properties that are used to include or
+ *	exclude optional sections on the web pages.
+ *	It also provides methods to populate radio settings <select>'s.
+ */
+
+function Radio(radio_index)
+{
+	/*
+	 * Define radio's attributes and their default values.
+	 */
+	if (radio_index == 1) {
+		//
+			this.region = parseInt("4");
+		//
+	} else if (radio_index == 2) {
+		//
+	}
+	this.type = ""
+	this.type_A = false;
+	this.type_B = false;
+	this.type_G = false;
+	this.type_NG = false;
+	this.type_NA = false;
+	this.auto_channel = false;
+	this.extra_ui_config = false;
+	this.scan_type_dual = false;
+	this.rf_test_mode = false;
+	this.band = DEFAULT_BAND;
+
+	if (radio_index == 1) {
+		//
+	} else if (radio_index == 2) {
+		//
+	}
+
+	/*
+	 * Update attribute values according to configuration.
+	 */
+	//
+		this.type = "BG";
+		this.type_B = true;
+		this.type_G = true;
+		//
+			this.type = "BGN";
+			this.type_NG = true;
+		//
+		if (radio_index == 1) {
+			//
+		} else if (radio_index == 2) {
+			//
+		}
+		this.auto_channel = true;
+	//
+
+	//
+
+	//
+
+	//
+
+	//
+
+	/*
+	 * Private method to easily add an <option> to a given <select>.
+	 */
+	function add(select, name, value)
+	{
+		//
+		/*
+		 * Hide DFS channels
+		 */
+		if (( value >= 52) && (value < 149) && name.match("GHz - CH")) {
+			return;
+		}
+		//
+
+		select.options.add(new Option(name, value));
+	}
+
+	/*
+	 * Standard toString method.
+	 */
+	this.toString = function () {
+		return this.type;
+	};
+
+	/*
+	 * Get the default channel for the radio
+	 */
+	this.get_default_channel = function() {
+		if (this.type_A || this.type_NA) {
+			if (this.region == 23 || this.region == 39 || this.region == 40)
+				return 149;
+			else
+			return DEFAULT_CHANNEL_A;
+		} else {
+			return DEFAULT_CHANNEL_G;
+		}
+	}
+
+	/*
+	 * populate_channel_selector()
+	 *	Adds channel <option>'s to the given <select>.
+	 */
+	this.populate_channel_selector = function (select) {
+		if (this.type_B || this.type_G || this.type_NG) {
+			if (this.region != 2 && this.region != 10) {
+				add(select, "2.412 GHz - CH 1", 1);
+				add(select, "2.417 GHz - CH 2", 2);
+				add(select, "2.422 GHz - CH 3", 3);
+				add(select, "2.427 GHz - CH 4", 4);
+			}
+
+			if (this.region != 10) {
+				add(select, "2.432 GHz - CH 5", 5);
+				add(select, "2.437 GHz - CH 6", 6);
+				add(select, "2.442 GHz - CH 7", 7);
+			}
+
+			if (this.region != 2 && this.region != 10) {
+				add(select, "2.447 GHz - CH 8", 8);
+				add(select, "2.452 GHz - CH 9", 9);
+			}
+
+			if (this.region != 2) {
+				add(select, "2.457 GHz - CH 10", 10);
+				add(select, "2.462 GHz - CH 11", 11);
+			}
+
+            /*
+             * Reason: Add region code for Latin America
+             * Modified: Yufa Huang
+             * Date: 2008.07.09
+             */
+			if (this.region != 2 && this.region != 4 && this.region != 6 && this.region != 30 &&
+			    this.region != 32 && this.region != 34 && this.region != 39 && this.region != 40) {
+				add(select, "2.467 GHz - CH 12", 12);
+				add(select, "2.472 GHz - CH 13", 13);
+			}
+
+			if (this.region == 16 || this.region == 17 || this.region == 19) {
+				add(select, "2.484 GHz - CH 14 (802.11b ONLY)", 14);
+			}
+
+			if (this.region == 26 || this.region == 27 || this.region == 28) {
+				add(select, "2.484 GHz - CH 14", 14);
+			}
+		}
+
+		/*
+		 * Now add the 802.11a channels.
+		 */
+		if (!(this.type_A || this.type_NA)) {
+			return;
+		}
+
+		/*
+		 *  	FCC1_FCCA
+		 *	FCC1_WORLD
+		 *	FCC2_FCCA
+		 *	FCC2_WORLD
+		 *	FCC2_ETSIC
+		 */
+		if (this.region == 4 || this.region == 5 || this.region == 6 || this.region == 7 || this.region == 8) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+
+		if (this.region == 9 || this.region == 10 || this.region == 11 || this.region == 12 || this.region == 13 || this.region == 14 || this.region == 15) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+
+			if (this.region != 15) {
+				add(select, "5.260 GHz - CH 52", 52);
+				add(select, "5.280 GHz - CH 56", 56);
+			}
+
+			if (this.region != 15 && this.region != 11) {
+				add(select, "5.300 GHz - CH 60", 60);
+				add(select, "5.320 GHz - CH 64", 64);
+			}
+
+			if (this.region == 11 || this.region == 14) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				add(select, "5.660 GHz - CH 132", 132);
+				add(select, "5.680 GHz - CH 136", 136);
+				add(select, "5.700 GHz - CH 140", 140);
+			}
+		}
+		if (this.region == 16 || this.region == 17 || this.region == 19) {
+			add(select, "5.170 GHz - CH 34", 34);
+			add(select, "5.190 GHz - CH 38", 38);
+			add(select, "5.210 GHz - CH 42", 42);
+			add(select, "5.230 GHz - CH 46", 46);
+		}
+
+		if (this.region == 19) {
+			add(select, "4.920 GHz - CH 184", 184);
+			add(select, "4.940 GHz - CH 188", 188);
+			add(select, "4.960 GHz - CH 192", 192);
+			add(select, "4.980 GHz - CH 196", 196);
+		}
+
+		if (this.region == 18 || this.region == 20 || this.region == 21 || this.region == 22 || this.region == 23 || this.region == 24 || this.region == 25) {
+			if (this.region == 18) {
+				add(select, "5.180 GHz - CH 36", 36);
+				add(select, "5.200 GHz - CH 40", 40);
+				add(select, "5.220 GHz - CH 44", 44);
+				add(select, "5.240 GHz - CH 48", 48);
+			}
+			if (this.region == 21) {
+				add(select, "5.280 GHz - CH 56", 56);
+				add(select, "5.300 GHz - CH 60", 60);
+				add(select, "5.320 GHz - CH 64", 64);
+			}
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			if (this.region == 18 || this.region == 23 || this.region == 24) {
+				add(select, "5.825 GHz - CH 165", 165);
+			}
+		}
+		if (this.region >= 26 && this.region <= 31) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+			if (this.region >= 26 && this.region <= 28) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				add(select, "5.600 GHz - CH 120", 120);
+				add(select, "5.620 GHz - CH 124", 124);
+				add(select, "5.640 GHz - CH 128", 128);
+				add(select, "5.660 GHz - CH 132", 132);
+				add(select, "5.680 GHz - CH 136", 136);
+				add(select, "5.700 GHz - CH 140", 140);
+			}
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+
+		/*
+		 *  	FCC3_FCCA
+		 *	FCC3_WORLD
+		 *	FCC6_FCCA
+		 *	FCC6_WORLD
+		 *	APL6_WORLD
+		 *	APL8_WORLD
+		 *	APL9_WORLD
+		 *	APL3_FCCA
+		 */
+		if (this.region >= 32 && this.region <= 38) {
+			if (this.region != 37) {
+				add(select, "5.180 GHz - CH 36", 36);
+				add(select, "5.200 GHz - CH 40", 40);
+				add(select, "5.220 GHz - CH 44", 44);
+				add(select, "5.240 GHz - CH 48", 48);
+			}
+
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			if (this.region != 36 && this.region != 37) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				if (this.region == 32 || this.region == 33 || this.region == 38) {
+					add(select, "5.600 GHz - CH 120", 120);
+					add(select, "5.620 GHz - CH 124", 124);
+				}
+				if (this.region == 32 || this.region == 33) {
+					add(select, "5.640 GHz - CH 128", 128);
+				}
+				if (this.region != 38) {
+					add(select, "5.660 GHz - CH 132", 132);
+					add(select, "5.680 GHz - CH 136", 136);
+					add(select, "5.700 GHz - CH 140", 140);
+				}
+			}
+
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			if (this.region != 38) {
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+		}
+
+        	if (this.region == 39) {
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			add(select, "5.500 GHz - CH 100", 100);
+			add(select, "5.520 GHz - CH 104", 104);
+			add(select, "5.540 GHz - CH 108", 108);
+			add(select, "5.560 GHz - CH 112", 112);
+			add(select, "5.580 GHz - CH 116", 116);
+			add(select, "5.600 GHz - CH 120", 120);
+			add(select, "5.620 GHz - CH 124", 124);
+			add(select, "5.640 GHz - CH 128", 128);
+			add(select, "5.660 GHz - CH 132", 132);
+			add(select, "5.680 GHz - CH 136", 136);
+			add(select, "5.700 GHz - CH 140", 140);
+
+            		add(select, "5.745 GHz - CH 149", 149);
+            		add(select, "5.765 GHz - CH 153", 153);
+            		add(select, "5.785 GHz - CH 157", 157);
+            		add(select, "5.805 GHz - CH 161", 161);
+        	}
+
+        if (this.region == 40) {
+            add(select, "5.745 GHz - CH 149", 149);
+            add(select, "5.765 GHz - CH 153", 153);
+            add(select, "5.785 GHz - CH 157", 157);
+            add(select, "5.805 GHz - CH 161", 161);
+        }
+
+	};
+
+	/*
+	 * populate_phymode_selector()
+	 *	Adds PHY mode <option>'s to the given <select> in some particular order: list 802.11b only
+	 * 802.11g only and 802.11n only first, then mixed modes.
+	 */
+	this.populate_phy_selector = function(select, band) {
+		band = band || this.band;
+		if (this.scan_type_dual && (band == DEFAULT_BAND)) {
+			add(select, "Mixed 802.11a and 802.11g", 6);
+			add(select, "Mixed 802.11a, 802.11g and 802.11b", 7);
+			add(select, "Mixed 802.11a, 802.11g and 802.11ng", 14);
+			add(select, "Mixed 802.11a, 802.11g, 802.11ng and 802.11b", 15);
+			add(select, "Mixed 802.11na, 802.11a and 802.11g", 22);
+			add(select, "Mixed 802.11na, 802.11a, 802.11g and 802.11b", 23);
+			add(select, "Mixed 802.11na, 802.11a, 802.11ng and 802.11g", 30);
+			add(select, "Mixed 802.11na, 802.11a, 802.11ng, 802.11g and 802.11b", 31);
+			return;
+		}
+
+		if (band == G_BAND_ONLY) {
+			if (this.type_B) {
+				add(select, "802.11b only", 1);
+			}
+
+			if (this.type_G) {
+				add(select, "802.11g only", 2);
+			}
+
+			if (this.type_NG) {
+				add(select, "802.11n only", 8);
+			}
+
+			if (this.type_G) {
+				add(select, "Mixed 802.11g and 802.11b", 3);
+			}
+
+			if (this.type_NG) {
+				//
+                add(select, "Mixed 802.11n and 802.11g", 10);
+				//
+                add(select, "Mixed 802.11n, 802.11g and 802.11b", 11);
+			}
+		}
+		if (band == A_BAND_ONLY) {
+			if (this.type_A) {
+				add(select, "802.11a only", 4);
+			}
+			if (this.type_NA) {
+				add(select, "802.11n only", 16);
+                add(select, "Mixed 802.11n and 802.11a", 20);
+			}
+		}
+	};
+
+	/*
+	 * populate_txrate_selector()
+	 *	Adds tx rate <option>'s to the given <select>.
+	 */
+	this.populate_txrate_selector = function(select) {
+		add(select, "Best (automatic)", 0);
+		if (this.type_NA || this.type_NG) {
+			add(select, "MCS 15 - 130 [270]", 27);
+			add(select, "MCS 14 - 117 [243]", 26);
+			add(select, "MCS 13 - 104 [216]", 25);
+			add(select, "MCS 12 - 78 [162]", 24);
+			add(select, "MCS 11 - 52 [108]", 23);
+			add(select, "MCS 10 - 39 [81]", 22);
+			add(select, "MCS 9 - 26 [54]", 21);
+			add(select, "MCS 8 - 13 [27]", 20);
+			add(select, "MCS 7 - 65 [135]", 19);
+			add(select, "MCS 6 - 58.5 [121.5]", 18);
+			add(select, "MCS 5 - 52 [108]", 17);
+			add(select, "MCS 4 - 39 [81]", 16);
+			add(select, "MCS 3 - 26 [54]", 15);
+			add(select, "MCS 2 - 19.5 [40.5]", 14);
+			add(select, "MCS 1 - 13 [27]", 13);
+			add(select, "MCS 0 - 6.5 [13.5]", 12);
+		}
+		if (this.type_A || this.type_G) {
+			add(select, "54", 11);
+			add(select, "48", 10);
+			add(select, "36", 9);
+			add(select, "24", 8);
+			add(select, "18", 7);
+			add(select, "12", 6);
+			add(select, "9", 5);
+			add(select, "6", 4);
+		}
+		if (this.type_B) {
+			add(select, "11", 3);
+			add(select, "5.5", 2);
+			add(select, "2", 1);
+			add(select, "1", 32768);
+		}
+	}
+
+	/*
+	 * populate_cwm_selector()
+	 *	Adds channel width <option>'s to the given <select>.
+	 */
+	this.populate_cwm_selector = function(select, phy_mode) {
+		if (this.type_NG || this.type_NA) {
+			add(select, "20 MHz", 0);
+    /* reason: Add channel bandwidth "40MHz" when set 802.11 mode to 11n only.
+     * modified by JerryChen
+     * date: 2008.07.25
+     */			
+			if (this.extra_ui_config || phy_mode == 8 || phy_mode == 16) {
+			    add(select, "40 MHz", 2);
+			}
+			add(select, "Auto 20/40 MHz", 1);
+		} else {
+			add(select, "Not applicable", -1);
+		}
+	};
+
+	/*
+	 * populate_streams_selector()
+	 *	Adds spacial stream <option>'s to the given <select>.
+	 */
+	this.populate_streams_selector = function(select) {
+		if (this.extra_ui_config && (this.type_NG || this.type_NA)) {
+			add(select, "1 Stream", 255);
+			add(select, "2 Streams", 65280);
+			add(select, "Auto (1 streams preferred)", 61695);
+			add(select, "Auto (2 streams preferred)", 65281);
+			add(select, "Auto (all rates)", 65535);
+		} else {
+			add(select, "Not applicable", -1);
+		}
+	};
+};
+//]]>
+</script>
+
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Advanced Help</h2>
+                                                                                        <ul>
+                                                                                        
+                                                                                                <li><a href="Advanced.html#Virtual_Server">Virtual Server</a></li>
+                                                                                                <li><a href="Advanced.html#Gaming">Port Forwarding</a></li>
+                                                                                                <li><a href="Advanced.html#Special_Applications">Application Rules</a></li>
+                                                                                                
+                                                                                                <li><a href="Advanced.html#Traffic_Shaping">QoS Engine</a></li>
+                                                                                                
+                                                                                                <li><a href="Advanced.html#Access_Control">Access Control</a></li>
+                                                                                                <li><a href="Advanced.html#Web_Filter">Website Filter</a></li>
+                                                                                        
+                                                                                                <li><a href="Advanced.html#MAC_Address_Filter">Network Filter</a></li>
+                                                                                        
+                                                                                                <li><a href="Advanced.html#Firewall">Firewall Settings</a></li>
+                                                                                                <li><a href="Advanced.html#Routing">Routing</a></li>
+                                                                                                <li><a href="Advanced.html#Inbound_Filter">Inbound Filter</a></li>
+                                                                                        
+                                                                                        
+                                                                                                <li><a href="Advanced.html#Advanced_Wireless">Advanced Wireless</a></li>
+                                                                                        
+                                                                                        
+                                                                                                <li><a href="Advanced.html#WISH" onclick="return jump_if();">WISH</a></li>
+                                                                                        
+                                                                                        
+                                                                                                 <li><a href="Advanced.html#Protected_Setup" onclick="return jump_if();">Wi-Fi Protected Setup</a></li>
+                                                                                        
+                                                                                        
+                                                                                                <li><a href="Advanced.html#Network">Advanced Network</a></li>
+                                                                                        
+                                                                                        
+                                                                                                <li><a href="Advanced.html#GuestZone">Guest Zone</a></li>
+                                                                                        
+                                                                                        </ul>
+                                                                                </div>
+                                                                                
+                                                                                <div class="box">
+                                                                                        <h3><a name="Virtual_Server">Virtual Server</a></h3>
+                                                                                        <p>
+The Virtual Server option gives Internet users access to services on
+your LAN. This feature is useful for hosting online services such as
+FTP, Web, or game servers. For each Virtual Server, you define a public
+port on your router for redirection to an internal LAN IP Address and
+LAN port. </p>
+                                                                                        <div class="help_example">
+                                                                                                <dl>
+                                                                                                        <dt>Example:</dt>
+                                                                                                        <dd>
+You are hosting a Web Server on a PC that has LAN IP Address of
+192.168.0.50 and your ISP is blocking Port 80. <ol>
+                                                                                                        <li>Name the Virtual Server (for example: <code>Web Server</code>) </li>
+                                                                                                        <li>Enter the IP Address of the machine on your LAN (for example: <code>192.168.0.50</code>)</li>
+                                                                                                        <li>Enter the Private Port as [80] </li>
+                                                                                                        <li>Enter the Public Port as [8888] </li>
+                                                                                                        <li>Select the Protocol (for example <code>TCP</code>). </li>
+                                                                                                        <li>Ensure the schedule is set to <code>Always</code></li>
+                                                                                                        <li>Click <span class="button_ref">Save</span> to add the settings to the Virtual Servers List </li>
+                                                                                                        <li>Repeat
+these steps for each Virtual Server Rule you wish to add. After the
+list is complete, click <span class="button_ref">Save Settings</span> at the top of the page. </li>
+                                                                                                </ol>
+With this Virtual Server entry, all Internet traffic on Port 8888 will
+be redirected to your internal web server on port 80 at IP Address
+192.168.0.50. </dd>
+                                                                                                </dl>
+                                                                                        </div>
+                                                                                        <dl>
+                                                                                                <dt>Virtual Server Parameters</dt>
+                                                                                                <dd>
+                                                                                                        <dl>
+                                                                                                                <dt>Name</dt>
+                                                                                                                <dd>
+Assign a meaningful name to the virtual server, for example <code>Web Server</code>.
+
+Several well-known types of virtual server are available from the
+"Application Name" drop-down list. Selecting one of these entries fills
+some of the remaining parameters with standard values for that type of
+server. </dd>
+                                                                                                                <dt>IP Address</dt>
+                                                                                                                <dd>
+The IP address of the system on your internal network that will provide
+the virtual service, for example <code>192.168.0.50</code>.
+
+You can select a computer from the list of DHCP clients in the
+"Computer Name" drop-down menu, or you can manually enter the IP
+address of the server computer. </dd>
+                                                                                                                <dt>Traffic Type</dt>
+                                                                                                                <dd>
+Select the protocol used by the service. The common choices -- UDP,
+TCP, and both UDP and TCP -- can be selected from the drop-down menu.
+To specify any other protocol, select "Other" from the list, then enter
+the corresponding protocol number (<a href="http://www.iana.org/assignments/protocol-numbers" target="_blank"> as assigned by the IANA</a>) in the <span class="option">Protocol</span> box.
+                                                                                                                </dd>
+                                                                                                                <dt>Private Port</dt>
+                                                                                                                <dd>The port that will be used on your internal network.</dd>
+                                                                                                                <dt>Public Port</dt>
+                                                                                                                <dd>The port that will be accessed from the Internet.</dd>
+                                                                                                                <dt>Inbound Filter</dt>
+                                                                                                                <dd>
+Select a filter that controls access as needed for this virtual server.
+If you do not see the filter you need in the list of filters, go to the
+<a href="Inbound_Filter.html"> Advanced → Inbound&nbsp;Filter</a> screen and create a new filter.
+                                                                                                                </dd>
+                                                                                                                <dt>Schedule</dt>
+                                                                                                                <dd>
+Select a schedule for when the service will be enabled. If you do not
+see the schedule you need in the list of schedules, go to the <a href="Schedules.html"> Tools → Schedules</a> screen and create a new schedule.
+                                                                                                                </dd>
+                                                                                                        </dl>
+                                                                                                </dd>
+                                                                                                <dt>
+                                                                                                    24 -- Virtual Servers List
+                                                                                                </dt>
+                                                                                                <dd>
+Use the checkboxes at the left to activate or deactivate completed
+Virtual Server entries. </dd>
+                                                                                        </dl>
+                                                                                        <p>
+                                                                                            <b>Note:</b>
+You might have trouble accessing a virtual server using its public
+identity (WAN-side IP-address of the gateway or its dynamic DNS name)
+from a machine on the LAN. Your requests may not be looped back or you
+may be redirected to the "Forbidden" page. </p>
+                                                                                        <p>
+This will happen if you have an Access Control Rule configured for this
+LAN machine. </p>
+                                                                                        <p>
+The requests from the LAN machine will not be looped back if Internet
+access is blocked at the time of access. To work around this problem,
+access the LAN machine using its LAN-side identity. </p>
+                                                                                        <p>
+Requests may be redirected to the "Forbidden" page if web access for
+the LAN machine is restricted by an Access Control Rule. Add the
+WAN-side identity (WAN-side IP-address of the router or its dynamic DNS
+name) on the <a href="Web_Filter.html">
+                                                                                            Advanced → Web&nbsp;Filter</a> screen to work around this problem.
+                                                                                        </p>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3><a name="Gaming">Port Forwarding</a></h3>
+                                                                                        <p>
+Multiple connections are required by some applications, such as
+internet games, video conferencing, Internet telephony, and others.
+These applications have difficulties working through NAT (Network
+Address Translation). This section is used to open multiple ports or a
+range of ports in your router and redirect data through those ports to
+a single PC on your network. You can enter ports in various formats: </p>
+                                                                                        <p>
+                                                                                            Range (50-100)
+                                                                                            <br clear="none">
+                                                                                            Individual (80, 68, 888)
+                                                                                            <br clear="none">
+                                                                                            Mixed (1020-5000, 689)
+                                                                                        </p>
+                                                                                        <div class="help_example">
+                                                                                            <dl>
+                                                                                                <dt>Example:</dt>
+                                                                                                <dd>
+Suppose you are hosting an online game server that is running on a PC
+with a private IP Address of 192.168.0.50. This game requires that you
+open multiple ports (6159-6180, 99) on the router so Internet users can
+connect. </dd>
+                                                                                            </dl>
+                                                                                        </div>
+                                                                                        <dl>
+                                                                                            <dt>Port Forwarding Fields</dt>
+                                                                                            <dd>
+                                                                                                <dl>
+                                                                                                    <dt>Name</dt>
+                                                                                                    <dd>
+Give the rule a name that is meaningful to you, for example <code>Game Server</code>.
+
+You can also select from a list of popular games, and many of the
+remaining configuration values will be filled in accordingly. However,
+you should check whether the port values have changed since this list
+was created, and you must fill in the IP address field. </dd>
+                                                                                                    <dt>IP Address</dt>
+                                                                                                    <dd>
+Enter the local network IP address of the system hosting the server,
+for example <code>192.168.0.50</code>.
+
+You can select a computer from the list of DHCP clients in the
+"Computer Name" drop-down menu, or you can manually enter the IP
+address of the server computer. </dd>
+                                                                                                    <dt>TCP Ports To Open</dt>
+                                                                                                    <dd>
+Enter the TCP ports to open (for example <code>6159-6180, 99</code>).
+                                                                                                    </dd>
+                                                                                                    <dt>UDP Ports To Open</dt>
+                                                                                                    <dd>
+Enter the UDP ports to open (for example <code>6159-6180, 99</code>).
+                                                                                                    </dd>
+                                                                                                    <dt>Inbound Filter</dt>
+                                                                                                    <dd>
+Select a filter that controls access as needed for this rule. If you do
+not see the filter you need in the list of filters, go to the <a href="Inbound_Filter.html">
+Advanced → Inbound&nbsp;Filter</a> screen and create a new filter.
+                                                                                                    </dd>
+                                                                                                    <dt>Schedule</dt>
+                                                                                                    <dd>
+Select a schedule for the times when this rule is in effect. If you do
+not see the schedule you need in the list of schedules, go to the <a href="Schedules.html"> Tools→Schedules</a> screen and create a new schedule.
+                                                                                                    </dd>
+                                                                                                </dl>
+                                                                                                <div class="help_example">
+                                                                                                    <p>
+With the above example values filled in and this Port Forwarding Rule
+enabled, all TCP and UDP traffic on ports 6159 through 6180 and port 99
+is passed through the router and redirected to the Internal Private IP
+Address of your Game Server at 192.168.0.50. </p>
+                                                                                                </div>
+                                                                                                <p>Note
+that different LAN computers cannot be associated with Port Forwarding
+rules that contain any ports in common; such rules would contradict
+each other.</p>
+                                                                                            </dd>
+                                                                                            <dt>24 -- Port Forwarding Rules</dt>
+                                                                                            <dd>
+Enable or disable defined rules with the checkboxes at the left. </dd>
+                                                                                        </dl>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>
+                                                                                            <a name="Special_Applications"> Application Rules</a>
+                                                                                        </h3>
+                                                                                        <p>
+An application rule is used to open single or multiple ports on your
+router when the router senses data sent to the Internet on a "trigger"
+port or port range. An application rule applies to all computers on
+your internal network. </p>
+                                                                                        <dl>
+                                                                                            <dt>Parameters for an Application Rule</dt>
+                                                                                            <dd>
+                                                                                                <div class="help_example">
+                                                                                                    <dl>
+                                                                                                        <dt>Example:</dt>
+                                                                                                        <dd>
+You need to configure your router to allow a software application
+running on any computer on your network to connect to a web-based
+server or another user on the Internet. </dd>
+                                                                                                    </dl>
+                                                                                                </div>
+                                                                                                <dl>
+                                                                                                    <dt>Name</dt>
+                                                                                                    <dd>Enter a name for the Special Application Rule, for example <code>Game App</code>, which will help you identify the rule in the future. Alternatively, you can select from the <span class="option">Application</span> list of common applications.</dd>
+                                                                                                    <dt>Application</dt>
+                                                                                                    <dd>Instead
+of entering a name for the Special Application rule, you can select
+from this list of common applications, and the remaining configuration
+values will be filled in accordingly.</dd>
+                                                                                                    <dt>Trigger Port</dt>
+                                                                                                    <dd>Enter the outgoing port range used by your application (for example <code>6500-6700</code>).</dd>
+                                                                                                    <dt>Trigger Traffic Type</dt>
+                                                                                                    <dd>Select the outbound protocol used by your application (for example <code>Both</code>).</dd>
+                                                                                                    <dt>Firewall Port</dt>
+                                                                                                    <dd>Enter the port range that you want to open up to Internet traffic (for example <code>6000-6200</code>).</dd>
+                                                                                                    <dt>Firewall Traffic Type</dt>
+                                                                                                    <dd>
+Select the protocol used by the Internet traffic coming back into the
+router through the opened port range (for example <code>Both</code>).
+                                                                                                    </dd>
+                                                                                                    <dt>Schedule</dt>
+                                                                                                    <dd>
+Select a schedule for when this rule is in effect. If you do not see
+theschedule you need in the list of schedules, go to the <a href="Schedules.html"> Tools → Schedules</a> screen and create a new schedule.
+                                                                                                    </dd>
+                                                                                                </dl>
+                                                                                                <div class="help_example">
+                                                                                                    <p>
+With the above example application rule enabled, the router will open
+up a range of ports from 6000-6200 for incoming traffic from the
+Internet, whenever any computer on the internal network opens up an
+application that sends data to the Internet using a port in the range
+of 6500-6700. </p>
+                                                                                                </div>
+                                                                                            </dd>
+                                                                                        </dl>
+                                                                                        <dl>
+                                                                                            <dt>24 -- Application Rules</dt>
+                                                                                            <dd>
+This section is where you define application rules. Enable or disable
+defined rules with the checkboxes at the left. </dd>
+                                                                                        </dl>
+                                                                                </div>
+                                                                                
+                                                                                <div class="box">
+                                                                                        <h3><a name="Traffic_Shaping">QoS Engine</a></h3>
+                                                                                        <p>
+The QoS Engine feature helps improve your network performance by
+prioritizing applications. </p>
+                                                                                        <dl>
+                                                                                            <dt>WAN Traffic Shaping</dt>
+                                                                                            <dd>
+                                                                                                <dl>
+                                                                                                    <dt>Enable Traffic Shaping</dt>
+                                                                                                    <dd>When this option is enabled, the router restricts the flow of outbound traffic so as not to exceed the WAN uplink bandwidth.</dd>
+                                                                                                    <dt>Automatic Uplink Speed</dt>
+                                                                                                    <dd>
+When enabled, this option causes the router to automatically measure
+the useful uplink bandwidth each time the WAN interface is
+re-established (after a reboot, for example). </dd>
+                                                                                                    <dt>Measured Uplink Speed</dt>
+                                                                                                    <dd>
+This is the uplink speed measured when the WAN interface was last
+re-established. The value may be lower than that reported by your ISP
+as it does not include all of the network protocol overheads associated
+with your ISP's network. Typically, this figure will be between 87% and
+91% of the stated uplink speed for xDSL connections and around 5 kbps
+lower for cable network connections. </dd>
+                                                                                                    <dt>Manual Uplink Speed</dt>
+                                                                                                    <dd>
+If Automatic Uplink Speed is disabled, this options allows you to set
+the uplink speed manually. Uplink speed is the speed at which data can
+be transferred from the router to your ISP. This is determined by your
+ISP. ISPs often specify speed as a downlink/uplink pair; for example,
+1.5Mbps/284kbps. For this example, you would enter "284". Alternatively
+you can test your uplink speed with a service such as <a href="http://www.dslreports.com/">www.dslreports.com</a>.
+Note however that sites such as DSL Reports, because they do not
+consider as many network protocol overheads, will generally note speeds
+slightly lower than the Measured Uplink Speed or the ISP rated speed. </dd>
+                                                                                                    <dt>Connection Type</dt>
+                                                                                                    <dd>
+By default, the router automatically determines whether the underlying
+connection is an xDSL/Frame-relay network or some other connection type
+(such as cable modem or Ethernet), and it displays the result as <span class="option">Detected
+
+xDSL or Frame Relay Network</span>.
+If you have an unusual network connection in which you are actually
+connected via xDSL but for which you configure either "Static" or
+"DHCP" in the WAN settings, setting this option to <span class="option">
+xDSL or Other Frame Relay Network</span>
+ensures that the router will recognize that it needs to shape traffic
+slightly differently in order to give the best performance. Choosing <span class="option">xDSL or Other Frame Relay Network</span>
+causes the measured uplink speed to be reported slightly lower than
+before on such connections, but gives much better results. </dd>
+                                                                                                    <dt>Detected xDSL or Frame Relay Network</dt>
+                                                                                                    <dd>
+                                                                                                        When <span class="option">Connection Type</span> is set to <span class="option">
+                                                                                                        Auto-detect</span>, the automatically detected connection type is displayed
+                                                                                                        here.
+                                                                                                    </dd>
+                                                                                                </dl>
+                                                                                            </dd>
+                                                                                            <dt>QoS Engine Setup</dt>
+                                                                                            <dd>
+                                                                                                <dl>
+                                                                                                    <dt>Enable QoS Engine</dt>
+                                                                                                    <dd>
+Enable this option for better performance and experience with online
+games and other interactive applications, such as VoIP. </dd>
+                                                                                                    <dt>Automatic Classification</dt>
+                                                                                                    <dd>
+This option is enabled by default so that your router will
+automatically determine which programs should have network priority.
+For best performance, use the Automatic Classification option to
+automatically set the priority for your applications. </dd>
+                                                                                                    <dt>Dynamic Fragmentation</dt>
+                                                                                                    <dd>
+This option should be enabled when you have a slow Internet uplink. It
+helps to reduce the impact that large low priority network packets can
+have on more urgent ones by breaking the large packets into several
+smaller packets. </dd>
+                                                                                                </dl>
+                                                                                            </dd>
+                                                                                            <dt>QoS Engine Rules</dt>
+                                                                                                <dd>
+A QoS Engine Rule identifies a specific message flow and assigns a
+priority to that flow. For most applications, automatic classification
+will be adequate, and specific QoS Engine Rules will not be required. <p>The
+QoS Engine supports overlaps between rules, where more than one rule
+can match for a specific message flow. If more than one rule is found
+to match the rule with the highest priority will be used.</p>
+                                                                                                    <dl>
+                                                                                                        <dt>Name</dt>
+                                                                                                        <dd>Create a name for the rule that is meaningful to you.</dd>
+                                                                                                        <dt>Priority</dt>
+                                                                                                        <dd>
+The priority of the message flow is entered here -- 1 receives the
+highest priority (most urgent) and 255 receives the lowest priority
+(least urgent). </dd>
+                                                                                                        <dt>Protocol</dt>
+                                                                                                        <dd>The protocol used by the messages. </dd>
+                                                                                                        <dt>Local IP Range</dt>
+                                                                                                        <dd>
+The rule applies to a flow of messages whose LAN-side IP address falls
+within the range set here. </dd>
+                                                                                                        <dt>Local Port Range</dt>
+                                                                                                        <dd>
+The rule applies to a flow of messages whose LAN-side port number is
+within the range set here. </dd>
+                                                                                                        <dt>Remote IP Range</dt>
+                                                                                                        <dd>
+The rule applies to a flow of messages whose WAN-side IP address falls
+within the range set here. </dd>
+                                                                                                        <dt>Remote Port Range</dt>
+                                                                                                        <dd>
+The rule applies to a flow of messages whose WAN-side port number is
+within the range set here. </dd>
+                                                                                                    </dl>
+                                                                                                </dd>
+                                                                                            <dt>10 -- QoS Engine Rules</dt>
+                                                                                            <dd>
+This section is where you define QoS Engine Rules. Enable or disable
+defined rules with the checkboxes at the left. </dd>
+                                                                                        </dl>
+                                                                                </div>
+                                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a name="Access_Control">Access Control</a></h3>
+                                                                                    <p>
+The Access Control section allows you to control access in and out of
+devices on your network. Use this feature as Parental Controls to only
+grant access to approved sites, limit web access based on time or
+dates, and/or block access from applications such as peer-to-peer
+utilities or games. </p>
+                                                                                    <dl>
+                                                                                        <dt>Enable</dt>
+                                                                                        <dd>
+By default, the Access Control feature is disabled. If you need Access
+Control, check this option. <p>
+                                                                                                <b>Note: </b>
+When Access Control is disabled, every device on the LAN has
+unrestricted access to the Internet. However, if you enable Access
+Control, Internet access is restricted for those devices that have an
+Access Control Policy configured for them. All other devices have
+unrestricted access to the Internet. </p>
+                                                                                        </dd>
+                                                                                        <dt>Policy Wizard</dt>
+                                                                                        <dd>
+The Policy Wizard guides you through the steps of defining each access
+control policy. A policy is the "Who, What, When, and How" of access
+control -- whose computer will be affected by the control, what
+internet addresses are controlled, when will the control be in effect,
+and how is the control implemented. You can define multiple policies.
+The Policy Wizard starts when you click the button below and also when
+you edit an existing policy. <dl>
+                                                                                                <dt>Add Policy</dt>
+                                                                                                <dd>Click this button to start creating a new access control policy.</dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>Policy Table</dt>
+                                                                                        <dd>
+This section shows the currently defined access control policies. A
+policy can be changed by clicking the Edit icon, or deleted by clicking
+the Delete icon. When you click the Edit icon, the Policy Wizard starts
+and guides you through the process of changing a policy. You can enable
+or disable specific policies in the list by clicking the "Enable"
+checkbox. </dd>
+                                                                                    </dl>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                    <h3><a name="Web_Filter">Website Filter</a></h3>
+                                                                                    <p>
+This section is where you add the Web sites to be used for Access
+Control. The Web sites listed here are used when the Web Filter option
+is enabled in <a href="Access_Control.html">Advanced → Access&nbsp;Control</a>.
+                                                                                    </p>
+                                                                                    
+                                                                                    <dl>
+                                                                                        <dt>Website Filter Parameters</dt>
+                                                                                        <dd>
+                                                                                            <dl>
+                                                                                                <dt>Website URL/Domain</dt>
+                                                                                                <dd>
+Enter the URL (address) of the Web Site that you want to allow or deny;
+for example: <code>google.com</code>. Do not enter the <code>http://</code>
+preceding the URL. Enter the most inclusive domain; for example, select
+allow and enter <code>dlink.com</code> and access
+                                                                                                    will be permitted to both <code>www.dlink.com</code> and <code>support.dlink.com</code>.
+                                                                                                    <p>
+                                                                                                        <b>Note: </b>
+Many web sites construct pages with images and content from other web
+sites. For example, to access <code>my.yahoo.com</code>,
+
+you would need to select allow and type <code>yahoo.com</code>, <code>yimg.com</code>, and
+                                                                                                        <code>doubleclick.net</code>.
+                                                                                                    </p>
+                                                                                                </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                    </dl>
+                                                                                    <dl>
+                                                                                        <dt>40 -- Website Filtering Rules</dt>
+                                                                                        <dd>The section lists the current denied or allowed web sites.</dd>
+                                                                                
+                                                                                    </dl>
+                                                                                </div>
+                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a name="MAC_Address_Filter">MAC Address Filter (Network Filter)</a></h3>
+                                                                                    <p>
+The MAC address filter section can be used to filter network access by
+machines based on the unique MAC addresses of their network adapter(s).
+It is most useful to prevent unauthorized wireless devices from
+connecting to your network. A MAC address is a unique ID assigned by
+the manufacturer of the network adapter. </p>
+                                                                                    <dl>
+                                                                                        <dt>24 -- MAC Filtering Rules</dt>
+                                                                                        <dd>
+                                                                                            <dl>
+                                                                                                <dt>Configure MAC Filtering</dt>
+                                                                                                <dd>
+When "OFF" is selected, MAC addresses are not used to control network
+access. When "ALLOW" is selected, only computers with MAC addresses
+listed in the MAC Address List are granted network access. When "DENY"
+is selected, any computer with a MAC address listed in the MAC Address
+List is refused access to the network. </dd>
+                                                                                                <dt>MAC Address</dt>
+                                                                                                <dd>
+Enter the MAC address of the desired. Computers that have obtained an
+IP address from the router's DHCP server will be in the DHCP Client
+List. Select a device from the drop down menu, then click the arrow to
+add that device's MAC address to the list. </dd>
+								                                <dt>Filter wireless clients: </dt>
+								                                <dd>
+Apply MAC Filtering to devices that connect to the network via Wi-Fi.
+This is the normal usage of MAC Filtering. </dd>
+								                                <dt>Filter wired clients: </dt>
+                                                                                                <dd>
+Apply MAC Filtering to devices that are physically connected to the
+network (as by Ethernet cable). Note that a wired device that is
+blocked cannot access the WAN and cannot access wireless devices on the
+LAN, but can still access other wired devices on the LAN. </dd>
+                                                                                                <dt>Clear</dt>
+                                                                                                <dd>
+                                                                                                    Click the <span class="button_ref">Clear</span> button to remove the MAC address from the MAC Filtering list.
+                                                                                                </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                    </dl>
+                                                                                </div>
+                                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a id="Firewall" name="Firewall">Firewall Settings</a></h3>
+                                                                                    <p>
+The router provides a tight firewall by virtue of the way NAT works.
+Unless you configure the router to the contrary, the NAT does not
+respond to unsolicited incoming requests on any port, thereby making
+your LAN invisible to Internet cyberattackers. However, some network
+applications cannot run with a tight firewall. Those applications need
+to selectively open ports in the firewall to function correctly. The
+options on this page control several ways of opening the firewall to
+address the needs of specific types of applications. See also <a href="Virtual_Server.html">
+                                                                                        Advanced → Virtual&nbsp;Server</a>, <a href="Gaming.html">Advanced → Port&nbsp;Forwarding</a>, <a href="Special_Applications.html">
+                                                                                        Advanced → Application&nbsp;Rules</a>, and <a href="Network.html">Advanced → Network (UPnP)</a> for
+                                                                                        related options.
+                                                                                    </p>
+                                                                                    <dl>
+                                                                                        <dt>Firewall Settings</dt>
+                                                                                        <dd>
+                                                                                            <dl>
+                                                                                                <dt>Enable SPI</dt>
+                                                                                                <dd>
+SPI ("stateful packet inspection" also known as "dynamic packet
+filtering") helps to prevent cyberattacks by tracking more state per
+session. It validates that the traffic passing through that session
+conforms to the protocol. When the protocol is TCP, SPI checks that
+packet sequence numbers are within the valid range for the session,
+discarding those packets that do not have valid sequence numbers. <p>
+Whether SPI is enabled or not, the router always tracks TCP connection
+states and ensures that each TCP packet's flags are valid for the
+current state. </p>
+                                                                                                </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>NAT Endpoint Filtering</dt>
+                                                                                        <dd>
+                                                                                            <p>The
+NAT Endpoint Filtering options control how the router's NAT manages
+incoming connection requests to ports that are already being used.</p>
+                                                                                            <dl>
+                                                                                                <dt>Endpoint Independent</dt>
+                                                                                                <dd>Once
+a LAN-side application has created a connection through a specific
+port, the NAT will forward any incoming connection requests with the
+same port to the LAN-side application regardless of their origin. This
+is the least restrictive option, giving the best connectivity and
+allowing some applications (P2P applications in particular) to behave
+almost as if they are directly connected to the Internet.</dd>
+                                                                                                <dt>Address Restricted</dt>
+                                                                                                <dd>The
+NAT forwards incoming connection requests to a LAN-side host only when
+they come from the same IP address with which a connection was
+established. This allows the remote application to send data back
+through a port different from the one used when the outgoing session
+was created.</dd>
+                                                                                                <dt>Port And Address Restricted</dt>
+                                                                                                <dd>The NAT does not forward any incoming connection requests with the same port address as an already establish connection.</dd>
+                                                                                            </dl>
+                                                                                            <p>Note
+that some of these options can interact with other port restrictions.
+Endpoint Independent Filtering takes priority over inbound filters or
+schedules, so it is possible for an incoming session request related to
+an outgoing session to enter through a port in spite of an active
+inbound filter on that port. However, packets will be rejected as
+expected when sent to blocked ports (whether blocked by schedule or by
+inbound filter) for which there are no active sessions. Port and
+Address Restricted Filtering ensures that inbound filters and schedules
+work precisely, but prevents some level of connectivity, and therefore
+might require the use of port triggers, virtual servers, or port
+forwarding to open the ports needed by the application. Address
+Restricted Filtering gives a compromise position, which avoids problems
+when communicating with certain other types of NAT router (symmetric
+NATs in particular) but leaves inbound filters and scheduled access
+working as expected.</p>
+                                                                                            <dl>
+                                                                                                <dt>UDP Endpoint Filtering</dt>
+                                                                                                <dd>Controls endpoint filtering for packets of the UDP protocol.</dd>
+                                                                                                <dt>TCP Endpoint Filtering</dt>
+                                                                                                <dd>Controls endpoint filtering for packets of the TCP protocol.</dd>
+                                                                                            </dl>
+                                                                                            <p>
+Formerly, the terms "Full Cone", "Restricted Cone", "Port Restricted
+Cone" and "Symmetric" were used to refer to different variations of
+NATs. These terms are purposely not used here, because they do not
+fully describe the behavior of this router's NAT. While not a perfect
+mapping, the following loose correspondences between the "cone"
+classification and the "endpoint filtering" modes can be drawn: if this
+router is configured for endpoint independent filtering, it implements
+full cone behavior; address restricted filtering implements restricted
+cone behavior; and port and address restricted filtering implements
+port restricted cone behavior. </p>
+                                                                                        </dd>
+                                                                                        <dt>Anti-Spoof checking</dt>
+                                                                                        <dd>
+                                                                                            <p>This
+mechanism protects against activity from spoofed or forged IP
+addresses, mainly by blocking packets appearing on interfaces and in
+directions which are logically not possible.</p>
+                                                                                        </dd>
+                                                                                        <dt>DMZ Host</dt>
+                                                                                        <dd>
+                                                                                            <p>
+DMZ means "Demilitarized Zone." If an application has trouble working
+from behind the router, you can expose one computer to the Internet and
+run the application on that computer. </p>
+                                                                                            <p>
+When a LAN host is configured as a DMZ host, it becomes the destination
+for all incoming packets that do not match some other incoming session
+or rule. If any other ingress rule is in place, that will be used
+instead of sending packets to the DMZ host; so, an active session,
+virtual server, active port trigger, or port forwarding rule will take
+priority over sending a packet to the DMZ host. (The DMZ policy
+resembles a default port forwarding rule that forwards every port that
+is not specifically sent anywhere else.) </p>
+                                                                                            <p>
+The router provides only limited firewall protection for the DMZ host.
+The router does not forward a TCP packet that does not match an active
+DMZ session, unless it is a connection establishment packet (SYN).
+Except for this limited protection, the DMZ host is effectively
+"outside the firewall". Anyone considering using a DMZ host should also
+consider running a firewall on that DMZ host system to provide
+additional protection. </p>
+                                                                                            <p>
+Packets received by the DMZ host have their IP addresses translated
+from the WAN-side IP address of the router to the LAN-side IP address
+of the DMZ host. However, port numbers are not translated; so
+applications on the DMZ host can depend on specific port numbers. </p>
+                                                                                            <p>
+The DMZ capability is just one of several means for allowing incoming
+requests that might appear unsolicited to the NAT. In general, the DMZ
+host should be used only if there are no other alternatives, because it
+is much more exposed to cyberattacks than any other system on the LAN.
+Thought should be given to using other configurations instead: a
+virtual server, a port forwarding rule, or a port trigger. Virtual
+servers open one port for incoming sessions bound for a specific
+application (and also allow port redirection and the use of ALGs ).
+Port forwarding is rather like a selective DMZ, where incoming traffic
+targeted at one or more ports is forwarded to a specific LAN host
+(thereby not exposing as many ports as a DMZ host). Port triggering is
+a special form of port forwarding, which is activated by outgoing
+traffic, and for which ports are only forwarded while the trigger is
+active. </p>
+                                                                                            <p>
+Few applications truly require the use of the DMZ host. Following are
+examples of when a DMZ host might be required: </p>
+                                                                                            <ul>
+                                                                                                <li>
+A host needs to support several applications that might use overlapping
+ingress ports such that two port forwarding rules cannot be used
+because they would potentially be in conflict. </li>
+                                                                                                <li>
+To handle incoming connections that use a protocol other than ICMP,
+TCP, UDP, and IGMP (also GRE and ESP, when these protocols are enabled
+by the PPTP and IPSec ALGs ). </li>
+                                                                                            </ul>
+                                                                                            <dl>
+                                                                                                <dt>Enable DMZ</dt>
+                                                                                                <dd>
+                                                                                                    <p>
+                                                                                                        <b>Note:</b>
+Putting a computer in the DMZ may expose that computer to a variety of
+security risks. Use of this option is only recommended as a last
+resort. </p>
+                                                                                                </dd>
+                                                                                                <dt>DMZ IP Address</dt>
+                                                                                                <dd>
+Specify the LAN IP address of the LAN computer that you want to have
+unrestricted Internet communication. If this computer obtains its
+address Automatically using DHCP, then you may want to make a static
+reservation on the <a href="Network.html">Setup → Network&nbsp;Settings</a> page so that the IP address of the DMZ computer
+                                                                                                    does not change.
+                                                                                                </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                    
+                                                                                        <dt>Application Level Gateway (ALG) Configuration</dt>
+                                                                                        <dd>
+Here you can enable or disable ALGs. Some protocols and applications
+require special handling of the IP payload to make them work with
+network address translation (NAT). Each ALG provides special handling
+for a specific protocol or application. A number of ALGs for common
+applications are enabled by default. <dl>
+                                                                                                <dt>PPTP</dt>
+                                                                                                <dd>
+Allows multiple machines on the LAN to connect to their corporate
+networks using PPTP protocol. When the PPTP ALG is enabled, LAN
+computers can establish PPTP VPN connections either with the same or
+with different VPN servers. When the PPTP ALG is disabled, the router
+allows VPN operation in a restricted way -- LAN computers are typically
+able to establish VPN tunnels to different VPN Internet servers but not
+to the same server. The advantage of disabling the PPTP ALG is to
+increase VPN performance. Enabling the PPTP ALG also allows incoming
+VPN connections to a LAN side VPN server (refer to <a href="Virtual_Server.html">Advanced → Virtual&nbsp;Server</a>).
+                                                                                                </dd>
+                                                                                                <dt>IPSec (VPN)</dt>
+                                                                                                <dd>
+Allows multiple VPN clients to connect to their corporate networks
+using IPSec. Some VPN clients support traversal of IPSec through NAT.
+This option may interfere with the operation of such VPN clients. If
+you are having trouble connecting with your corporate network, try
+disabling this option. <p>
+Check with the system administrator of your corporate network whether
+your VPN client supports NAT traversal. </p>
+                                                                                                    <p>
+Note that L2TP VPN connections typically use IPSec to secure the
+connection. To achieve multiple VPN pass-through in this case, the
+IPSec ALG must be enabled. </p>
+                                                                                                </dd>
+                                                                                                <dt>RTSP </dt>
+                                                                                                <dd>
+Allows applications that use Real Time Streaming Protocol to receive
+streaming media from the internet. QuickTime and Real Player are some
+of the common applications using this protocol. </dd>
+                                                                                                <dt>SIP </dt>
+                                                                                                <dd>
+Allows devices and applications using VoIP (Voice over IP) to
+communicate across NAT. Some VoIP applications and devices have the
+ability to discover NAT devices and work around them. This ALG may
+interfere with the operation of such devices. If you are having trouble
+making VoIP calls, try turning this ALG off. </dd>
+                                                                                            
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                    </dl>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                    <h3><a name="Inbound_Filter">Inbound Filter</a></h3>
+                                                                                    <p>
+When you use the Virtual Server, Port Forwarding, or Remote
+Administration features to open specific ports to traffic from the
+Internet, you could be increasing the exposure of your LAN to
+cyberattacks from the Internet. In these cases, you can use Inbound
+Filters to limit that exposure by specifying the IP addresses of
+internet hosts that you trust to access your LAN through the ports that
+you have opened. You might, for example, only allow access to a game
+server on your home LAN from the computers of friends whom you have
+invited to play the games on that server. </p>
+                                                                                    <p>
+Inbound Filters can be used for limiting access to a server on your
+network to a system or group of systems. Filter rules can be used with
+Virtual Server, Gaming, or Remote Administration features. Each filter
+can be used for several functions; for example a "Game Clan" filter
+might allow all of the members of a particular gaming group to play
+several different games for which gaming entries have been created. At
+the same time an "Admin" filter might only allows systems from your
+office network to access the WAN admin pages and an FTP server you use
+at home. If you add an IP address to a filter, the change is effected
+in all of the places where the filter is used. </p>
+                                                                                    <dl>
+                                                                                        <dt>Add/Update Inbound Filter Rule</dt>
+                                                                                        <dd>
+Here you can add entries to the Inbound Filter Rules List below, or
+edit existing entries. <dl>
+                                                                                                <dt>Name</dt>
+                                                                                                <dd>Enter a name for the rule that is meaningful to you.</dd>
+                                                                                                <dt>Action</dt>
+                                                                                                <dd>The rule can either Allow or Deny messages.</dd>
+                                                                                                <dt>Remote IP Range</dt>
+                                                                                                <dd>
+Define the ranges of Internet addresses this rule applies to. For a
+single IP address, enter the same address in both the <span class="option">Start</span>
+                                                                                                    and <span class="option">End</span> boxes. Up to eight ranges can be entered. The
+                                                                                                    <span class="option">Enable</span>
+checkbox allows you to turn on or off specific entries in the list of
+ranges. </dd>
+                                                                                                <dt>Add/Update</dt>
+                                                                                                <dd>Saves the new or edited Inbound Filter Rule in the following list.</dd>
+                                                                                                <dt>Clear</dt>
+                                                                                                <dd>Re-initializes
+the Add/Update area of the screen, erasing any changes that you may
+have made prior to clicking the Add/Update button.</dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>Inbound Filter Rules List</dt>
+                                                                                        <dd>
+The section lists the current Inbound Filter Rules. An Inbound Filter
+Rule can be changed by clicking the Edit icon, or deleted by clicking
+the Delete icon. When you click the Edit icon, the item is highlighted,
+and the "Update Inbound Filter Rule" section is activated for editing. <p>
+In addition to the filters listed here, two predefined filters are
+available wherever inbound filters can be applied: </p>
+                                                                                            <dl>
+                                                                                                <dt>Allow All</dt>
+                                                                                                <dd>Permit any WAN user to access the related capability.</dd>
+                                                                                                <dt>Deny All</dt>
+                                                                                                <dd>
+Prevent all WAN users from accessing the related capability. (LAN users
+are not affected by Inbound Filter Rules.) </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                    </dl>
+                                                                                </div>
+                                                                
+                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a name="Advanced_Wireless">Advanced Wireless</a></h3>
+                                                                                    <dl>
+                                                                                        <dt>Transmit Power</dt>
+                                                                                        <dd>
+Normally the wireless transmitter operates at 100% power. In some
+circumstances, however, there might be a need to isolate specific
+frequencies to a smaller area. By reducing the power of the radio, you
+can prevent transmissions from reaching beyond your corporate/home
+office or designated wireless area. </dd>
+                                                                                        <dt>Beacon Period</dt>
+                                                                                        <dd>
+Beacons are packets sent by a wireless router to synchronize wireless
+devices. Specify a Beacon Period value between 20 and 1000. The default
+value is set to 100 milliseconds. </dd>
+                                                                                        <dt>RTS Threshold</dt>
+                                                                                        <dd>
+When an excessive number of wireless packet collisions are occurring,
+wireless performance can be improved by using the RTS/CTS (Request to
+Send/Clear to Send) handshake protocol. The wireless transmitter will
+begin to send RTS frames (and wait for CTS) when data frame size in
+bytes is greater than the RTS Threshold. This setting should remain at
+its default value of 2346 bytes. </dd>
+                                                                                        <dt>Fragmentation Threshold</dt>
+                                                                                        <dd>
+Wireless frames can be divided into smaller units (fragments) to
+improve performance in the presence of RF interference and at the
+limits of RF coverage. Fragmentation will occur when frame size in
+bytes is greater than the Fragmentation Threshold. This setting should
+remain at its default value of 2346 bytes. Setting the Fragmentation
+value too low may result in poor performance. </dd>
+                                                                                        <dt>DTIM Interval</dt>
+                                                                                        <dd>
+A DTIM is a countdown informing clients of the next window for
+listening to broadcast and multicast messages. When the wireless router
+has buffered broadcast or multicast messages for associated clients, it
+sends the next DTIM with a DTIM Interval value. Wireless clients detect
+the beacons and awaken to receive the broadcast and multicast messages.
+The default value is 1. Valid settings are between 1 and 255. </dd>
+                                                                                    
+                                                                                        <dt>WLAN Partition</dt>
+                                                                                        <dd>Enabling WLAN Partition prevents associated wireless clients from communicating with each other.</dd>
+                                                                                        <dt>WMM Enable</dt>
+                                                                                        <dd>
+Enabling WMM can help control latency and jitter when transmitting
+multimedia content over a wireless connection. </dd>
+                                                                                    
+                                                                                        
+                                                                                        
+                                                                                        <dt>Short GI</dt>
+                                                                                        <dd>
+Using a short (400ns) guard interval can increase throughput. However,
+it can also increase error rate in some installations, due to increased
+sensitivity to radio-frequency reflections. Select the option that
+works best for your installation. </dd>
+                                                                                        
+                                                                                        
+                                                                                        <dt>Extra Wireless Protection</dt>
+                                                                                        <dd>
+Extra protection for neighboring 11b wireless networks. Turn this
+option off to reduce the adverse effect of legacy wireless networks on
+802.11ng performance. This option is available only when <span class="option">802.11 Mode</span> is set to an <span class="option">11n Only</span>option.
+                                                                                            (Refer to the <a href="Wireless.html">
+Setup → Wireless Settings → Manual Wireless Network Setup</a> page.)
+                                                                                        </dd>
+                                                                                    
+                                                                                    
+                                                                                    </dl>
+                                                                                </div>
+                                                                
+                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a name="WISH">WISH</a></h3>
+                                                                                    <p>WISH
+is short for Wireless Intelligent Stream Handling, a technology
+developed to enhance your experience of using a wireless network by
+prioritizing the traffic of different applications.</p>
+                                                                                    <dl>
+                                                                                        <dt>WISH</dt>
+                                                                                        <dd>
+                                                                                            <dl>
+                                                                                                <dt>Enable WISH</dt>
+                                                                                                <dd>Enable this option if you want to allow WISH to prioritize your traffic.</dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>Priority Classifiers</dt>
+                                                                                        <dd>
+                                                                                            <dl>
+                                                                                                <dt>HTTP</dt>
+                                                                                                <dd>Allows
+the router to recognize HTTP transfers for many common audio and video
+streams and prioritize them above other traffic. Such streams are
+frequently used by digital media players.</dd>
+                                                                                                <dt>Windows Media Center</dt>
+                                                                                                <dd>
+Enables the router to recognize certain audio and video streams
+generated by a Windows Media Center PC and to prioritize these above
+other traffic. Such streams are used by systems known as Windows Media
+Extenders, such as the Xbox 360. </dd>
+                                                                                                <dt>Automatic</dt>
+                                                                                                <dd>When
+enabled, this option causes the router to automatically attempt to
+prioritize traffic streams that it doesn't otherwise recognize, based
+on the behavior that the streams exhibit. This acts to deprioritize
+streams that exhibit bulk transfer characteristics, such as file
+transfers, while leaving interactive traffic, such as gaming or VoIP,
+running at a normal priority.</dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>WISH Rules</dt>
+                                                                                        <dd>
+A WISH Rule identifies a specific message flow and assigns a priority
+to that flow. For most applications, the priority classifiers ensure
+the right priorities and specific WISH Rules are not required. <p>WISH
+supports overlaps between rules. If more than one rule matches for a
+specific message flow, the rule with the highest priority will be used.</p>
+                                                                                            <dl>
+                                                                                                <dt>Name</dt>
+                                                                                                <dd>Create a name for the rule that is meaningful to you.</dd>
+                                                                                                <dt>Priority</dt>
+                                                                                                <dd>
+The priority of the message flow is entered here. Four priorities are
+defined: <ul>
+                                                                                                        <li>BK: Background (least urgent).</li>
+                                                                                                        <li>BE: Best Effort.</li>
+                                                                                                        <li>VI: Video.</li>
+                                                                                                        <li>VO: Voice (most urgent).</li>
+                                                                                                    </ul>
+                                                                                                </dd>
+                                                                                                <dt>Protocol</dt>
+                                                                                                <dd>The protocol used by the messages.</dd>
+                                                                                                <dt>Host 1 IP Range</dt>
+                                                                                                <dd>The rule applies to a flow of messages for which one computer's IP address falls within the range set here.</dd>
+                                                                                                <dt>Host 1 Port Range</dt>
+                                                                                                <dd>The rule applies to a flow of messages for which host 1's port number is within the range set here.</dd>
+                                                                                                <dt>Host 2 IP Range</dt>
+                                                                                                <dd>The rule applies to a flow of messages for which the other computer's IP address falls within the range set here.</dd>
+                                                                                                <dt>Host 2 Port Range</dt>
+                                                                                                <dd>The rule applies to a flow of messages for which host 2's port number is within the range set here.</dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>24 -- WISH Rules</dt>
+                                                                                        <dd>
+This section is where you define WISH Rules. Enable or disable defined
+rules with the checkboxes at the left. </dd>
+                                                                                    </dl>
+                                                                                </div><!-- box -->
+                                                                
+                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a name="Protected_Setup">Wi-Fi Protected Setup</a></h3>
+                                                                                    <dl>
+                                                                                        <dt>Wi-Fi Protected Setup</dt>
+                                                                                        <dd>
+                                                                                            <dl>
+                                                                                                <dt>Enable</dt>
+                                                                                                <dd>Enable the Wi-Fi Protected Setup feature.</dd>
+                                                                                                <dt>Lock Wireless Security Settings</dt>
+                                                                                                <dd>Locking
+the wireless security settings prevents the settings from being changed
+by any new external registrar using its PIN. Devices can still be added
+to the wireless network using Wi-Fi Protected Setup. It is still
+possible to change wireless network settings with <a href="Basic_Wireless.html">Manual Wireless Network Setup</a>, <a href="########" onclick="(alert('The wizard is not supported on this emulator. Please run the Setup Wizard from the CD that came with the device.'))">Wireless Network Setup Wizard</a>, or an existing external WLAN Manager Registrar.</dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>PIN Settings</dt>
+                                                                                        <dd>
+                                                                                            <p>A
+PIN is a unique number that can be used to add the router to an
+existing network or to create a new network. The default PIN may be
+printed on the bottom of the router. For extra security, a new PIN can
+be generated. You can restore the default PIN at any time. Only the
+Administrator ("admin" account) can change or reset the PIN.</p>
+                                                                                            <dl>
+                                                                                                <dt>Current PIN</dt>
+                                                                                                <dd>Shows the current value of the router's PIN.</dd>
+                                                                                                <dt>Reset PIN to Default</dt>
+                                                                                                <dd>Restore the default PIN of the router.</dd>
+                                                                                                <dt>Generate New PIN</dt>
+                                                                                                <dd>Create
+a random number that is a valid PIN. This becomes the router's PIN. You
+can then copy this PIN to the user interface of the registrar.</dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>Add Wireless Station</dt>
+                                                                                        <dd>
+                                                                                            <p>This Wizard helps you add wireless devices to the wireless network.</p>
+                                                                                            <p>The
+wizard will either display the wireless network settings to guide you
+through manual configuration, prompt you to enter the PIN for the
+device, or ask you to press the configuration button on the device. If
+the device supports Wi-Fi Protected Setup and has a configuration
+button, you can add it to the network by pressing the configuration
+button on the device and then the on the router within 60 seconds. The
+status LED on the router will flash three times if the device has been
+successfully added to the network.</p>
+                                                                                            <p>There
+are several ways to add a wireless device to your network. Access to
+the wireless network is controlled by a “registrar”. A registrar only
+allows devices onto the wireless network if you have entered the PIN,
+or pressed a special Wi-Fi Protected Setup button on the device. The
+router acts as a registrar for the network, although other devices may
+act as a registrar as well.</p>
+                                                                                            <dl>
+                                                                                                <dt>Add Wireless Device with WPS</dt>
+                                                                                                <dd>Start the wizard.
+                                                                                                </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                    </dl>
+                                                                                </div><!-- box -->
+                                                                
+                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a name="Routing">Routing</a></h3>
+                                                                                    <dl>
+                                                                                        <dt>
+                                                                                                Enable: 
+                                                                                        </dt>
+                                                                                        <dd>
+Specifies whether the entry will be enabled or disabled. <p>
+                                                                                                <span class="option">Destination IP: </span>
+The IP address of packets that will take this route. </p>
+                                                                                            <p>
+                                                                                                <span class="option">Netmask: </span>
+One bits in the mask specify which bits of the IP address must match. </p>
+                                                                                            <p>
+                                                                                                <span class="option">Gateway: </span>
+Specifies the next hop to be taken if this route is used. A gateway of
+0.0.0.0 implies there is no next hop, and the IP address matched is
+directly connected to the router on the interface specified: WAN.</p>
+                                                                                            <p>
+                                                                                                <span class="option">Metric: </span>
+The route metric is a value from 1 to 16 that indicates the cost of
+using this route. A value of 1 is the lowest cost, and 15 is the
+highest cost. A value of 16 indicates that the route is not reachable
+from this router. When trying to reach a particular destination,
+computers on your network will select the best route, ignoring
+unreachable routes. </p>
+                                                                                            <p>
+                                                                                                <span class="option">Interface: </span>
+Specifies the interface -- WAN -- that the IP packet must use to
+transit out of the router, when this route is used. </p>
+                                                                                        </dd>
+                                                                                    </dl>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                    <h3><a name="Network">Advanced Network</a></h3>
+                                                                                    <dl>
+                                                                                        <dt>UPnP</dt>
+                                                                                        <dd>
+UPnP is short for Universal Plug and Play, which is a networking
+architecture that provides compatibility among networking equipment,
+software, and peripherals. This router has optional UPnP capability,
+and can work with other UPnP devices and software. <dl>
+                                                                                                <dt>Enable UPnP</dt>
+                                                                                                <dd>If you need to use the UPnP functionality, you can enable it here.</dd>
+                                                                                            
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>WAN Ping</dt>
+                                                                                        <dd>
+Pinging public WAN IP addresses is a common method used by hackers to
+test whether your WAN IP address is valid. <dl>
+                                                                                                <dt>Enable WAN Ping Respond</dt>
+                                                                                                <dd>
+If you leave this option unchecked, you are causing the router to
+ignore <code>ping</code> commands for the public WAN IP address of the router.
+                                                                                                </dd>
+                                                                                                <dt>WAN Ping Inbound Filter</dt>
+                                                                                                <dd>
+Select a filter that controls which WAN computers can use the ping
+feature. If you do not see the filter you need in the list of filters,
+go to the <a href="Inbound_Filter.html"> Advanced&nbsp;→&nbsp;Inbound&nbsp;Filter</a> screen and create a new filter.
+                                                                                                </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        <dt>WAN Port Speed</dt>
+                                                                                        <dd>
+Normally, this is set to "auto". If you have trouble connecting to the
+WAN, try the other settings. </dd>
+                                                                                        <dt>Multicast Streams</dt>
+                                                                                        <dd>
+The router uses the IGMP protocol to support efficient multicasting --
+transmission of identical content, such as multimedia, from a source to
+a number of recipients. <dl>
+                                                                                                <dt>Enable Multicast Streams</dt>
+                                                                                                <dd>
+This option must be enabled if any applications on the LAN participate
+in a multicast group. If you have a multimedia LAN application that is
+not receiving content as expected, try enabling this option. </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                    
+                                                                                    </dl>
+                                                                                </div>
+                                                                
+                                                                
+                                                                                <div class="box">
+                                                                                    <h3><a name="GuestZone">Guest Zone</a></h3>
+                                                                                    <dl>
+                                                                                        <dt>Guest Zone Selection</dt>
+                                                                                        <dd>
+                                                                                            <p>The selection helps you to define the Guest Zone scale.</p>
+                                                                                            <dl>
+                                                                                                <dt>Enable Guest Zone</dt>
+                                                                                                <dd>Specifies whether the Guest Zone will be enabled or disabled.</dd>
+                                                                                                
+                                                                                                <dt>Wireless Network Name</dt>
+                                                                                                <dd>Provide a name for Guest Zone wireless network.</dd>
+                                                                                                <dt>Enable Routing Between Zones</dt>
+                                                                                                <dd>Use
+this section to enable routing between Host Zone and Guest Zone, Guest
+clients can not access Host clients' data without enable the function.</dd>
+                                                                                                <dt>Security Mode</dt>
+                                                                                                    <dd>Unless
+one of these encryption modes is selected, wireless transmissions to
+and from your wireless network can be easily intercepted and
+interpreted by unauthorized users.</dd>
+                                                                                                    <dt>WEP</dt>
+                                                                                                    <dd>
+                                                                                                        <p>A
+method of encrypting data for wireless communication intended to
+provide the same level of privacy as a wired network. WEP is not as
+secure as WPA encryption. To gain access to a WEP network, you must
+know the key. The key is a string of characters that you create. When
+using WEP, you must determine the level of encryption. The type of
+encryption determines the key length. 128-bit encryption requires a
+longer key than 64-bit encryption. Keys are defined by entering in a
+string in HEX (hexadecimal - using characters 0-9, A-F) or ASCII
+(American Standard Code for Information Interchange - alphanumeric
+characters) format. ASCII format is provided so you can enter a string
+that is easier to remember. The ASCII string is converted to HEX for
+use over the network. Four keys can be defined so that you can change
+keys easily. A default key is selected for use on the network.</p>
+                                                                                                        <div class="help_example">
+                                                                                                <dl>
+                                                                                                                <dt>Example: </dt>
+                                                                                                                <dd>
+64-bit hexadecimal keys are exactly 10 characters in length.
+(12345678FA is a valid string of 10 characters for 64-bit encryption.) </dd>
+                                                                                                                <dd>
+128-bit hexadecimal keys are exactly 26 characters in length.
+(456FBCDF123400122225271730 is a valid string of 26 characters for
+128-bit encryption.) </dd>
+                                                                                                                <dd>
+64-bit ASCII keys are up to 5 characters in length (DMODE is a valid
+string of 5 characters for 64-bit encryption.) </dd>
+                                                                                                                <dd>
+128-bit ASCII keys are up to 13 characters in length (2002HALOSWIN1 is
+a valid string of 13 characters for 128-bit encryption.) </dd>
+                                                                                                </dl>
+                                                                                                        </div>
+                                                                                                        <p>Note
+that, if you enter fewer characters in the WEP key than required, the
+remainder of the key is automatically padded with zeros.</p>
+                                                                                                </dd>
+                                                                                                <dt>WPA-Personal and WPA-Enterprise</dt>
+                                                                                                <dd>
+                                                                                                    <p>Both
+of these options select some variant of Wi-Fi Protected Access (WPA) --
+security standards published by the Wi-Fi Alliance. The <span class="option">WPA Mode</span> further refines the variant that the router should employ.</p>
+                                                                                                    <p>
+                                                                                                        <span class="option">WPA Mode: </span>
+WPA is the older standard; select this option if the clients that will
+be used with the router only support the older standard. WPA2 is the
+newer implementation of the stronger IEEE 802.11i security standard.
+With the "WPA2" option, the router tries WPA2 first, but falls back to
+WPA if the client only supports WPA. With the "WPA2 Only" option, the
+router associates only with clients that also support WPA2 security. </p>
+                                                                                                    <p>
+                                                                                                        <span class="option">Cipher Type: </span>
+The encryption algorithm used to secure the data communication. TKIP
+(Temporal Key Integrity Protocol) provides per-packet key generation
+and is based on WEP. AES (Advanced Encryption Standard) is a very
+secure block based encryption. With the "TKIP and AES" option, the
+router negotiates the cipher type with the client, and uses AES when
+available. </p>
+                                                                                                    <p>
+                                                                                                        <span class="option">Group Key Update Interval: </span>
+The amount of time before the group key used for broadcast and
+multicast data is changed. </p>
+                                                                                                </dd>
+                                                                                                <dt>WPA-Personal</dt>
+                                                                                                <dd>
+                                                                                                    <p>This option uses Wi-Fi Protected Access with a Pre-Shared Key (PSK). </p>
+                                                                                                    <p>
+                                                                                                        <span class="option">Pre-Shared Key: </span>
+The key is entered as a pass-phrase of up to 63 alphanumeric characters
+in ASCII (American Standard Code for Information Interchange) format at
+both ends of the wireless connection. It cannot be shorter than eight
+characters, although for proper security it needs to be of ample length
+and should not be a commonly known phrase. This phrase is used to
+generate session keys that are unique for each wireless client. </p>
+                                                                                                    <div class="help_example">
+                                                                                                <dl>
+                                                                                                            <dt>Example: </dt>
+                                                                                                            <dd><code>Wireless Networking technology enables ubiquitous communication</code></dd>
+                                                                                                </dl>
+                                                                                                    </div>
+                                                                                                </dd>
+                                                                                                <dt>WPA-Enterprise</dt>
+                                                                                                <dd>
+                                                                                                    <p>This
+option works with a RADIUS Server to authenticate wireless clients.
+Wireless clients should have established the necessary credentials
+before attempting to authenticate to the Server through this Gateway.
+Furthermore, it may be necessary to configure the RADIUS Server to
+allow this Gateway to authenticate users. </p>
+                                                                                                    <p>
+                                                                                                        <span class="option">Authentication Timeout: </span>
+Amount of time before a client will be required to re-authenticate. </p>
+                                                                                                    <p>
+                                                                                                        <span class="option">RADIUS Server IP Address: </span>
+The IP address of the authentication server. </p>
+                                                                                                    <p>
+                                                                                                        <span class="option">RADIUS Server Port: </span>
+The port number used to connect to the authentication server. </p>
+                                                                                                    <p>
+                                                                                                         <span class="option">RADIUS Server Shared Secret: </span>
+A pass-phrase that must match with the authentication server. </p>
+                                                                                                    <p>
+                                                                                                        <span class="option">MAC Address Authentication: </span>
+If this is selected, the user must connect from the same computer
+whenever logging into the wireless network. </p>
+                                                                                                    <p><span class="option">Advanced: </span></p>
+                                                                                                <dl>
+                                                                                                        <dt>Optional Backup RADIUS Server</dt>
+                                                                                                        <dd>
+This option enables configuration of an optional second RADIUS server.
+A second RADIUS server can be used as backup for the primary RADIUS
+server. The second RADIUS server is consulted only when the primary
+server is not available or not responding. The fields <span class="option">Second RADIUS Server IP Address</span>, <span class="option">RADIUS Server Port</span>, <span class="option">Second RADIUS server Shared Secret</span>, <span class="option">Second MAC Address Authentication</span> provide the corresponding parameters for the second RADIUS Server. 
+                                                                                                        </dd>
+                                                                                                </dl>
+                                                                                                </dd>
+                                                                                            </dl>
+                                                                                        </dd>
+                                                                                        
+                                                                                    </dl>
+                                                                                </div><!-- box -->
+                                                                
+                                                                        </div>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div><!-- main_content -->
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                                                        <td>&nbsp;</td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

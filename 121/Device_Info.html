@@ -1,0 +1,1968 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+    	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+    <!-- InstanceBeginEditable name="Page Title" -->
+    <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+        Status / Device Info
+    </title>
+    <!-- InstanceEndEditable -->
+
+    <!-- InstanceBeginEditable name="Local Styles" -->
+    <style type="text/css">
+    /*
+     * Styles used only on this page.
+     */
+    </style>
+    <!-- InstanceEndEditable -->
+
+    
+        
+    
+
+    
+        
+    
+
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="ajax.js"></script>
+    <script type="text/javascript" src="navigation.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("main_content").style.display = "block";
+            document.getElementById("reboot_content").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                              "If not, press Cancel and then click Save Settings.\n" +
+                              "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Status/Device_Info.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+    //]]>
+    </script>
+
+    <!-- InstanceBeginEditable name="Scripts" -->
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * Handle for document form.
+         */
+        var mf;
+
+        /*
+         * Used for connection status report.
+         */
+        var current_time;
+        var system_uptime_secs;
+        var session_name = [];
+        var connection_state = [];
+        var wan_ip_address = [];
+        var wan_physical_state;
+        var wan_auth_sec_model = [];
+        var wan_subnet = [];
+        var wan_gateway = [];
+        var wan_interface_up_time = [];
+        var wan_interface_up_time_secs = [];
+        var wan_state = [];
+        var wan_primary_dns = [];
+        var wan_secondary_dns = [];
+        var connection_status_xml_loader = new ajax_xmlhttp("/wan_connection_status.xml", connection_status_xml_ready, connection_status_xml_timeout, 10000);
+        var wan_lan_status_xml_loader = new ajax_xmlhttp("/wan_lan_status.xml", wan_lan_status_xml_ready, wan_lan_status_xml_timeout, 10000);
+        var wan_action_status_xml_loader = new ajax_xmlhttp("/wan_action_status.xml", wan_action_status_xml_ready, wan_action_status_xml_timeout, 10000);
+        // 
+            var wlan_radio_status_xml_loader = new ajax_xmlhttp("/wlan_radio_status.xml", wlan_radio_status_xml_ready);
+        // 
+
+        /*
+         * Start a DNS retriever to resolve a known host name (this allows us to determine if the WAN is online).
+         */
+        var dnsxml = new ajax_xmlhttp("/ssi_dns_resolve.xml?data=www.dlink.com", dnsdone);
+
+        var wan_ip_mode;
+        var connection_status_xml_timer = 0;
+
+        /*
+         * WAN modes.
+         */
+        var STATIC = 0;
+        var DHCP = 1;
+        var PPPOE = 2;
+        var PPTP = 3;
+        var L2TP = 4;
+        var MPPPOE = 5;
+        var RussiaPPTP = 7;
+        var RussiaPPPoE = 8;
+
+        //
+        var WWAN_MODE = 10;
+        
+        // 
+        
+        
+        var thetime = new Date();
+
+        /*
+         * page_reload()
+         */
+        function page_reload()
+        {
+            top.location = "/Status/Device_Info.html";
+        }
+
+        // 
+        /*
+         * Radio init state, "false" if init failed
+         */
+        var radio_started = [];
+
+        /*
+         * wireless_selector()
+         */
+        function wireless_selector(radio_index, schedule)
+        {
+            var radio_control_off;
+            var phy_mode;
+            var wlan_mac_addr;
+            var wifisc_enabled;
+            var wifisc_configured;
+            var guest_wifisc_configured;
+
+            if (radio_index == 0) {
+                radio_control_off = "1" != "1";
+                phy_mode = "11";
+                wlan_mac_addr = "00:21:91:ff:44:d1";
+                wifisc_enabled = "true";
+                wifisc_configured = "false";
+                guest_wifisc_configured = "false";
+            }
+
+            // 
+
+            if (radio_control_off) {
+                document.getElementById("wireless_radio_" + radio_index).innerHTML = "Off";
+                document.getElementById("wireless_status_" + radio_index).style.display = "none";
+            } else {
+                if (radio_started[radio_index] == "false") {
+                    document.getElementById("wireless_radio_" + radio_index).innerHTML = "Init failed";
+                    document.getElementById("primary_channel_" + radio_index).style.visibility = "hidden";
+                    document.getElementById("secondary_channel_" + radio_index).style.visibility = "hidden";
+                    document.getElementById("channel_width_" + radio_index).style.visibility = "hidden";
+                    //
+                    document.getElementById("wlan_qos_engine_" + radio_index).style.visibility = "hidden";
+                    //
+                    //
+                        document.getElementById("wifisc_configured_" + radio_index).style.visibility = "hidden";
+                        document.getElementById("guest_wifisc_configured_" + radio_index).style.visibility = "hidden";
+                    //
+                } else {
+                    //
+                        if (wifisc_enabled == "false") {
+                            document.getElementById("wifisc_configured_" + radio_index).innerHTML = "Disabled";
+                            document.getElementById("guest_wifisc_configured_" + radio_index).innerHTML = "Disabled";
+                        } else {
+                            if (wifisc_configured == "true") {
+                                document.getElementById("wifisc_configured_" + radio_index).innerHTML = "Enabled/Configured";
+                            } else {
+                                document.getElementById("wifisc_configured_" + radio_index).innerHTML = "Enabled/Not Configured";
+                            }
+                            if (guest_wifisc_configured == "true") {
+                                document.getElementById("guest_wifisc_configured_" + radio_index).innerHTML = "Enabled/Configured";
+                            } else {
+                                document.getElementById("guest_wifisc_configured_" + radio_index).innerHTML = "Enabled/Not Configured";
+                        }
+                        }
+                    //
+                    if (schedule == 0){
+                         document.getElementById("wireless_radio_" + radio_index).innerHTML = "Off";
+                         document.getElementById("wireless_status_" + radio_index).style.display = "none"; 
+											}                    
+                    else
+                    	{
+                    	   document.getElementById("wireless_radio_" + radio_index).innerHTML = "Enabled";
+                         document.getElementById("wireless_status_" + radio_index).style.display = "block";     
+                       }
+                }
+            }
+        }
+
+        /*
+         * wlan_radio_status_xml_ready()
+         */
+        function wlan_radio_status_xml_ready(xml_doc)
+        {
+        	  var schedule;
+        	
+            /*
+             * Extract the wlan radio status from the document retrieved.
+             */
+            do {
+                for (var i = 0; i < radio_count; i++) {
+                    radio_started[i] = xml_doc.get_element_data("radio_started", i);
+                    if (radio_started[i] == null) {
+                        break;
+                    }
+
+                    schedule = xml_doc.get_element_data("wireless_schedule", i);
+                    if (schedule == null) {
+                        break;
+                    }
+                    
+                    /*
+                     * Dynamically update the UI with our new info.
+                     */
+                    wireless_selector(i, schedule);
+                }
+                return;
+            } while (false);
+
+            /*
+             * Force a page refresh after a delay (we may have been logged out).
+             */
+            window.setTimeout(page_reload, 15000);
+        }
+        //
+
+        /*
+         * current_time_selector()
+         */
+        function current_time_selector()
+        {
+            document.getElementById("current_time").innerHTML = current_time;
+        }
+
+        /*
+         * nat_enabled_selector()
+         */
+        function nat_enabled_selector()
+        {
+            var nat_enabled = "";
+            document.getElementById("nat_enabled").innerHTML = (nat_enabled == "true")?"Enable":"Disable";
+        }
+
+        /*
+         * system_uptime_selector()
+         */
+        function system_uptime_selector()
+        {
+            var system_uptime = '';
+            var   uptime_secs = system_uptime_secs;
+            var days = Math.floor(uptime_secs / 86400);
+            uptime_secs %= 86400;
+            var hours = Math.floor(uptime_secs / 3600);
+            uptime_secs %= 3600;
+            var mins = Math.floor(uptime_secs / 60);
+            uptime_secs %= 60;
+
+            system_uptime = days + " " +
+                ((days == 1)
+                    ? "Day"
+                    : "Days")
+                + ", ";
+            system_uptime += hours + ":" + padout(mins) + ":" + padout(uptime_secs);
+            document.getElementById("system_uptime").innerHTML = system_uptime;
+        }
+
+        /*
+         * wan_uptime_selector()
+         */
+        function wan_uptime_selector(index)
+        {
+            if (get_connection_state(index) == 0) {
+                //
+                document.getElementById("wan_interface_up_time_str_0").innerHTML = "N/A";
+                return;
+            }
+
+            if (get_connection_state(index) != 2) {
+                wan_interface_up_time_secs[index] = 0;
+            }
+
+            var wan_uptime = '';
+            var wan_uptime_secs = wan_interface_up_time_secs[index];
+            var days = Math.floor(wan_uptime_secs / 86400);
+            wan_uptime_secs %= 86400;
+            var hours = Math.floor(wan_uptime_secs / 3600);
+            wan_uptime_secs %= 3600;
+            var mins = Math.floor(wan_uptime_secs / 60);
+            wan_uptime_secs %= 60;
+
+            wan_uptime = days + " Day ";
+            wan_uptime += hours + " Hour " + padout(mins) + " Min " + padout(wan_uptime_secs) + " Sec";
+            //
+            document.getElementById("wan_interface_up_time_str_0").innerHTML = wan_uptime;
+        }
+
+        /*
+         * wan_ip_mode_selector()
+         *  Show WAN settings according to selected WAN mode.
+         */
+        function wan_ip_mode_selector()
+        {
+            /*
+             * Create a connection name enumeration array.
+             */
+            connection_types = [
+                "Static IP",
+                "DHCP Client",
+                "PPPoE",
+                "PPTP",
+                "L2TP",
+                //
+            ];
+
+            wan_ip_mode = "1";
+            wan_ip_mode = +wan_ip_mode;
+            
+            //
+            if( wan_ip_mode == WWAN_MODE) {
+            	document.getElementById("wan_ip_mode").innerHTML = "3G USB Adapter";
+                document.getElementById("qos_engine_box").style.display = "none";
+                document.getElementById("mac_address_box").style.display = "none";
+
+            }
+            else 
+            
+            
+            //
+            document.getElementById("wan_ip_mode").innerHTML = connection_types[wan_ip_mode];
+        }
+
+        /*
+         * get_wan_network_status_string()
+         */
+        function get_wan_network_status_string(index)
+        {
+            if (get_connection_state(index) == -1) {
+                return ("Incorrectly configured - check logs");
+            }
+            if (get_connection_state(index) != 2) {
+                wan_interface_up_time_secs[index] = 0;
+            }
+            if (get_connection_state(index) == 0) {
+                return "Disconnected";
+            }
+            if (get_connection_state(index) == 1) {
+                return "Establishing (please wait...)";
+            }
+            if (get_connection_state(index) == 2) {
+                if (wan_state[index] == "1") {
+                    return "Established: Rate Estimating";
+                } else {
+                    return "Established";
+                }
+            }
+            if (get_connection_state(index) == 3) {
+                return "Disconnecting (please wait...)";
+            }
+            return "Unknown";
+        }
+
+        /*
+         * wan_lan_status_selector()
+         *  Show WAN/LAN common settings.
+         */
+        function wan_lan_status_selector()
+        {
+            document.getElementById("wan_physical_state").innerHTML = wan_physical_state;
+            document.getElementById("wan_primary_dns_0").innerHTML = wan_primary_dns[0];
+            document.getElementById("wan_secondary_dns_0").innerHTML = wan_secondary_dns[0];
+
+            var dhcp_server_enabled = parseInt("1",10);
+            if (dhcp_server_enabled == 1) {
+                document.getElementById("info_dhcp_server_status").innerHTML = "Enabled";
+            } else {
+                document.getElementById("info_dhcp_server_status").innerHTML = "Disabled";
+            }
+        }
+
+        /*
+         * wan_connection_status_selector()
+         *  Show WAN settings according to selected WAN mode.
+         */
+        function wan_connection_status_selector(index)
+        {
+            //
+            wan_uptime_selector(0);
+            document.getElementById("wan_network_status_0").innerHTML = get_wan_network_status_string(0);
+            document.getElementById("wan_ip_address_0").innerHTML = wan_ip_address[0];
+            document.getElementById("wan_subnet_0").innerHTML = wan_subnet[0];
+            document.getElementById("wan_gateway_0").innerHTML = wan_gateway[0];
+            document.getElementById("wan_primary_dns_0").innerHTML = wan_primary_dns[0];
+            document.getElementById("wan_secondary_dns_0").innerHTML = wan_secondary_dns[0];
+
+            if (wan_auth_sec_model[0]) {
+                var auth_sec_display = "none";
+                if ( wan_auth_sec_model[0] != "N/A" ) {
+                    document.getElementById("wan_auth_sec_model_0").innerHTML = wan_auth_sec_model[0];
+                    auth_sec_display = "block";
+                }
+                document.getElementById("box_authsecmodel_status").style.display = auth_sec_display;
+            }
+            document.getElementById("box_wan_connection_info").style.display = "block";
+            document.getElementById("box_wan_network_info").style.display = "block";
+        }
+
+        /*
+         * wan_mac_addr_selector()
+         *  Show WAN mac address in uppercase.
+         */
+        function wan_mac_addr_selector()
+        {
+            var wan_mac_addr = "00:21:91:ff:44:d2";
+            document.getElementById("wan_mac_addr").innerHTML = wan_mac_addr.toUpperCase();
+        }
+
+        /*
+         * lan_mac_addr_selector()
+         *  Show LAN mac address in uppercase.
+         */
+        function lan_mac_addr_selector()
+        {
+            var lan_mac_addr = "00:21:91:ff:44:d1";
+            document.getElementById("lan_mac_addr").innerHTML = lan_mac_addr.toUpperCase();
+        }
+
+        /*
+         * padout()
+         */
+        function padout(number)
+        {
+            return (number < 10) ? '0' + number : number;
+        }
+
+        /*
+         * DST start and end Date objects.
+         */
+        var dst_start_d, dst_end_d, add_daylight_offset = 0;
+
+        /*
+         * update_clock()
+         *  Update current time and system up time.
+         */
+        function update_clock()
+        {
+            var tz_daylight_flag = "false";
+            var tz_daylight_offset = "3600" * 1;
+
+            /*
+             * Update current time.
+             */
+            thetime.setTime(thetime.getTime() + 1000);
+
+            if (tz_daylight_flag == "true") {
+                /*
+                 * Are we in DST now?
+                 */
+                if (in_dst_now(thetime)) {
+                    if (add_daylight_offset == 0) {
+                        thetime.setTime(thetime.getTime() + 1000 * tz_daylight_offset);
+                        add_daylight_offset = 1;
+                    }
+                }
+                else {
+                    if (add_daylight_offset == 1) {
+                        thetime.setTime(thetime.getTime() - 1000 * tz_daylight_offset);
+                        add_daylight_offset = 2;
+                    }
+                }
+            }
+
+            current_time = thetime.toLocaleString();
+            current_time_selector();
+
+            /*
+             * Update wan up time if there is an established connection.
+             */
+            switch (wan_ip_mode) {
+            //
+            case STATIC:
+            case DHCP:
+            case PPPOE:
+            case PPTP:
+            case L2TP:
+            default:
+            if ((get_connection_state(0) == 2) && (wan_interface_up_time_secs[0] > 0)) {
+                wan_interface_up_time_secs[0] += 1;
+                wan_uptime_selector(0);
+                }
+                break;
+            }
+
+            /*
+             * Update system up time.
+             */
+            system_uptime_secs += 1;
+            window.setTimeout(update_clock, 1000);
+        }
+
+        /*
+         * Number of days in each month of the year.
+         */
+        var days_in_month = ['31', '28', '31', '30', '31', '30', '31', '31', '30', '31', '30', '31'];
+
+        /*
+         * compute_date()
+         * Return an initialized Date object.
+         */
+        function compute_date(year, month, week, day, hour, min)
+        {
+            /*
+             * Get first day of week in the specified month and year.
+             */
+            var tentative_d = new Date(year, month, 1, hour - 1, min + 59, 59);
+            var exact_date = tentative_d.getDate() - tentative_d.getDay() + day;
+            if (exact_date <= 0) {
+                exact_date += 7;
+            }
+
+            /*
+             * Get day of week for the specified week.
+             */
+            exact_date += (week - 1) * 7;
+
+            /*
+             * We may have gone beyond the number of days in the month.
+             */
+            if (exact_date > days_in_month[month]) {
+                exact_date -= 7;
+            }
+
+            return new Date(year, month, exact_date, hour - 1, min + 59, 59);
+        }
+
+        /*
+         * in_dst_now()
+         *  Returns true if the Date argument is within the DST start and end times.
+         */
+        function in_dst_now(date)
+        {
+            var localtime = date.getTime();
+            if (dst_start_d.getTime() < dst_end_d.getTime()) {
+                return localtime >= dst_start_d.getTime() && localtime <= dst_end_d.getTime();
+            } else {
+                return !(localtime < dst_start_d.getTime() && localtime > dst_end_d.getTime());
+            }
+        }
+
+        /*
+         * get_current_time()
+         *  The server maintains an internal time reference by storing three values,
+         *  the UTC (or 'epoch time') in seconds, the timezone (UTC offset in seconds)
+         *  which refers to a geographic time zone, and a daylight savings offset
+         *  which is used to adjust the timezone. note that PCs usually incorporate
+         *  the daylight savings offset into the timezone, for instance you have
+         *  PST and PDT used at different times of the year on the US pacific coast.
+         *  all this information needs to be plugged into the date object, but the
+         *  date object does not allow the current timezone to be set (only gotten).
+         *  thus, we'll adjust the UTC time to compensate for any differences between
+         *  the date object's timezone and the server's timezone+offset.
+         */
+        function get_current_time()
+        {
+            var epoch_seconds = "1075028622" * 1;
+            var tz_timezone = "-28800" * 1;
+            var tz_daylight_flag = "false";
+            var tz_daylight_offset = "3600" * 1;
+
+            epoch_seconds += tz_timezone;
+            thetime.setTime(epoch_seconds * 1000);
+            epoch_seconds += thetime.getTimezoneOffset()*60;
+            thetime.setTime(epoch_seconds * 1000);
+
+            /*
+             * Calculate number of days in the month for the current year. Account for leap years.
+             */
+            var year = thetime.getYear();
+            if (year < 1900) {
+                year += 1900;
+            }
+            var days_in_month = ['31', '28', '31', '30', '31', '30', '31', '31', '30', '31', '30', '31'];
+            if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+                days_in_month[1] = 29;
+            }
+
+            /*
+             * Calculate the DST start time.
+             */
+            var month = parseInt("2", 10);
+            var week  = parseInt("1", 10);
+            var day   = parseInt("0", 10);
+            var hour  = parseInt("2", 10);
+            dst_start_d = compute_date(year, month, week, day, hour, 0);
+
+            /*
+             * Calculate the DST end time.
+             */
+            month = parseInt("9", 10);
+            week  = parseInt("5", 10);
+            day   = parseInt("0", 10);
+            hour  = parseInt("2", 10);
+            dst_end_d = compute_date(year, month, week, day, hour, 0);
+
+            if (tz_daylight_flag == "true") {
+                /*
+                 * Are we in DST now?
+                 */
+                if (in_dst_now(thetime)) {
+                    epoch_seconds += (tz_daylight_offset);
+                    add_daylight_offset = 1;
+                }
+            }
+            thetime.setTime(epoch_seconds * 1000);
+            current_time = thetime.toLocaleString();
+        }
+
+        /*
+         * wan_lan_status_xml_ready()
+         */
+        function wan_lan_status_xml_ready(xml_doc)
+        {
+            /*
+             * Extract the connection status from the document retrieved.
+             */
+            do {
+                wan_physical_state = xml_doc.get_element_data("wan_physical_state");
+                if (wan_physical_state == null) {
+                    break;
+                }
+
+                /*
+                 * Dynamically update the UI with our new info.
+                 */
+                wan_lan_status_selector();
+
+                /*
+                 * Restart the retrieval in 5 sec.
+                 */
+                window.setTimeout(wan_lan_status_xml_loader.retrieve_xml, 5000);
+                return;
+            } while (false);
+
+            /*
+             * Force a page refresh after a delay (we may have been logged out).
+             */
+            window.setTimeout(page_reload, 5000);
+        }
+
+        /*
+         * connection_status_xml_ready()
+         */
+        function connection_status_xml_ready(xml_doc)
+        {
+            var result = true;
+
+            /*
+             * Extract the connection status from the document retrieved.
+            */
+            do {
+                wan_auth_sec_model[0] = xml_doc.get_element_data("auth_sec_model_0");
+                if (wan_auth_sec_model[0] == null) {
+                    break;
+                }
+                connection_state[0] = xml_doc.get_element_data("connection_state_0");
+                if (connection_state[0] == null) {
+                    break;
+                }
+
+                wan_ip_address[0] = xml_doc.get_element_data("wan_ip_address_0");
+                if (wan_ip_address[0] == null) {
+                    break;
+                }
+                wan_subnet[0] = xml_doc.get_element_data("wan_subnet_0");
+                if (wan_subnet[0] == null) {
+                    break;
+                }
+
+                wan_gateway[0] = xml_doc.get_element_data("wan_gateway_0");
+                if (wan_gateway[0] == null) {
+                    break;
+                }
+                wan_primary_dns[0] = xml_doc.get_element_data("wan_primary_dns_0");
+                if (wan_primary_dns[0] == null) {
+                    break;
+                }
+                wan_secondary_dns[0] = xml_doc.get_element_data("wan_secondary_dns_0");
+                if (wan_secondary_dns[0] == null) {
+                    break;
+                }
+
+                wan_interface_up_time[0] = xml_doc.get_element_data("wan_interface_up_time_0");
+                if (wan_interface_up_time[0] == null) {
+                    break;
+                }
+                wan_interface_up_time_secs[0] = wan_interface_up_time[0] * 1;
+
+                wan_state[0] = xml_doc.get_element_data("wan_state_0");
+                if (wan_state[0] == null) {
+                    break;
+                }
+
+                var session_count = 0;
+                //
+
+                /*
+                 * Dynamically update the UI with our new info.
+                */
+                wan_connection_status_selector(session_count);
+                wan_action_buttons_selector();
+
+                if (wan_state[0] == "1") {
+                    window.location.reload();
+                    return;
+                }
+
+                /*
+                 * Restart the retrieval in 5 sec.
+                 */
+                connection_status_xml_timer = window.setTimeout(connection_status_xml_loader.retrieve_xml, 5000);
+                return;
+            } while (false);
+
+            /*
+            * Force a page refresh after a delay (we may have been logged out).
+            */
+            window.setTimeout(page_reload, 5000);
+        }
+
+        //
+
+        /*
+         * get_connection_state()
+         */
+        function get_connection_state(index)
+        {
+            return +connection_state[index];        // Cast returned value to a Number.
+        }
+
+        /*
+         * wan_action_buttons_selector()
+         */
+        function wan_action_buttons_selector()
+        {
+            /*
+             * Do not display buttons when wan mode is STATIC.
+             * Disable "release" button if WAN is not in established state(2).
+             * Disable "renew" button if WAN is not in disconnected state(0).
+             */
+            document.getElementById("box_wan_buttons").style.display = (wan_ip_mode == STATIC) ? "none" : "block";
+            switch (wan_ip_mode) {
+            case DHCP:
+                document.getElementById("wan_dhcp_button1").style.display = "inline";
+                document.getElementById("wan_dhcp_button2").style.display = "inline";
+                disable_form_field(mf.wan_dhcp_button1, (get_connection_state(0) != 0) || !is_admin);
+                disable_form_field(mf.wan_dhcp_button2, (get_connection_state(0) != 2) || !is_admin);
+                break;
+            case PPPOE:
+                document.getElementById("wan_pppoe_button1").style.display = "inline";
+                document.getElementById("wan_pppoe_button2").style.display = "inline";
+                disable_form_field(mf.wan_pppoe_button1, (get_connection_state(0) != 0) || !is_admin);
+                disable_form_field(mf.wan_pppoe_button2, (get_connection_state(0) != 2) || !is_admin);
+                break;
+            case PPTP:
+                document.getElementById("wan_pptp_button1").style.display = "inline";
+                document.getElementById("wan_pptp_button2").style.display = "inline";
+                disable_form_field(mf.wan_pptp_button1, (get_connection_state(0) != 0) || !is_admin);
+                disable_form_field(mf.wan_pptp_button2, (get_connection_state(0) != 2) || !is_admin);
+                break;
+            case L2TP:
+                document.getElementById("wan_l2tp_button1").style.display = "inline";
+                document.getElementById("wan_l2tp_button2").style.display = "inline";
+                disable_form_field(mf.wan_l2tp_button1, (get_connection_state(0) != 0) || !is_admin);
+                disable_form_field(mf.wan_l2tp_button2, (get_connection_state(0) != 2) || !is_admin);
+                break;
+            //
+            //
+            case WWAN_MODE:
+                document.getElementById("wan_wwan_button1").style.display = "inline";
+                document.getElementById("wan_wwan_button2").style.display = "inline";
+                disable_form_field(mf.wan_wwan_button1, (get_connection_state(0) != 0) || !is_admin);
+                disable_form_field(mf.wan_wwan_button2, (get_connection_state(0) != 2) || !is_admin);
+                
+                break;
+            
+            //
+            
+            }
+        }
+
+        var xsl_loader = new ajax_xslproc("../Status/lan_computers_table.sxsl", xsl_ready, xsl_timeout);
+        var xml_loader = new ajax_xmlhttp("../dhcp_clients.xml", xml_ready, xml_timeout);
+        var xml_data_ready = false;
+        var xsl_data_ready = false;
+        var xml_data;
+        var channel_xml_loader = new ajax_xmlhttp("../get_current_wlan_channel.xml", channel_xml_ready);
+
+        /*
+         * connection_status_xml_timeout()
+         */
+        function connection_status_xml_timeout()
+        {
+            /*
+             * Keep trying, if disconnected or establishing try a bit
+             * quicker (perhaps rate estimation is blocking us).
+             */
+            if ((get_connection_state(0) == 0) || (get_connection_state(0) == 1)) {
+                connection_status_xml_timer = window.setTimeout(connection_status_xml_loader.retrieve_xml, 2000);
+                return;
+            }
+            connection_status_xml_timer = window.setTimeout(connection_status_xml_loader.retrieve_xml, 20000);
+        }
+
+        /*
+         * wan_lan_status_xml_timeout()
+         */
+        function wan_lan_status_xml_timeout()
+        {
+            /*
+             * Keep trying, if disconnected or establishing try a bit
+             * quicker (perhaps rate estimation is blocking us).
+             */
+            if ((get_connection_state(0) == 0) || (get_connection_state(0) == 1)) {
+                window.setTimeout(wan_lan_status_xml_loader.retrieve_xml, 2000);
+                return;
+            }
+            window.setTimeout(wan_lan_status_xml_loader.retrieve_xml, 20000);
+        }
+
+        /*
+         * wan_action_status_xml_ready()
+         */
+        function wan_action_status_xml_ready(xml_doc)
+        {
+            var wan_action_status = xml_doc.get_element_data("status");
+
+            /*
+             * Dynamically update the UI with our new info.
+             */
+            if (wan_action_status == "Done") {
+                wan_action_buttons_selector();
+                return;
+            }
+            alert (wan_action_status);
+        }
+
+        /*
+         * wan_action_status_xml_timeout()
+         */
+        function wan_action_status_xml_timeout()
+        {
+            window.setTimeout(wan_action_status_xml_loader.retrieve_xml, 20000);
+        }
+
+        /*
+         * wan_button_action()
+         */
+        function wan_button_action (cgi_name)
+        {
+            wan_action_status_xml_loader.xmlhttp_url = cgi_name;
+            wan_action_status_xml_loader.retrieve_xml();
+            if (connection_status_xml_timer) {
+                window.clearTimeout(connection_status_xml_timer);
+            }
+            connection_status_xml_loader.retrieve_xml();
+        }
+
+        /*
+         * xsl_ready()
+         */
+        function xsl_ready()
+        {
+            xsl_data_ready = true;
+            refresh_table();
+        }
+
+        /*
+         * xml_ready()
+         */
+        function xml_ready(xml_doc)
+        {
+            xml_data = xml_doc;
+            xml_data_ready = true;
+            refresh_table();
+        }
+
+        /*
+         * refresh_table()
+         */
+        function refresh_table()
+        {
+            if (!(xml_data_ready && xsl_data_ready)) {
+                return;
+            }
+
+            var parent = document.getElementById("lan_computers_container");
+            while (parent.childNodes[0]) {
+                parent.removeChild(parent.childNodes[0]);
+            }
+            xml_data_ready = false;
+
+            xsl_loader.transform(xml_data, window.document, parent);
+            window.setTimeout(xml_loader.retrieve_xml, 10000);
+        }
+
+        var igmp_xsl_loader = new ajax_xslproc("../Status/igmp_group_memberships.sxsl", igmp_xsl_ready, igmp_xsl_timeout);
+        var igmp_xml_loader = new ajax_xmlhttp("../cgi_ssi_igmp_group_memberships.xml", igmp_xml_ready, igmp_data_fetcher_timeout);
+        var igmp_xml_data_ready = false;
+        var igmp_xsl_data_ready = false;
+        var igmp_xml_data;
+
+        /*
+         * igmp_xsl_ready()
+         */
+        function igmp_xsl_ready()
+        {
+            igmp_xsl_data_ready = true;
+            igmp_refresh_table();
+        }
+
+        /*
+         * igmp_xml_ready()
+         */
+        function igmp_xml_ready(xml_doc)
+        {
+            igmp_xml_data = xml_doc;
+            igmp_xml_data_ready = true;
+            igmp_refresh_table();
+        }
+
+        /*
+         * igmp_refresh_table()
+         */
+        function igmp_refresh_table()
+        {
+            if (!(igmp_xml_data_ready && igmp_xsl_data_ready)) {
+                return;
+            }
+
+            var parent = document.getElementById("igmp_membership_container");
+            while (parent.childNodes[0]) {
+                parent.removeChild(parent.childNodes[0]);
+            }
+            xml_data_ready = false;
+
+            igmp_xsl_loader.transform(igmp_xml_data, window.document, parent);
+            window.setTimeout(igmp_xml_loader.retrieve_xml, 10000);
+        }
+
+        /*
+         * xsl_timeout()
+         */
+        function xsl_timeout()
+        {
+            /*
+             * Keep trying, if disconnected or establishing try a bit
+             * quicker (perhaps rate estimation is blocking us).
+             */
+            if ((get_connection_state(0) == 0) || (get_connection_state(0) == 1)) {
+                window.setTimeout(xsl_loader.retrieve_xsl, 2000);
+                return;
+            }
+            window.setTimeout(xsl_loader.retrieve_xsl, 20000);
+        }
+
+        /*
+         * xml_timeout()
+         */
+        function xml_timeout()
+        {
+            /*
+             * Keep trying, if disconnected or establishing try a bit
+             * quicker (perhaps rate estimation is blocking us).
+             */
+            if ((get_connection_state(0) == 0) || (get_connection_state(0) == 1)) {
+                window.setTimeout(xml_loader.retrieve_xml, 2000);
+                return;
+            }
+            window.setTimeout(xml_loader.retrieve_xml, 20000);
+        }
+
+        /*
+         * igmp_xsl_timeout()
+         */
+        function igmp_xsl_timeout()
+        {
+            /*
+             * Keep trying, if disconnected or establishing try a bit
+             * quicker (perhaps rate estimation is blocking us).
+             */
+            if ((get_connection_state(0) == 0) || (get_connection_state(0) == 1)) {
+                window.setTimeout(igmp_xsl_loader.retrieve_xsl, 2000);
+                    return;
+                }
+            window.setTimeout(igmp_xsl_loader.retrieve_xsl, 20000);
+        }
+
+        /*
+         * igmp_data_fetcher_timeout()
+         */
+        function igmp_data_fetcher_timeout()
+        {
+            /*
+             * Keep trying, if disconnected or establishing try a bit
+             * quicker (perhaps rate estimation is blocking us).
+             */
+            if ((get_connection_state(0) == 0) || (get_connection_state(0) == 1)) {
+                window.setTimeout(igmp_xml_loader.retrieve_xml, 2000);
+                return;
+                }
+            window.setTimeout(igmp_xml_loader.retrieve_xml, 20000);
+        }
+
+        /*
+         * channel_xml_ready()
+         * An example xml file expected (replace &lt; with < ):
+         * <wlan_channels>
+         *  <wlan_channel>
+         *      <!-- Empty here, if the radio fails to init -->.
+         *  &lt;/wlan_channel>
+         *
+         *  <wlan_channel>
+         *      <cwm_mode>0&lt;/cwm_mode>
+         *      <channel>11&lt;/channel>
+         *      <channel_offset>0&lt;/channel_offset>
+         *  &lt;/wlan_channel>
+         *
+         * &lt;/wlan_channels>
+         */
+        function channel_xml_ready(xml_doc)
+        {
+            var cwm_mode = [];
+            var primary_channel = [];
+            var channel_offset = [];
+            var channel_width = ["20MHz", "40MHz"];
+            var xml_node_to_skip = 0;
+            for (var i = 0; i < radio_count; i++) {
+                /*
+                 * If we receive an empty node of <wlan_channel>, it means the radio is turned off or radio init failed.
+                 * We skip this radio.
+                 */
+                var wlan_channel_info_empty = xml_doc.is_node_empty("wlan_channel", i);
+                if (wlan_channel_info_empty) {
+                    if (i == 0) {
+                        xml_node_to_skip = 1;
+                    }
+                    continue;
+                }
+
+                /*
+                 * Update Channel infomation
+                 */
+                var k = i - xml_node_to_skip;
+                cwm_mode[i] = xml_doc.get_element_data("cwm_mode", k);
+                primary_channel[i] = xml_doc.get_element_data("channel", k);
+                document.getElementById("channel_width_" + i).innerHTML =  channel_width[cwm_mode[i]];
+                document.getElementById("primary_channel_" + i).innerHTML =  primary_channel[i];
+
+                /*
+                 * Only show extension channel if channel width is 40MHz, i.e. cwm_mode == 1.
+                 */
+                if (cwm_mode[i] == 1) {
+                    channel_offset[i] = xml_doc.get_element_data("channel_offset", k);
+                    var primary_channel_number = parseInt(primary_channel[i], 10);
+                    document.getElementById("secondary_channel_" + i).innerHTML =  channel_offset[i] == "1" ? primary_channel_number + 4 :  primary_channel_number - 4;
+                    document.getElementById("secondary_channel_block_" + i).style.display =  "block";
+                } else {
+                    document.getElementById("secondary_channel_block_" + i).style.display =  "none";
+                }
+            }
+
+            /*
+             * Continue retrieving, as channel may change frequently if in auto channel mode,
+             * or the channel actually in use may not have adjusted in time after the use changes the channel.
+             */
+            window.setTimeout(channel_xml_loader.retrieve_xml, 10000);
+        }
+
+        /*
+         * dnsdone()
+         *  DNS resolution to check if WAN is online.
+         */
+        function dnsdone(xml)
+        {
+            var dns = xml.get_element_data("dns");
+            document.getElementById("wan_dns_state").innerHTML = (dns) ? "Online" : "Offline";
+
+            /*
+             * Restart the retrieval in 5 sec.
+             */
+            window.setTimeout(dnsxml.retrieve_xml, 5000);
+        }
+
+        /*
+         * Number of SSIDs.
+         */
+        var number_ssid = parseInt("2", 10);
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            /*
+             * Display ssid instances or not acc. to mssid enabled value.
+             */
+            //
+                //
+            //
+
+            if (document.getElementById("guest_wps_0")) {
+                document.getElementById("guest_wps_0").style.display = "none";
+            }
+            if (document.getElementById("guest_wps_1")) {
+                document.getElementById("guest_wps_1").style.display = "none";
+            }
+            //
+            //
+                //
+                //
+                    //
+                        /*
+                         * Reason: Display guest wps status when guest enable.
+                         * Modified: Yufa Huang
+                         * Date: 2008.04.28
+                         */
+                        //
+                        //
+                    //
+                //
+                    //
+                //
+                //
+            //
+
+            if(local_debug) {
+                hide_all_ssi_tr();
+                document.getElementById("firmware_version").innerHTML="1.9,  2006/04/15";
+                document.getElementById("current_time").innerHTML="Saturday, April 15, 2006 2:25:33 PM";
+                document.getElementById("wan_ip_mode").innerHTML="DHCP";
+                document.getElementById("wan_ip_address_0").innerHTML="192.168.1.100";
+                document.getElementById("wan_subnet_0").innerHTML="255.255.255.0";
+                document.getElementById("wan_gateway_0").innerHTML="192.168.1.1";
+                document.getElementById("wan_primary_dns_0").innerHTML="0.0.0.0";
+                document.getElementById("wan_mac_addr").innerHTML="00:00:00:00:00:00";
+                document.getElementById("multicast_memberships_div").style.display = "block";
+                wan_ip_mode = DHCP;
+                connection_state = 0;
+                wan_action_buttons_selector();
+                return;
+            }
+
+            get_current_time();
+            system_uptime_secs = "15" * 1;
+            update_clock();
+            lan_mac_addr_selector();
+
+            // 
+                radio_count = parseInt(document.getElementById("radio_count").value, 10);
+                /*
+                 * Display the name of the Radios.
+                 */
+                if (radio_count > 1) {
+                    for (var i = 0; i < radio_count; i++) {
+                        document.getElementById("radio_name_" + i).innerHTML = radio_name[i];
+                    }
+                }
+
+                
+
+                /*
+                 * Check if the radio is in a working state
+                 */
+                
+            // 
+
+            /*
+             * Variable global_fw_minor_version is defined in the template where '0' is prepended to firmware minor version if it less than 10.
+             */
+            document.getElementById("fw_minor_current").innerHTML = global_fw_minor_version;
+
+            var is_router_mode = "0" == "0";
+
+            document.getElementById("bridge_mode_only_lan_settings").style.display = is_router_mode ? "none" : "block";
+            document.getElementById("router_mode_only_lan_settings").style.display = is_router_mode ? "block" : "none";
+
+            /*
+             * If WAN port mode selected is Bridge mode, we hide  "WAN", "LAN Computers" and "IGMP Membership" sections.
+             */
+            if (!is_router_mode) {
+                document.getElementById("wan_box").style.display = "none";
+                document.getElementById("lan_computers_box").style.display = "none";
+                document.getElementById("multicast_memberships_div").style.display = "none";
+                return;
+            }
+
+           
+            
+            /*
+             * Hide the IGMP memberships list of multicast streams are disabled.
+             */
+            var igmp_proxy_enabled = "0" * 1;
+            if (igmp_proxy_enabled == 0) {
+                document.getElementById("multicast_memberships_div").style.display = "none";
+            } else {
+                
+            }
+
+            wan_ip_mode_selector();
+            wan_mac_addr_selector();
+
+            //
+
+            /*
+             * Create and start an XML retrieval object that we will use to continually update our
+             * connection status with.
+             */
+            
+            wan_action_buttons_selector();
+        
+        }
+    //]]>
+    </script>
+    <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+    <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+    <div id="outside">
+        <table id="table_shell" summary="" cellspacing="0"><col span="1">
+            <tbody><tr>
+                <td>
+                    <div id="header_container">
+                        <div id="info_bar">
+                            <div class="fwv">Firmware Version:
+                            1.<span id="fw_minor_head">21</span>
+                            </div>
+                            <div class="hwv">Hardware Version:
+                            A4
+                            </div>
+                            <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                        </div>
+                    </div>
+                    <table id="masthead_container" summary="" cellspacing="0">
+                        <tbody><tr>
+                            <td><div id="masthead_image"></div></td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="topnav_container" summary="" border="0" cellspacing="1">
+                        <tbody><tr>
+                            <td id="modnum">
+                                <div id="modnum_image"></div>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                            </td>
+                            <td class="topnavon">
+                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                            </td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                        <tbody><tr>
+                            <td id="sidenav_container">
+                                <div id="sidenav">
+
+                                    <ul id="Basic_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul id="Advanced_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul id="Tools_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                            </div>
+                                        </li>
+
+                                        
+                                    </ul>
+
+                                    <ul style="display: block;" id="Status_subnav" class="subnav_group">
+                                        <li class="here">
+                                            <div>
+                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                    </ul>
+
+                                    <ul id="Help_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </td>
+                            <td id="maincontent_container">
+                                <div id="rebootcontent" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>Reboot needed</h2>
+                                            <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                            <form id="rebootdummy" action="#" method="get">
+
+                                            <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                            <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                            </form>
+                                        </div>
+                                    </div> <!-- reboot_warning -->
+                                </div>
+                                <div id="warnings_section" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>
+                                                Configuration Warnings
+                                            </h2>
+                                            <div style="display: block;" id="warnings_section_content">
+                                                <!-- This division will be populated with configuration warning information -->
+                                            </div><!-- box warnings_section_content -->
+                                        </div>
+                                    </div>
+                                </div> <!-- warnings_section -->
+
+        <input id="radio_count" value="1" type="hidden">
+                                <div id="maincontent" style="display: block;">
+                                    <!-- InstanceBeginEditable name="Main Content" -->
+                                    <form id="mainform" action="/Status/Device_Info.html" method="post" onsubmit="return false;">
+                                        <div class="section">
+                                            <div class="section_head">
+                                                <h2>Device Information</h2>
+                                                <p>All of your Internet and network connection details are displayed on this page. The firmware version is also displayed here.</p>
+                                            </div>
+                                        <div class="box">
+                                            <h3>General</h3>
+                                            <fieldset>
+                                                <p>
+                                                    <label class="duple">Time :</label>
+                                                <span id="current_time" class="output">Saturday, January 31, 2004 10:43:34 AM</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Firmware Version :</label>
+                                                    <strong id="firmware_version" class="output">1.<span id="fw_minor_current">21</span>,&nbsp;&nbsp;2008/09/11</strong>
+                                                </p>
+                                            </fieldset>
+                                        </div>
+                                        <div class="box" id="wan_box">
+                                            <h3>WAN</h3>
+                                            <fieldset>
+                                                <p>
+                                                    <label class="duple">Connection Type :</label>
+                                                    <span id="wan_ip_mode" class="output">DHCP Client</span>
+                                                </p>
+                                                <p id="qos_engine_box">
+                                                    <label class="duple">QoS Engine :</label>
+                                                    <span id="wan_qos_engine" class="output">
+                                                        
+                                                            Active
+                                                        
+                                                    </span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Cable Status :</label>
+                                                    <span id="wan_physical_state" class="output">Disconnected</span>
+                                                </p>
+                                                <p style="display: none;">
+                                                    <label class="duple">DNS Status :</label>
+                                                    <span id="wan_dns_state" class="output">Offline</span>
+                                                </p>
+                                                <div id="box_wan_connection_info" style="display: block;">
+                                                <p>
+                                                    <label class="duple">Network Status :</label>
+                                                    <span id="wan_network_status_0" class="output">Disconnected</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Connection Up Time :</label>
+                                                    <span id="wan_interface_up_time_str_0" class="output">N/A</span>
+                                                </p>
+                                                </div>
+                                                <div id="box_wan_buttons" style="display: block;">
+                                                <p>
+                                                    <label class="duple">&nbsp;</label>
+                                                    <input class="" id="wan_dhcp_button1" value="Renew" onclick="wan_button_action('/wan_dhcp.cgi?renew=true');" style="display: inline;" type="button">
+                                                    <input disabled="disabled" class="disabled" id="wan_dhcp_button2" value="Release" onclick="wan_button_action('/wan_dhcp.cgi?renew=false');" style="display: inline;" type="button">
+                                                    <input id="wan_pppoe_button1" value="Connect" onclick="wan_button_action('/wan_pppoe.cgi?connect=true');" style="display: none;" type="button">
+                                                    <input id="wan_pppoe_button2" value="Disconnect" onclick="wan_button_action('/wan_pppoe.cgi?connect=false');" style="display: none;" type="button">
+                                                    <input id="wan_pptp_button1" value="Connect" onclick="wan_button_action('/wan_pptp.cgi?connect=true');" style="display: none;" type="button">
+                                                    <input id="wan_pptp_button2" value="Disconnect" onclick="wan_button_action('/wan_pptp.cgi?connect=false');" style="display: none;" type="button">
+                                                    <input id="wan_l2tp_button1" value="Connect" onclick="wan_button_action('/wan_l2tp.cgi?connect=true');" style="display: none;" type="button">
+                                                    <input id="wan_l2tp_button2" value="Disconnect" onclick="wan_button_action('/wan_l2tp.cgi?connect=false');" style="display: none;" type="button">
+                                                    <input id="wan_wwan_button1" value="Connect" onclick="wan_button_action('/usb3g_connect.cgi?connect=true');" style="display: none;" type="button">
+                                                    <input id="wan_wwan_button2" value="Disconnect" onclick="wan_button_action('/usb3g_connect.cgi?connect=false');" style="display: none;" type="button">
+                                                </p>
+                                                </div>
+                                                <p id="mac_address_box">
+                                                    <label class="duple">MAC Address :</label>
+                                                    <span id="wan_mac_addr" class="output">00:21:91:FF:44:D2</span>
+                                                </p>
+                                                <div id="box_authsecmodel_status" style="display: none;">
+                                                    <p>
+                                                        <label class="duple">Authentication &amp; Security :</label>
+                                                        <span id="wan_auth_sec_model_0" class="output">&nbsp;</span>
+                                                    </p>
+                                                </div>
+                                                <div id="box_wan_network_info" style="display: block;">
+                                                <p>
+                                                    <label class="duple">IP Address :</label>
+                                                    <span id="wan_ip_address_0" class="output">0.0.0.0</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Subnet Mask :</label>
+                                                    <span id="wan_subnet_0" class="output">0.0.0.0</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Default Gateway :</label>
+                                                    <span id="wan_gateway_0" class="output">0.0.0.0</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Primary DNS Server :</label>
+                                                    <span id="wan_primary_dns_0" class="output">0.0.0.0</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Secondary DNS Server :</label>
+                                                    <span id="wan_secondary_dns_0" class="output">0.0.0.0</span>
+                                                </p>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                        
+                                        <div class="box">
+                                            <h3>LAN</h3>
+                                            <fieldset>
+                                                <p>
+                                                    <label class="duple">MAC Address :</label>
+                                                    <span id="lan_mac_addr" class="output">00:21:91:FF:44:D1</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">IP Address :</label>
+                                                    <span id="lan_ip_address" class="output">192.168.0.1</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Subnet Mask :</label>
+                                                    <span id="lan_subnet" class="output">255.255.255.0</span>
+                                                </p>
+                                                <p style="display: none;">
+                                                    <label class="duple">Auto IP Address:</label>
+                                                    <span id="lan_auto_ip_address" class="output">0.0.0.0</span>
+                                                </p>
+                                                <div style="display: none;" id="bridge_mode_only_lan_settings">
+                                                    <p>
+                                                        <label class="duple">Default Gateway :</label>
+                                                        <span id="lan_gateway" class="output">0.0.0.0</span>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple">Primary DNS Server :</label>
+                                                        <span id="lan_primary_dns" class="output">0.0.0.0</span>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple">Secondary DNS Server :</label>
+                                                        <span id="lan_secondary_dns" class="output">0.0.0.0</span>
+                                                    </p>
+                                                </div>
+                                                <div style="display: block;" id="router_mode_only_lan_settings">
+                                                    <p>
+                                                        <label class="duple">DHCP Server :</label>
+                                                        <span id="info_dhcp_server_status" class="output">Enabled</span>
+                                                    </p>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                    
+                                        
+                                            <div class="box">
+                                            <h3>Wireless LAN</h3>
+                                            <fieldset>
+                                            
+                                            <p>
+                                                <label class="duple">Wireless Radio :</label>
+                                                <span class="output" id="wireless_radio_0">Enabled</span>
+                                            </p>
+                                            
+                                            <div style="display: block;" id="wireless_status_0">
+                                                <p>
+                                                   <label class="duple">802.11 Mode :</label>
+                                                   <span class="output">
+                                                   
+                                                       Mixed 802.11n, 802.11g and 802.11b
+                                                   
+                                                   </span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Channel Width :</label>
+                                                    <span class="output" id="channel_width_0">20MHz</span>
+                                                </p>
+                                                <p>
+                                                    <label class="duple">Channel :</label>
+                                                    <span class="output" id="primary_channel_0">11</span>
+                                                </p>
+                                                <p id="secondary_channel_block_0" style="display: none;">
+                                                    <label class="duple">Secondary Channel :</label>
+                                                    <span class="output" id="secondary_channel_0">&nbsp;</span>
+                                                </p>
+                                                
+                                                <p>
+                                                    <label class="duple">WISH :</label>
+                                                    <span id="wlan_qos_engine_0" class="output">
+                                                    
+                                                        Active
+                                                    
+                                                    </span>
+                                                </p>
+                                                
+                                                
+                                                <p>
+                                                    <label class="duple">Wi-Fi Protected Setup :</label>
+                                                    <span class="output" id="wifisc_configured_0">Enabled/Not Configured</span>
+                                                </p>
+                                                <p style="display: none;" id="guest_wps_0">
+                                                    <label class="duple">Guest Wi-Fi Protected Setup :</label>
+                                                    <span class="output" id="guest_wifisc_configured_0">Enabled/Not Configured</span>
+                                                </p>
+                                                
+                                        <h4>SSID List</h4>
+                                        <table class="formlisting" summary="" border="0" cellpadding="0" cellspacing="1" width="100%">
+                                            <col width="25%">
+                                            <col width="25%">
+                                            <col width="25%">
+                                            <col width="25%">
+                                            <tbody><tr>
+                                                <th class="formlist_col1">Network Name (SSID)</th>
+                                                <th class="formlist_col1">Guest</th>
+                                                <th class="formlist_col2">MAC Address</th>
+                                                <th class="formlist_col3">Security Mode</th>
+                                            </tr>
+                                            
+                                                
+                                                <tr id="ssid_item_0_0">
+                                                    <td>dlink
+                                                    </td>
+                                                    <td>No
+                                                    </td>
+                                                    <td>00:21:91:ff:44:d1
+                                                    </td>
+                                                    <td>
+                                                        
+                                                            Disabled
+                                                        
+                                                    </td>
+                                                </tr>
+                                                
+                                            
+                                                
+                                            
+                                        </tbody></table>
+                                        </div>
+                                            
+                                            </fieldset>
+                                            </div>
+                                        
+                                    
+                                        <div class="box" id="lan_computers_box">
+                                            <h3>LAN Computers</h3>
+                                            <p class="box_msg">
+                                            </p><div id="lan_computers_container"><fieldset><table summary="" id="lan_computer_list" class="formlisting" border="0" cellpadding="0" cellspacing="1"><thead><tr class="form_label_row"><th class="formlist_col1">IP Address</th><th class="formlist_col2">Name (if any)</th><th class="formlist_col3">MAC</th></tr></thead><tfoot></tfoot><tbody></tbody></table></fieldset></div>
+                                        </div>
+                                        <div style="display: none;" class="box" id="multicast_memberships_div">
+                                            <h3>IGMP Multicast memberships</h3>
+                                            <p class="box_msg">
+                                            </p><div id="igmp_membership_container"></div>
+                                        </div>
+                                        </div>
+                                    </form>
+                                    <!-- InstanceEndEditable -->
+                                </div><!-- maincontent -->
+                            </td>
+
+                            <td id="sidehelp_container">
+                                <div id="help_text">
+                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                    <strong>Helpful Hints...</strong>
+                                    <p>All of your WAN and LAN connection details are displayed here.</p>
+                                        <p class="more">
+                                            <!-- Link to more help -->
+                                            <a href="Status.html#Device_Info" onclick="return jump_if();">More...</a>
+                                        </p>
+                                <!-- InstanceEndEditable -->
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody></table>
+                    <table id="footer_container" summary="" border="0" cellspacing="0">
+                        <tbody><tr>
+                            <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </tbody></table>
+                </td>
+            </tr>
+        </tbody></table>
+
+        <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+    </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

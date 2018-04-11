@@ -1,0 +1,1062 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+    	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+    <!-- InstanceBeginEditable name="Page Title" -->
+    <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+            Tools / EMail Settings    
+    </title>
+    <!-- InstanceEndEditable -->
+
+    <!-- InstanceBeginEditable name="Local Styles" -->
+    <style type="text/css">
+    /*
+     * Styles used only on this page.
+     */
+    </style>
+    <!-- InstanceEndEditable -->
+
+    
+            
+    
+
+    
+        
+    
+
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="ajax.js"></script>
+    <script type="text/javascript" src="navigation.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" === "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" === "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Tools/EMail.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+    //]]>
+    </script>
+
+    <!-- InstanceBeginEditable name="Scripts" -->
+    <script type="text/javascript">
+    //<![CDATA[
+    // 
+/*
+ * This script is to be SSI included in an HTML page.
+ *	It defines schedule options to be added to a select list, provides a function
+ *	to populate <select>'s and a function that return a schedule details.
+ */
+
+var schedule_options = [
+	{ value: "Always", text: "Always", days: "", stime: "", etime: "" },
+	{ value: "Never", text: "Never", days: "", stime: "", etime: ""},
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+];
+
+/*
+ * schedule_populate_select()
+ *	Add options from the schedule_options array to a specified <select>.
+ */
+function schedule_populate_select(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = schedule_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!schedule_options[k - 1]) {
+		k--;
+	}
+	for (var i = 0; i < k; i++) {
+		select_id.options.add(new Option(schedule_options[i].text, schedule_options[i].value));
+	}
+}
+
+/*
+ * schedule_populate_select_without_always()
+ *	Add options from the schedule_options array to a specified <select> but skip "Always".
+ */
+function schedule_populate_select_without_always(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = schedule_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!schedule_options[k - 1]) {
+		k--;
+	}
+	for (var i = 1; i < k; i++) {
+		select_id.options.add(new Option(schedule_options[i].text, schedule_options[i].value));
+	}
+}
+
+/*
+ * schedule_details()
+ *	Return a string describing the currently selected schedule in a specified <select>.
+ */
+function schedule_details(select_id, without_always)
+{
+	var days = [
+		"Sun",
+		"Mon",
+		"Tue",
+		"Wed",
+		"Thu",
+		"Fri",
+		"Sat"
+	];
+	var str = "";
+	var idx = select_id.selectedIndex;
+
+	if (select_id.value === "") {
+		return "";
+	}
+	if (select_id.value == "Always" || select_id.value == "Never") {
+		return select_id.options[idx].text;
+	}
+
+	idx += (without_always ? 1 : 0);
+
+	/* Compute week days. */
+	var bits = parseInt(schedule_options[idx].days, 10);
+	if (bits === 127) {
+		str = "Every Day ";
+	} else {
+		for (var i = 0; i < 7; i++) {
+			if (bits & (1 << i)) {
+				str += days[i] + " ";
+			}
+		}
+	}
+
+	/* Compute times. */
+	var stime = parseInt(schedule_options[idx].stime, 10);
+	var etime = parseInt(schedule_options[idx].etime, 10);
+	if (stime === 0 && etime === 86400) {
+		return str + "All Day";
+	}
+
+	var m = Math.floor(stime / 60);
+	var h = Math.floor(m / 60);
+	m = m - h * 60;
+	var sh;
+	var sm = m * 1;
+	var sampm;
+	if (h < 12) {
+		if (h === 0) {
+			sh = 12;
+		} else {
+			sh = h;
+		}
+		sampm = "AM";
+	} else {
+		if (h != 12) {
+			sh = h - 12;
+		} else {
+			sh = h;
+		}
+		sampm = "PM";
+	}
+
+	m = Math.floor (etime / 60);
+	h = Math.floor (m / 60);
+	m = m - h * 60;
+	var eh;
+	var em = m * 1;
+	var eampm;
+	if (h < 12) {
+		if (h === 0) {
+			eh = 12;
+		} else {
+			eh = h;
+		}
+		eampm = "AM";
+	} else {
+		if (h != 12) {
+			eh = h - 12;
+		} else {
+			eh = h;
+		}
+		eampm = "PM";
+	}
+
+	if (sh < 10) {
+		sh = "0" + sh;
+	}
+	if (sm < 10) {
+		sm = "0" + sm;
+	}
+	if (eh < 10) {
+		eh = "0" + eh;
+	}
+	if (em < 10) {
+		em = "0" + em;
+	}
+	return str + sh + ':' + sm + ' ' + sampm + ' - ' + eh + ':' + em + ' ' + eampm;
+}
+
+
+
+        /*
+         * Handle for document form.
+         */
+        var mf;
+
+        /*
+         * Check for validation errors.
+         */
+        var verify_failed = "";
+
+        /*
+         * smtp_email_enabled_selector()
+         */
+        function smtp_email_enabled_selector(value)
+        {
+            mf.smtp_email_enabled.value = value;
+            mf.smtp_email_enabled_select.checked = value;
+
+            disable_form_field(mf.smtp_email_from_email_addr, !value);
+            disable_form_field(mf.smtp_email_addr, !value);
+            disable_form_field(mf.smtp_email_server_addr, !value);
+
+            // 2008.04.16
+            disable_form_field(mf.smtp_email_server_port, !value);
+            
+            var auth_enable = (value && mf.smtp_email_enable_smtp_auth_select.checked);
+            disable_form_field(mf.smtp_email_enable_smtp_auth_select, !value);
+            disable_form_field(mf.smtp_email_acc_name, !auth_enable);
+            disable_form_field(mf.smtp_email_pass, !auth_enable);
+            disable_form_field(mf.smtp_email_pass_verify, !auth_enable);
+            disable_form_field(mf.log_when_log_full_select, !value);
+
+            var sched_enable = (value && mf.log_when_sched_select.checked);
+            disable_form_field(mf.log_when_sched_select, !value);
+            disable_form_field(mf.log_sched_name_select, !sched_enable);
+            disable_form_field(mf.schtext, !sched_enable);
+        }
+
+        /*
+         * smtp_email_enable_smtp_auth_selector()
+         */
+        function smtp_email_enable_smtp_auth_selector(value)
+        {
+            mf.smtp_email_enable_smtp_auth.value = value;
+            mf.smtp_email_enable_smtp_auth_select.checked = value;
+
+            var auth_enable = (value && mf.smtp_email_enabled_select.checked);
+            disable_form_field(mf.smtp_email_acc_name, !auth_enable);
+            disable_form_field(mf.smtp_email_pass, !auth_enable);
+            disable_form_field(mf.smtp_email_pass_verify, !auth_enable);
+        }
+
+        /*
+         * log_when_log_full_selector()
+         */
+        function log_when_log_full_selector(value)
+        {
+            mf.log_when_log_full.value = value;
+            mf.log_when_log_full_select.checked = value;
+        }
+
+        /*
+         * log_when_sched_selector()
+         */
+        function log_when_sched_selector(value)
+        {
+            mf.log_when_sched.value = value;
+            mf.log_when_sched_select.checked = value;
+
+            var email_enable = (value && mf.smtp_email_enabled_select.checked);
+            disable_form_field(mf.log_sched_name_select, !email_enable);
+            mf.schtext.disabled = !email_enable;
+        }
+
+        /*
+         * log_sched_name_selector()
+         */
+        function log_sched_name_selector(value)
+        {
+            mf.log_sched_name.value = value;
+            mf.log_sched_name_select.value = value;
+            mf.schtext.value = schedule_details(mf.log_sched_name_select, true);
+        }
+
+        /*
+         * verify_password()
+         */
+        function verify_password()
+        {
+            if (mf.smtp_email_pass.value != mf.smtp_email_pass_verify.value) {
+                alert("passwords do not match, please re-enter");
+                mf.smtp_email_pass.value = "";
+                mf.smtp_email_pass_verify.value = "";
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * trim_string_and_set()
+         */
+        function trim_string_and_set(field)
+        {
+            field.value = field.value.trim();
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") &&
+                !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+
+            if(!verify_password()) {
+                return;
+            }
+
+// 2008.04.16
+            if( !is_number(mf.smtp_email_server_port.value) || (!is_port_valid( mf.smtp_email_server_port.value)) 
+               || (mf.smtp_email_server_port.value == 0)   ) {
+                alert("Port should be in range (1..65535) '");
+                return;
+            }
+		
+
+
+            mf.submit();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") && confirm ("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed !== "") {
+                    top.location = "/Tools/EMail.html";
+                } else {
+                    reset_form("mainform");
+                    page_load();
+                }
+            }
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                smtp_email_enabled_selector(true);
+                smtp_email_enable_smtp_auth_selector(true);
+                log_when_log_full_selector(true);
+                log_when_sched_selector(true);
+                log_sched_name_selector("Never");
+                return;
+            }
+
+            smtp_email_enabled_selector(mf.smtp_email_enabled.value == "true");
+            smtp_email_enable_smtp_auth_selector(mf.smtp_email_enable_smtp_auth.value == "true");
+            log_when_log_full_selector(mf.log_when_log_full.value == "true");
+            log_when_sched_selector(mf.log_when_sched.value == "true");
+
+            schedule_populate_select_without_always(mf.log_sched_name_select);
+            if (mf.log_sched_name.value == "Always") {
+                mf.log_sched_name.value = "Never";
+            }
+            log_sched_name_selector(mf.log_sched_name.value);
+            mf.smtp_email_pass_verify.value = mf.smtp_email_pass.value;
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            save_form_default_values("mainform");
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed !== "") {
+                set_form_always_modified("mainform");
+                alert(verify_failed);
+            }
+        }
+    //]]>
+    </script>
+    <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.32NA
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <form saved="true" id="mainform" action="/Tools/EMail.html" method="post" onsubmit="return false;">
+        <div class="section">
+                <div class="section_head">
+                        <h2>EMail Settings</h2>
+                        <p>
+                                
+                                        The Email feature can be used to send the system log files, router alert messages,
+                                        and firmware update notification to your email address.
+                                
+                        </p>
+                        <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                        <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                        <input class="button_submit" value="Don't Save Settings" onclick="page_cancel()" type="button">
+                </div> <!-- section_head -->
+                <div class="box">
+                        <h3>Enable</h3>
+                        <fieldset>
+                                <p>
+                                        <label class="duple" for="smtp_email_enabled_select">Enable Email Notification&nbsp;:</label>
+                                        <input default="false" id="smtp_email_enabled" name="config.smtp_email_enabled" value="false" type="hidden">
+                                        <input default="false" id="smtp_email_enabled_select" onclick="smtp_email_enabled_selector(this.checked);" type="checkbox">
+                                </p>
+                        </fieldset>
+                </div>
+                <div class="box">
+                        <h3>Email Settings</h3>
+                        <p class="box_msg">
+                        </p>
+                        <fieldset>
+                                <p>
+                                        <label class="duple" for="smtp_email_from_email_addr">From Email Address:</label>
+                                        <input autocomplete="off" default="" disabled="disabled" class="disabled" id="smtp_email_from_email_addr" size="20" maxlength="35" value="" name="config.smtp_email_from_email_addr" onchange="trim_string_and_set(this);" type="text">
+                                </p>
+                                <p>
+                                        <label class="duple" for="smtp_email_addr">To Email Address:</label>
+                                        <input autocomplete="off" default="" disabled="disabled" class="disabled" id="smtp_email_addr" size="20" maxlength="35" value="" name="config.smtp_email_addr" onchange="trim_string_and_set(this);" type="text">
+                                </p>
+                                <p>
+                                        <label class="duple" for="smtp_email_server_addr">SMTP Server Address:</label>
+                                        <input autocomplete="off" default="" disabled="disabled" class="disabled" id="smtp_email_server_addr" size="20" maxlength="35" value="" name="config.smtp_email_server_addr" onchange="trim_string_and_set(this);" type="text">
+                                </p>
+                                <!-- 2008.04.16 email server port -->
+                                <p>
+                                        <label class="duple" for="smtp_email_server_port">SMTP Server Port:</label>
+                                        <input autocomplete="off" default="25" disabled="disabled" class="disabled" id="smtp_email_server_port" size="5" maxlength="5" value="25" name="config.smtp_email_server_port" type="text">
+                                </p>
+                                <p>
+                                        <label class="duple" for="smtp_email_enable_smtp_auth_select">Enable Authentication :</label>
+                                        <input default="false" id="smtp_email_enable_smtp_auth" name="config.smtp_email_enable_smtp_auth" value="false" type="hidden">
+                                        <input default="false" disabled="disabled" class="disabled" id="smtp_email_enable_smtp_auth_select" onclick="smtp_email_enable_smtp_auth_selector(this.checked);" type="checkbox">
+                                </p>
+                                <p>
+                                        <label class="duple" for="smtp_email_acc_name">Account Name:</label>
+                                        <input autocomplete="off" default="" disabled="disabled" class="disabled" id="smtp_email_acc_name" size="20" maxlength="35" value="" name="config.smtp_email_acc_name" type="text">
+                                </p>
+                                <p>
+                                        <label class="duple" for="smtp_email_pass">Password:</label>
+                                        <input default="" disabled="disabled" class="disabled" id="smtp_email_pass" maxlength="15" size="20" onfocus="select();" value="" name="config.smtp_email_pass" type="password">
+                                </p>
+                                <p>
+                                        <label class="duple" for="smtp_email_pass_verify">Verify Password:</label>
+                                        <input default="" disabled="disabled" class="disabled" id="smtp_email_pass_verify" maxlength="15" size="20" onfocus="select();" type="password">
+                                </p>
+                        </fieldset>
+                </div><!-- box -->
+                <div class="box">
+                        <h3>Email log when FULL or on Schedule</h3>
+                        <p class="box_msg">
+                        </p>
+                        <fieldset>
+                                <p>
+                                        <label class="duple" for="log_when_log_full_select">On Log Full:</label>
+                                        <input default="false" id="log_when_log_full" name="config.log_when_log_full" value="false" type="hidden">
+                                        <input default="false" disabled="disabled" class="disabled" id="log_when_log_full_select" onclick="log_when_log_full_selector(this.checked);" type="checkbox">
+                                </p>
+                                <p>
+                                        <label class="duple" for="log_when_sched_select">On Schedule:</label>
+                                        <input default="false" id="log_when_sched" name="config.log_when_sched" value="false" type="hidden">
+                                        <input default="false" disabled="disabled" class="disabled" id="log_when_sched_select" onclick="log_when_sched_selector(this.checked);" type="checkbox">
+                                </p>
+                                <p>
+                                        <label class="duple">
+                                                <a href="Schedules.html" onclick="return jump_if();">Schedule</a>&nbsp;:</label>
+                                        <input default="Never" id="log_sched_name" name="config.log_sched_name" value="Never" type="hidden">
+                                        <select disabled="disabled" class="disabled" name="log_sched_name_select" id="log_sched_name_select" onchange="log_sched_name_selector(this.value);">
+                                                
+                                        <option default="true" value="Never">Never</option></select>
+                                </p>
+                                <p>
+                                        <label class="duple">Details&nbsp;:</label>
+                                        <input autocomplete="off" default="Never" disabled="disabled" id="schtext" name="schtext" class="rule_details disabled" size="48" maxlength="48" readonly="readonly" value="" type="text">
+                                </p>
+                        </fieldset>
+                </div>
+        </div>
+</form>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                        <p>
+You may want to make the email settings similar to those of your email client program.
+</p>
+                                                                                <p class="more">
+                                                                                        <!-- Link to more help -->
+                                                                                        <a href="Tools.html#EMail" onclick="return jump_if();">More...</a>                                                                              </p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td>
+                                                                <img src="img_wireless_bottom.gif" alt="" width="114" height="35">
+                                                        </td>
+                                                        <td>&nbsp;
+
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

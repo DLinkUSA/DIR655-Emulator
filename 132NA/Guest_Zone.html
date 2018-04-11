@@ -1,0 +1,2731 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+    	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+    <!-- InstanceBeginEditable name="Page Title" -->
+    <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+            Setup / Wireless Settings
+    </title>
+    <!-- InstanceEndEditable -->
+
+    <!-- InstanceBeginEditable name="Local Styles" -->
+    <style type="text/css">
+    /*
+     * Styles used only on this page.
+     */
+     fieldset label.duple {
+            width: 200px;
+     }
+    </style>
+    <!-- InstanceEndEditable -->
+
+    
+            
+    
+
+    
+        
+    
+
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="ajax.js"></script>
+    <script type="text/javascript" src="navigation.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        // 
+		/*
+		 * General array editor (AE) functions
+		 */
+
+		/*extern add_class, remove_class */
+
+		/*
+		 * The currently selected AE row, or null
+		 */
+		var ae_selected_row = null;
+
+		/*
+		 * Call this function when you are finished
+		 *  with a specific row of the array.
+		 */
+		function deselect_ae_row()
+		{
+			if (ae_selected_row !== null) {
+				remove_class(ae_selected_row, 'ae_selected_row');
+				ae_selected_row = null;
+			}
+		}
+
+		/*
+		 * Call this function anytime you want to talk to the user
+		 *  about a specific row of the array (i.e. edit or delete it).
+		 */
+		function select_ae_row(child_element)
+		{
+			deselect_ae_row();
+
+			/*
+			 * Find the table row that contains the given element.
+			 * Allowing caller to specify a row by passing
+			 *  a child element of the row is simply a convenience,
+			 *  so you don't have to add an ID to the TR element.
+			 * Follow the parent chain up the tree, but stop if you leave the table.
+			 * The child_element parameter can be either an element id or element object.
+			 */
+
+			var el = child_element;
+			if (typeof(el) === 'string') {
+				el = document.getElementById(el);
+				if (el === null) {
+					//alert('select_ae_row: Element "' + child_element + '" does not exist.');
+					return;
+				}
+			}
+			if (typeof(el) !== 'object') {
+				//alert('select_ae_row: Invalid parameter: ' + child_element);
+				return;
+			}
+			if (el === null) {
+				//alert('select_ae_row: Invalid null parameter');
+				return;
+			}
+			if ('' === el.getAttribute('tagName'))  {
+				//alert('select_ae_row: Parameter has no attribute "tagName": ' + child_element);
+				return;
+			}
+
+			while (el.tagName !== 'TR') {
+				if (el.tagName === 'TABLE') {
+					return;
+				}
+				el = el.parentNode;
+			}
+			/*
+			 * Highlight the row with CSS properties
+			 *  so the user is sure which row will be operated on.
+			 */
+			add_class(el, 'ae_selected_row');
+			/*
+			 * Remember which row it is, so we don't have to look it up later.
+			 */
+			ae_selected_row = el;
+		}
+
+
+
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+                            /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+                return (local_debug) ? "/Basic/Setup.html" : "/Advanced/Guest_Zone.html";
+        }
+
+        /*
+         * template_load()
+         *     Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+    //]]>
+    </script>
+
+    <!-- InstanceBeginEditable name="Scripts" -->
+
+    <!-- Include radio definitions. -->
+
+    <!-- File "wlan_radio_inc.html" -->
+<!-- This file replaces the old gateway_radio.lua file which controlled cooker -->
+<!-- The ATHEROS part of the lua code has been translated into SSI -->
+<!-- FALSE is the empty string; TRUE is a nonempty string -->
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+		
+	
+	<!-- If either radio supports 11A, we display 11A related Help text -->
+	<!-- These variables are used only in the Help section of the UI -->
+	
+	
+
+
+
+
+
+
+<!-- If either radio needs extra ui config, we display the Help text on extra ui config -->
+
+
+<script type="text/javascript">
+//<![CDATA[
+/*
+ * Default channel
+ */
+var DEFAULT_CHANNEL_A = 40;
+var DEFAULT_CHANNEL_G = 6;
+
+/*
+ *  802.11 band
+ *  On some UI, we split phy modes into two drop down list for the user to select
+ *	2.4GHz
+ * 		11b only
+ * 		11g only
+ *		11n only
+ *		mixed 11g, 11b
+ *		mixed 11n, 11g
+ * 		mixed 11n, 11g, and 11b
+ * 	5Ghz
+ * 		11a only
+ *		11n only
+ *		mixed 11n and 11a
+ */
+ var DEFAULT_BAND = "2";	// 2.4GHz or 5GHz or both, used for the UIs that do not need to split the drop down list.
+ var G_BAND_ONLY = "0";		// 2.4GHz
+ var A_BAND_ONLY = "1";		// 5GHz
+
+/*
+ * Default phy mode to be selected
+ */
+ var DEFAULT_PHY_MODE_G_BAND = "11";
+ var DEFAULT_PHY_MODE_A_BAND = "20";
+ var DEFAULT_PHY_MODE_A_AND_G_BAND = "31";
+
+/*
+ * This defines a Radio object with properties that are used to include or
+ *	exclude optional sections on the web pages.
+ *	It also provides methods to populate radio settings <select>'s.
+ */
+
+function Radio(radio_index)
+{
+	/*
+	 * Define radio's attributes and their default values.
+	 */
+	if (radio_index == 1) {
+		//
+			this.region = parseInt("4");
+		//
+	} else if (radio_index == 2) {
+		//
+	}
+	this.type = ""
+	this.type_A = false;
+	this.type_B = false;
+	this.type_G = false;
+	this.type_NG = false;
+	this.type_NA = false;
+	this.auto_channel = false;
+	this.extra_ui_config = false;
+	this.scan_type_dual = false;
+	this.rf_test_mode = false;
+	this.band = DEFAULT_BAND;
+
+	if (radio_index == 1) {
+		//
+	} else if (radio_index == 2) {
+		//
+	}
+
+	/*
+	 * Update attribute values according to configuration.
+	 */
+	//
+		this.type = "BG";
+		this.type_B = true;
+		this.type_G = true;
+		//
+			this.type = "BGN";
+			this.type_NG = true;
+		//
+		if (radio_index == 1) {
+			//
+		} else if (radio_index == 2) {
+			//
+		}
+		this.auto_channel = true;
+	//
+
+	//
+
+	//
+
+	//
+
+	//
+
+	/*
+	 * Private method to easily add an <option> to a given <select>.
+	 */
+	function add(select, name, value)
+	{
+		//
+		/*
+		 * Hide DFS channels
+		 */
+		if (( value >= 52) && (value < 149) && name.match("GHz - CH")) {
+			return;
+		}
+		//
+
+		select.options.add(new Option(name, value));
+	}
+
+	/*
+	 * Standard toString method.
+	 */
+	this.toString = function () {
+		return this.type;
+	};
+
+	/*
+	 * Get the default channel for the radio
+	 */
+	this.get_default_channel = function() {
+		if (this.type_A || this.type_NA) {
+			if (this.region == 23 || this.region == 39 || this.region == 40)
+				return 149;
+			else
+			return DEFAULT_CHANNEL_A;
+		} else {
+			return DEFAULT_CHANNEL_G;
+		}
+	}
+
+	/*
+	 * populate_channel_selector()
+	 *	Adds channel <option>'s to the given <select>.
+	 */
+	this.populate_channel_selector = function (select) {
+		if (this.type_B || this.type_G || this.type_NG) {
+			if (this.region != 2 && this.region != 10) {
+				add(select, "2.412 GHz - CH 1", 1);
+				add(select, "2.417 GHz - CH 2", 2);
+				add(select, "2.422 GHz - CH 3", 3);
+				add(select, "2.427 GHz - CH 4", 4);
+			}
+
+			if (this.region != 10) {
+				add(select, "2.432 GHz - CH 5", 5);
+				add(select, "2.437 GHz - CH 6", 6);
+				add(select, "2.442 GHz - CH 7", 7);
+			}
+
+			if (this.region != 2 && this.region != 10) {
+				add(select, "2.447 GHz - CH 8", 8);
+				add(select, "2.452 GHz - CH 9", 9);
+			}
+
+			if (this.region != 2) {
+				add(select, "2.457 GHz - CH 10", 10);
+				add(select, "2.462 GHz - CH 11", 11);
+			}
+
+            /*
+             * Reason: Add region code for Latin America
+             * Modified: Yufa Huang
+             * Date: 2008.07.09
+             */
+			if (this.region != 2 && this.region != 4 && this.region != 6 && this.region != 30 &&
+			    this.region != 32 && this.region != 34 && this.region != 39 && this.region != 40) {
+				add(select, "2.467 GHz - CH 12", 12);
+				add(select, "2.472 GHz - CH 13", 13);
+			}
+
+			if (this.region == 16 || this.region == 17 || this.region == 19) {
+				add(select, "2.484 GHz - CH 14 (802.11b ONLY)", 14);
+			}
+
+			if (this.region == 26 || this.region == 27 || this.region == 28) {
+				add(select, "2.484 GHz - CH 14", 14);
+			}
+		}
+
+		/*
+		 * Now add the 802.11a channels.
+		 */
+		if (!(this.type_A || this.type_NA)) {
+			return;
+		}
+
+		/*
+		 *  	FCC1_FCCA
+		 *	FCC1_WORLD
+		 *	FCC2_FCCA
+		 *	FCC2_WORLD
+		 *	FCC2_ETSIC
+		 */
+		if (this.region == 4 || this.region == 5 || this.region == 6 || this.region == 7 || this.region == 8) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+
+		if (this.region == 9 || this.region == 10 || this.region == 11 || this.region == 12 || this.region == 13 || this.region == 14 || this.region == 15) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+
+			if (this.region != 15) {
+				add(select, "5.260 GHz - CH 52", 52);
+				add(select, "5.280 GHz - CH 56", 56);
+			}
+
+			if (this.region != 15 && this.region != 11) {
+				add(select, "5.300 GHz - CH 60", 60);
+				add(select, "5.320 GHz - CH 64", 64);
+			}
+
+			if (this.region == 11 || this.region == 14) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				add(select, "5.660 GHz - CH 132", 132);
+				add(select, "5.680 GHz - CH 136", 136);
+				add(select, "5.700 GHz - CH 140", 140);
+			}
+		}
+		if (this.region == 16 || this.region == 17 || this.region == 19) {
+			add(select, "5.170 GHz - CH 34", 34);
+			add(select, "5.190 GHz - CH 38", 38);
+			add(select, "5.210 GHz - CH 42", 42);
+			add(select, "5.230 GHz - CH 46", 46);
+		}
+
+		if (this.region == 19) {
+			add(select, "4.920 GHz - CH 184", 184);
+			add(select, "4.940 GHz - CH 188", 188);
+			add(select, "4.960 GHz - CH 192", 192);
+			add(select, "4.980 GHz - CH 196", 196);
+		}
+
+		if (this.region == 18 || this.region == 20 || this.region == 21 || this.region == 22 || this.region == 23 || this.region == 24 || this.region == 25) {
+			if (this.region == 18) {
+				add(select, "5.180 GHz - CH 36", 36);
+				add(select, "5.200 GHz - CH 40", 40);
+				add(select, "5.220 GHz - CH 44", 44);
+				add(select, "5.240 GHz - CH 48", 48);
+			}
+			if (this.region == 21) {
+				add(select, "5.280 GHz - CH 56", 56);
+				add(select, "5.300 GHz - CH 60", 60);
+				add(select, "5.320 GHz - CH 64", 64);
+			}
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			if (this.region == 18 || this.region == 23 || this.region == 24) {
+				add(select, "5.825 GHz - CH 165", 165);
+			}
+		}
+		if (this.region >= 26 && this.region <= 31) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+			if (this.region >= 26 && this.region <= 28) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				add(select, "5.600 GHz - CH 120", 120);
+				add(select, "5.620 GHz - CH 124", 124);
+				add(select, "5.640 GHz - CH 128", 128);
+				add(select, "5.660 GHz - CH 132", 132);
+				add(select, "5.680 GHz - CH 136", 136);
+				add(select, "5.700 GHz - CH 140", 140);
+			}
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+
+		/*
+		 *  	FCC3_FCCA
+		 *	FCC3_WORLD
+		 *	FCC6_FCCA
+		 *	FCC6_WORLD
+		 *	APL6_WORLD
+		 *	APL8_WORLD
+		 *	APL9_WORLD
+		 *	APL3_FCCA
+		 */
+		if (this.region >= 32 && this.region <= 38) {
+			if (this.region != 37) {
+				add(select, "5.180 GHz - CH 36", 36);
+				add(select, "5.200 GHz - CH 40", 40);
+				add(select, "5.220 GHz - CH 44", 44);
+				add(select, "5.240 GHz - CH 48", 48);
+			}
+
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			if (this.region != 36 && this.region != 37) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				if (this.region == 32 || this.region == 33 || this.region == 38) {
+					add(select, "5.600 GHz - CH 120", 120);
+					add(select, "5.620 GHz - CH 124", 124);
+				}
+				if (this.region == 32 || this.region == 33) {
+					add(select, "5.640 GHz - CH 128", 128);
+				}
+				if (this.region != 38) {
+					add(select, "5.660 GHz - CH 132", 132);
+					add(select, "5.680 GHz - CH 136", 136);
+					add(select, "5.700 GHz - CH 140", 140);
+				}
+			}
+
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			if (this.region != 38) {
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+		}
+
+        	if (this.region == 39) {
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			add(select, "5.500 GHz - CH 100", 100);
+			add(select, "5.520 GHz - CH 104", 104);
+			add(select, "5.540 GHz - CH 108", 108);
+			add(select, "5.560 GHz - CH 112", 112);
+			add(select, "5.580 GHz - CH 116", 116);
+			add(select, "5.600 GHz - CH 120", 120);
+			add(select, "5.620 GHz - CH 124", 124);
+			add(select, "5.640 GHz - CH 128", 128);
+			add(select, "5.660 GHz - CH 132", 132);
+			add(select, "5.680 GHz - CH 136", 136);
+			add(select, "5.700 GHz - CH 140", 140);
+
+            		add(select, "5.745 GHz - CH 149", 149);
+            		add(select, "5.765 GHz - CH 153", 153);
+            		add(select, "5.785 GHz - CH 157", 157);
+            		add(select, "5.805 GHz - CH 161", 161);
+        	}
+
+        if (this.region == 40) {
+            add(select, "5.745 GHz - CH 149", 149);
+            add(select, "5.765 GHz - CH 153", 153);
+            add(select, "5.785 GHz - CH 157", 157);
+            add(select, "5.805 GHz - CH 161", 161);
+        }
+
+	};
+
+	/*
+	 * populate_phymode_selector()
+	 *	Adds PHY mode <option>'s to the given <select> in some particular order: list 802.11b only
+	 * 802.11g only and 802.11n only first, then mixed modes.
+	 */
+	this.populate_phy_selector = function(select, band) {
+		band = band || this.band;
+		if (this.scan_type_dual && (band == DEFAULT_BAND)) {
+			add(select, "Mixed 802.11a and 802.11g", 6);
+			add(select, "Mixed 802.11a, 802.11g and 802.11b", 7);
+			add(select, "Mixed 802.11a, 802.11g and 802.11ng", 14);
+			add(select, "Mixed 802.11a, 802.11g, 802.11ng and 802.11b", 15);
+			add(select, "Mixed 802.11na, 802.11a and 802.11g", 22);
+			add(select, "Mixed 802.11na, 802.11a, 802.11g and 802.11b", 23);
+			add(select, "Mixed 802.11na, 802.11a, 802.11ng and 802.11g", 30);
+			add(select, "Mixed 802.11na, 802.11a, 802.11ng, 802.11g and 802.11b", 31);
+			return;
+		}
+
+		if (band == G_BAND_ONLY) {
+			if (this.type_B) {
+				add(select, "802.11b only", 1);
+			}
+
+			if (this.type_G) {
+				add(select, "802.11g only", 2);
+			}
+
+			if (this.type_NG) {
+				add(select, "802.11n only", 8);
+			}
+
+			if (this.type_G) {
+				add(select, "Mixed 802.11g and 802.11b", 3);
+			}
+
+			if (this.type_NG) {
+				//
+                add(select, "Mixed 802.11n and 802.11g", 10);
+				//
+                add(select, "Mixed 802.11n, 802.11g and 802.11b", 11);
+			}
+		}
+		if (band == A_BAND_ONLY) {
+			if (this.type_A) {
+				add(select, "802.11a only", 4);
+			}
+			if (this.type_NA) {
+				add(select, "802.11n only", 16);
+                add(select, "Mixed 802.11n and 802.11a", 20);
+			}
+		}
+	};
+
+	/*
+	 * populate_txrate_selector()
+	 *	Adds tx rate <option>'s to the given <select>.
+	 */
+	this.populate_txrate_selector = function(select) {
+		add(select, "Best (automatic)", 0);
+		if (this.type_NA || this.type_NG) {
+			add(select, "MCS 15 - 130 [270]", 27);
+			add(select, "MCS 14 - 117 [243]", 26);
+			add(select, "MCS 13 - 104 [216]", 25);
+			add(select, "MCS 12 - 78 [162]", 24);
+			add(select, "MCS 11 - 52 [108]", 23);
+			add(select, "MCS 10 - 39 [81]", 22);
+			add(select, "MCS 9 - 26 [54]", 21);
+			add(select, "MCS 8 - 13 [27]", 20);
+			add(select, "MCS 7 - 65 [135]", 19);
+			add(select, "MCS 6 - 58.5 [121.5]", 18);
+			add(select, "MCS 5 - 52 [108]", 17);
+			add(select, "MCS 4 - 39 [81]", 16);
+			add(select, "MCS 3 - 26 [54]", 15);
+			add(select, "MCS 2 - 19.5 [40.5]", 14);
+			add(select, "MCS 1 - 13 [27]", 13);
+			add(select, "MCS 0 - 6.5 [13.5]", 12);
+		}
+		if (this.type_A || this.type_G) {
+			add(select, "54", 11);
+			add(select, "48", 10);
+			add(select, "36", 9);
+			add(select, "24", 8);
+			add(select, "18", 7);
+			add(select, "12", 6);
+			add(select, "9", 5);
+			add(select, "6", 4);
+		}
+		if (this.type_B) {
+			add(select, "11", 3);
+			add(select, "5.5", 2);
+			add(select, "2", 1);
+			add(select, "1", 32768);
+		}
+	}
+
+	/*
+	 * populate_cwm_selector()
+	 *	Adds channel width <option>'s to the given <select>.
+	 */
+	this.populate_cwm_selector = function(select, phy_mode) {
+		if (this.type_NG || this.type_NA) {
+			add(select, "20 MHz", 0);
+    /* reason: Add channel bandwidth "40MHz" when set 802.11 mode to 11n only.
+     * modified by JerryChen
+     * date: 2008.07.25
+     */			
+			if (this.extra_ui_config || phy_mode == 8 || phy_mode == 16) {
+			    add(select, "40 MHz", 2);
+			}
+			add(select, "Auto 20/40 MHz", 1);
+		} else {
+			add(select, "Not applicable", -1);
+		}
+	};
+
+	/*
+	 * populate_streams_selector()
+	 *	Adds spacial stream <option>'s to the given <select>.
+	 */
+	this.populate_streams_selector = function(select) {
+		if (this.extra_ui_config && (this.type_NG || this.type_NA)) {
+			add(select, "1 Stream", 255);
+			add(select, "2 Streams", 65280);
+			add(select, "Auto (1 streams preferred)", 61695);
+			add(select, "Auto (2 streams preferred)", 65281);
+			add(select, "Auto (all rates)", 65535);
+		} else {
+			add(select, "Not applicable", -1);
+		}
+	};
+};
+//]]>
+</script>
+
+
+
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * Handle for document forms.
+         */
+        var mf;
+
+        // 2007.07.02
+        // 
+/*
+ * This script is to be SSI included in an HTML page.
+ *	It defines schedule options to be added to a select list, provides a function
+ *	to populate <select>'s and a function that return a schedule details.
+ */
+
+var schedule_options = [
+	{ value: "Always", text: "Always", days: "", stime: "", etime: "" },
+	{ value: "Never", text: "Never", days: "", stime: "", etime: ""},
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+];
+
+/*
+ * schedule_populate_select()
+ *	Add options from the schedule_options array to a specified <select>.
+ */
+function schedule_populate_select(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = schedule_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!schedule_options[k - 1]) {
+		k--;
+	}
+	for (var i = 0; i < k; i++) {
+		select_id.options.add(new Option(schedule_options[i].text, schedule_options[i].value));
+	}
+}
+
+/*
+ * schedule_populate_select_without_always()
+ *	Add options from the schedule_options array to a specified <select> but skip "Always".
+ */
+function schedule_populate_select_without_always(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = schedule_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!schedule_options[k - 1]) {
+		k--;
+	}
+	for (var i = 1; i < k; i++) {
+		select_id.options.add(new Option(schedule_options[i].text, schedule_options[i].value));
+	}
+}
+
+/*
+ * schedule_details()
+ *	Return a string describing the currently selected schedule in a specified <select>.
+ */
+function schedule_details(select_id, without_always)
+{
+	var days = [
+		"Sun",
+		"Mon",
+		"Tue",
+		"Wed",
+		"Thu",
+		"Fri",
+		"Sat"
+	];
+	var str = "";
+	var idx = select_id.selectedIndex;
+
+	if (select_id.value === "") {
+		return "";
+	}
+	if (select_id.value == "Always" || select_id.value == "Never") {
+		return select_id.options[idx].text;
+	}
+
+	idx += (without_always ? 1 : 0);
+
+	/* Compute week days. */
+	var bits = parseInt(schedule_options[idx].days, 10);
+	if (bits === 127) {
+		str = "Every Day ";
+	} else {
+		for (var i = 0; i < 7; i++) {
+			if (bits & (1 << i)) {
+				str += days[i] + " ";
+			}
+		}
+	}
+
+	/* Compute times. */
+	var stime = parseInt(schedule_options[idx].stime, 10);
+	var etime = parseInt(schedule_options[idx].etime, 10);
+	if (stime === 0 && etime === 86400) {
+		return str + "All Day";
+	}
+
+	var m = Math.floor(stime / 60);
+	var h = Math.floor(m / 60);
+	m = m - h * 60;
+	var sh;
+	var sm = m * 1;
+	var sampm;
+	if (h < 12) {
+		if (h === 0) {
+			sh = 12;
+		} else {
+			sh = h;
+		}
+		sampm = "AM";
+	} else {
+		if (h != 12) {
+			sh = h - 12;
+		} else {
+			sh = h;
+		}
+		sampm = "PM";
+	}
+
+	m = Math.floor (etime / 60);
+	h = Math.floor (m / 60);
+	m = m - h * 60;
+	var eh;
+	var em = m * 1;
+	var eampm;
+	if (h < 12) {
+		if (h === 0) {
+			eh = 12;
+		} else {
+			eh = h;
+		}
+		eampm = "AM";
+	} else {
+		if (h != 12) {
+			eh = h - 12;
+		} else {
+			eh = h;
+		}
+		eampm = "PM";
+	}
+
+	if (sh < 10) {
+		sh = "0" + sh;
+	}
+	if (sm < 10) {
+		sm = "0" + sm;
+	}
+	if (eh < 10) {
+		eh = "0" + eh;
+	}
+	if (em < 10) {
+		em = "0" + em;
+	}
+	return str + sh + ':' + sm + ' ' + sampm + ' - ' + eh + ':' + em + ' ' + eampm;
+}
+
+
+
+        /*
+         * Selectors.
+         */
+        function guest_zone_checkbox_control_selector(inst_num, checked)
+        { 
+            mf["guest_zone_used_" + inst_num].value = checked;                                                                    
+            mf["guest_zone_enabled_" + inst_num].value = checked;                                                               
+            mf["guest_zone_checkbox_control_select_" + inst_num].checked = checked;                                                                 
+
+            var disabled = !checked;
+           
+            if (mf["wireless_checkbox_control_" + inst_num].value == "0") {
+                disabled = true;
+                disable_form_field(mf["guest_zone_checkbox_control_select_" + inst_num], disabled);  
+                document.getElementById("box_wireless_security_" + inst_num).style.display = "none";
+                document.getElementById("box_security_" + inst_num).style.display = "none";
+            }
+            else{
+                document.getElementById("box_wireless_security_" + inst_num).style.display = checked ? "block" : "none";
+                document.getElementById("box_security_" + inst_num).style.display = checked ? "block" : "none";
+            }
+            disable_form_field(mf["guest_zone_schedule_control_select_" + inst_num], disabled);  
+            disable_form_field(mf["wireless_SSID_" + inst_num], disabled); 
+            disable_form_field(mf["guest_select_" + inst_num], disabled);     
+        }
+           
+        function wireless_checkbox_control_selector(inst_num, checked)
+        {  
+            mf["wireless_checkbox_control_" + inst_num].value = checked ? "1" : "0";
+            mf["wireless_checkbox_control_select_" + inst_num].checked = checked;
+           
+            var disabled = !checked;
+            //disable_form_field(mf["wireless_SSID_" + inst_num], disabled);
+           
+        }  
+           
+        function lan_port_checkbox_control_selector(inst_num, checked)
+        {
+            mf["lan_port_checkbox_control_" + inst_num].value = checked ? "1" : "0";
+            mf["lan_port_checkbox_control_select_" + inst_num].checked = checked;
+
+        }
+
+        function GZCIsolation_checkbox_control_selector(checked)
+        {
+            mf["GZCIsolation_checkbox_control"].value = checked ? "1" : "0";
+            mf["GZCIsolation_checkbox_control_select"].checked = checked;
+
+        }
+
+        function routing_between_zones_checkbox_control_selector(checked)
+        {
+            mf["routing_between_zones_checkbox_control"].value = checked ? "1" : "0";
+            mf["routing_between_zones_checkbox_control_select"].checked = checked;
+        }
+
+        function dhcp_server_checkbox_control_selector(checked)
+        {
+            mf["dhcp_server_checkbox_control"].value = checked ? "1" : "0";
+            mf["dhcp_server_checkbox_control_select"].checked = checked;
+        }
+
+        function lock_client_list_checkbox_control_selector(checked)
+        {
+            mf["lock_client_list_checkbox_control"].value = checked ? "1" : "0";
+            mf["lock_client_list_checkbox_control_select"].checked = checked;
+        }
+
+        /*
+         * To hold a Radio object. Radio is defined in pkg/ipWireless/config/wlan_radio_inc.html.
+        */
+        var radio = new Array();
+        var radio_type_B = new Array();
+        var radio_type_G = new Array();
+        var radio_type_A = new Array();
+        var radio_type_NG = new Array();
+        var radio_type_NA = new Array();
+
+        /*
+         * For local view of the page: to eliminate script errors such as "radio has no properties".
+         */
+        if (local_debug) {
+            radio = [];
+            /*
+             * 802.11 bands and phy modes defined in pkg/ipWireless/config/wlan_radio_inc.html.
+             */
+            var DEFAULT_BAND = "2";
+            var G_BAND_ONLY = "0";
+            var A_BAND_ONLY = "1";
+            var DEFAULT_PHY_MODE_G_BAND = "11";
+            var DEFAULT_PHY_MODE_A_BAND = "20";
+        } else {
+            radio = new Radio(1);
+        }
+
+        /*
+         * The phy mode drop down list currently in use.
+         */
+        var current_phy_mode_select_id = new Array();
+
+        /*
+         * Check for validation errors.
+         */
+        var verify_failed = "";
+
+        /*
+         * Security modes.
+         */
+        var WEPON = 1;
+        var WPA_ENABLED = 2;
+        var IEEE8021X_ENABLED = 4;
+        var WPA_PERSONAL = WPA_ENABLED;
+        var WPA_ENTERPRISE = WPA_ENABLED | IEEE8021X_ENABLED;
+
+        /*
+         * wireless_radio_control_selector()
+         */
+        function wireless_radio_control_selector(inst_num, checked)
+        {
+            mf["wireless_radio_control_" + inst_num].value = checked ? "1" : "0";
+            mf["wireless_radio_control_select_" + inst_num].checked = checked;
+
+            var disabled = !checked;
+            disable_form_field(mf["wireless_auto_channel_select_" + inst_num], disabled);
+            disable_form_field(mf["wireless_SSID_" + inst_num], disabled);
+            disable_form_field(mf["wireless_channel_select_" + inst_num], mf["wireless_auto_channel_select_" + inst_num].checked || disabled);
+            disable_form_field(mf["wireless_phy_mode_G_band_select_" + inst_num], disabled);
+            disable_form_field(mf["wireless_schedule_name_select_" + inst_num], disabled);
+
+            if (inst_num == 0) {
+                //
+            }
+            else if (inst_num == 1) {
+                //
+            }
+
+            disable_form_field(mf["wireless_tx_rate_select_" + inst_num], disabled);
+            disable_form_field(mf["wireless_cwm_mode_select_" + inst_num], disabled);
+            disable_form_field(mf["wireless_num_streams_select_" + inst_num], disabled);
+            disable_form_field(mf["wireless_invisibility_radio_" + inst_num + "_0"], disabled);
+            disable_form_field(mf["wireless_invisibility_radio_" + inst_num + "_1"], disabled);
+            document.getElementById("box_wireless_security_" + inst_num).style.display = checked ? "block" : "none";
+        }
+
+        /*
+         * wireless_auto_channel_selector()
+         */
+        function wireless_auto_channel_selector(inst_num, value)
+        {
+            mf["wireless_auto_channel_" + inst_num].value = value;
+            mf["wireless_auto_channel_select_" + inst_num].checked = value;
+            disable_form_field(mf["wireless_channel_select_" + inst_num], value);
+        }
+
+        /*
+         * wireless_channel_selector()
+         */
+        function wireless_channel_selector(inst_num, value)
+        {
+            mf["wireless_channel_" + inst_num].value = value;
+            mf["wireless_channel_select_" + inst_num].value = value;
+        }
+
+        /*
+         * wireless_phy_mode_selector()
+         */
+        function wireless_phy_mode_selector(inst_num, value)
+        {
+            mf["wireless_phy_mode_" + inst_num].value = value;
+            current_phy_mode_select_id[inst_num].value = value;
+
+            /*
+             * Update the radio type before we populate the rest of the selectors so that we can
+             * show/hide properly channels, tx rates etc based on the selected phy mode.
+             */
+            update_radio_type_on_selected_phy_mode(inst_num, value);
+            populate_selectors(inst_num);
+            show_hide_form_fields(inst_num);
+        }
+
+        /*
+         * wireless_tx_rate_selector()
+         */
+        function wireless_tx_rate_selector(inst_num, value)
+        {
+            mf["wireless_tx_rate_" + inst_num].value = value;
+            mf["wireless_tx_rate_select_" + inst_num].value = value;
+            disable_form_field(mf["wireless_num_streams_select_" + inst_num], value != 0);
+        }
+
+        /*
+         * add_option()
+         * Add value if it's not found in options.
+         */
+        function add_option(select, name, value)
+        {
+            for (var i = select.options.length - 1; i >= 0 ; i--) {
+                if (select.options[i].value == value) {
+                    return;
+                }
+            }
+            select.options.add(new Option(name, value));
+        }
+
+        /*
+         * remove_option()
+         * Remove value if it's found in options.
+         */
+        function remove_option(select, value)
+        {
+            for (var i = select.options.length - 1; i >= 0 ; i--) {
+                if (select.options[i].value == value) {
+                    select.remove(i);
+                }
+            }
+        }
+
+        /*
+         * wireless_cwm_mode_selector()
+         */
+        function wireless_cwm_mode_selector(inst_num, value)
+        {
+            mf["wireless_cwm_mode_" + inst_num].value = value;
+            mf["wireless_cwm_mode_select_" + inst_num].value = value;
+        }
+
+        /*
+         * wireless_num_streams_selector()
+         */
+        function wireless_num_streams_selector(inst_num, value)
+        {
+            mf["wireless_num_streams_" + inst_num].value = value;
+            mf["wireless_num_streams_select_" + inst_num].value = value;
+        }
+
+        /*
+         * wireless_security_mode_selector()
+         */
+        function wireless_security_mode_selector(inst_num, mode)
+        {
+            mf["wireless_security_mode_select_" + inst_num].value = mode;
+            mf["wireless_wepon_" + inst_num].value = (mode == WEPON) ? "true" : "false";
+            mf["wireless_wpa_enabled_" + inst_num].value = ((mode & WPA_ENABLED) != 0) ? "true" : "false";
+            mf["wireless_ieee8021x_enabled_" + inst_num].value = ((mode & IEEE8021X_ENABLED) != 0) ? "true" : "false";
+            document.getElementById("box_wireless_wepon_" + inst_num).style.display = (mode == WEPON) ? "block" : "none";
+            document.getElementById("box_wireless_wpa_" + inst_num).style.display = ((mode & WPA_ENABLED) != 0) ? "block" : "none";
+            document.getElementById("box_wireless_wpa_personal_" + inst_num).style.display = (mode == WPA_PERSONAL) ? "block" : "none";
+            document.getElementById("box_wireless_wpa_enterprise_" + inst_num).style.display = (mode == WPA_ENTERPRISE) ? "block" : "none";
+            document.getElementById("box_wireless_wpa_enterprise_advanced_" + inst_num).style.display = "none";
+        }
+
+        /*
+         * wireless_wpa_mode_selector()
+         */
+        function wireless_wpa_mode_selector(inst_num, value)
+        {
+            mf["wireless_wpa_mode_select_" + inst_num].value = value;
+            mf["wireless_wpa_mode_" + inst_num].value = value;
+        }
+
+        /*
+         * wireless_wpa_cipher_selector()
+         */
+        function wireless_wpa_cipher_selector(inst_num, value)
+        {
+            mf["wireless_wpa_cipher_select_" + inst_num].value = value;
+            mf["wireless_wpa_cipher_" + inst_num].value = value;
+        }
+
+        /*
+         * validate_wpa_psk()
+         */
+        function validate_wpa_psk(inst_num, value)
+        {
+            if (value.length < 8) {
+                alert("WPA Personal Key must be at least 8 characters.");
+                mf["wireless_wpa_psk_" + inst_num].select();
+                mf["wireless_wpa_psk_" + inst_num].focus();
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * validate_wpa_rekey()
+         */
+        function validate_wpa_rekey(inst_num, value)
+        {
+            if (!is_number(value)) {
+                alert("Invalid Group Key Update Interval.");
+                mf["wireless_wpa_rekey_time_" + inst_num].select();
+                mf["wireless_wpa_rekey_time_" + inst_num].focus();
+                return false;
+            }
+
+            if (value < 30 || value > 65535) {
+                alert("WPA Group Key Update Interval should be between 30 and 65535 seconds.");
+                mf["wireless_wpa_rekey_time_" + inst_num].select();
+                mf["wireless_wpa_rekey_time_" + inst_num].focus();
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * validate_1x_rekey()
+         */
+        function validate_1x_rekey(inst_num, value)
+        {
+            if (!is_number(value)) {
+                alert("Invalid Authentication Timeout.");
+                mf["wireless_ieee8021x_reauth_time_" + inst_num].select();
+                mf["wireless_ieee8021x_reauth_time_" + inst_num].focus();
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * validate_port()
+         */
+        function validate_port(value)
+        {
+            if (!is_port_valid(value)) {
+                alert("Invalid Port Number.");
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * validate_ip()
+         */
+        function validate_ip(ip)
+        {
+            if (!is_ipv4_valid(ip)) {
+                alert("Invalid IP Address" + ": " + ip);
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * wireless_radius_auth_mac_selector()
+         */
+        function wireless_radius_auth_mac_selector(inst_num, value)
+        {
+            mf["wireless_radius_auth_mac_" + inst_num].value = value;
+            mf["wireless_radius_auth_mac_select_" + inst_num].checked = value;
+        }
+
+        /*
+         * wireless_second_radius_auth_mac_selector()
+         */
+        function wireless_second_radius_auth_mac_selector(inst_num, value)
+        {
+            mf["wireless_second_radius_auth_mac_" + inst_num].value = value;
+            mf["wireless_second_radius_auth_mac_select_" + inst_num].checked = value;
+        }
+
+        /*
+         * pad_wep_keys()
+         */
+        function pad_wep_keys(inst_num)
+        {
+            /*
+             * No need to pad WEP keys if it's 128 bits.
+             */
+            if (mf["wireless_keylen_" + inst_num].value == 1) {
+                return;
+            }
+            for (var i = 0; i < 4; i++) {
+                mf["wep_" + inst_num + "_key" + i].maxLength = 26;
+                var s = mf["wep_" + inst_num + "_key" + i].value;
+                s = s.substring (0,10);
+                while (s.length < 26) {
+                    s += '0';
+                }
+                mf["wep_" + inst_num + "_key" + i].value = s;
+            }
+        }
+
+        /*
+         * truncate_wep_keys()
+         */
+        function truncate_wep_keys(inst_num)
+        {
+            for (var i = 0; i < 4; i++) {
+                var got = mf["wep_" + inst_num + "_key" + i].value.match (/^\s*([0-9a-fA-F]+)\s*$/);
+                if (got) {
+                    var s = got[1];
+                    var n = (mf["wireless_keylen_" + inst_num].value == 1) ? 13*2 : 5*2;
+                    if (mf["wireless_keylen_" + inst_num].value == "0") {
+                            s = s.substring (0,10);
+                    }
+                    else {
+                            while (s.length < n) {
+                                    s += '0';
+                            }
+                    }
+                    mf["wep_" + inst_num + "_key" + i].value = s;
+                }
+            }
+        }
+
+        /*
+         * wireless_keylen_selector()
+         */
+        function wireless_keylen_selector(inst_num, value)
+        {
+                mf["wireless_keylen_" + inst_num].value = value;
+                mf["wireless_keylen_select_" + inst_num].value = value;
+
+            /*
+             * Set the maxlength fields of all wep keys appropriately.
+             */
+                var len = (mf["wireless_keylen_" + inst_num].value == 1) ? 26 : 10;
+                mf["wep_" + inst_num + "_key0"].maxLength = len;
+                mf["wep_" + inst_num + "_key1"].maxLength = len;
+                mf["wep_" + inst_num + "_key2"].maxLength = len;
+                mf["wep_" + inst_num + "_key3"].maxLength = len;
+            truncate_wep_keys(inst_num);
+        }
+
+        /*
+         * validate_wep_keys()
+         */
+        function validate_wep_keys(inst_num)
+        {
+            var wep_error_msg = "";
+            var wep_error_flag = 0;
+            var got;
+            var i, j, k;
+
+            for (k = 0; k < 4; k++) {
+                var key = mf["wep_" + inst_num + "_key" + k].value;
+                if (((key.length == 5) && (mf["wireless_keylen_" + inst_num].value == 0)) || ((key.length == 13) && (mf["wireless_keylen_" + inst_num].value == 1))) {
+                    got = mf["wep_" + inst_num + "_key" + k].value.match (/^\s*([a-zA-Z0-9]+)\s*$/);
+                    // 20070416
+                    got = 1;
+                    if (!got) {
+                        var key_number = k + 1;
+                        wep_error_msg = wep_error_msg + key_number + ",";
+                        wep_error_flag ++;
+                    } else {
+                        var n = (mf["wireless_keylen_" + inst_num].value == 1) ? 13 : 5;
+                        if (key.length <= n) {
+                            var newkey = '';
+                            for (i = 0; i < n; i++) {
+                                if (i >= key.length) {
+                                    newkey += '00';
+                                } else {
+                                    var c = key.charCodeAt(i);
+                                    var s = c.toString(16);
+                                    if (s.length < 2) {
+                                        s = '0' + s;
+                                    }
+                                    newkey += s;
+                                }
+                            }
+                            mf["wep_" + inst_num + "_key" + k].value = newkey;
+                        }
+                    }
+                } else if (((key.length == 10) && (mf["wireless_keylen_" + inst_num].value == 0)) || ((key.length == 26) && (mf["wireless_keylen_" + inst_num].value == 1))) {
+                    got = mf["wep_" + inst_num + "_key" + k].value.match (/^\s*([0-9a-fA-F]+)\s*$/);
+                    if (!got) {
+                        j = k + 1;
+                        if (wep_error_flag > 0) {
+                            wep_error_msg = wep_error_msg + ", ";
+                        }
+                        wep_error_msg = wep_error_msg + j;
+                        wep_error_flag++;
+                    }
+                } else {
+                    j = k + 1;
+                    if (wep_error_flag > 0) {
+                        wep_error_msg = wep_error_msg + ", ";
+                    }
+                    wep_error_msg = wep_error_msg + j;
+                    wep_error_flag++;
+                }
+            }
+            if (wep_error_flag > 1) {
+                    alert("Invalid WEP Keys" + ": " + wep_error_msg + ".");
+                return false;
+            } else if (wep_error_flag == 1) {
+                    alert("Invalid WEP Key"  + ": " + wep_error_msg + ".");
+                return false;
+            }
+
+            /*
+             * Pad 0 to maxLength.
+             */
+            pad_wep_keys(inst_num);
+            return true;
+        }
+
+        /*
+         * wireless_use_key_selector()
+         */
+        function wireless_use_key_selector(inst_num, value)
+        {
+            mf["wireless_use_key_" + inst_num].value = value;
+            mf["wireless_use_key_select_" + inst_num].value = value;
+        }
+
+        /*
+         * wireless_auth_selector()
+         */
+        function wireless_auth_selector(inst_num, value)
+        {
+            var wps_enable = "true";
+
+            if ((wps_enable == "true") && (value == "2")) {
+                alert("Can't choose shared key when WPS is enable!!");
+                mf["wireless_auth_select_" + inst_num].value = "1";
+                return;
+            }
+
+            mf["wireless_auth_" + inst_num].value = value;
+            mf["wireless_auth_select_" + inst_num].value = value;
+        }
+
+        //
+        /*
+         * update_radio_band_on_selected_phy_mode()
+         */
+        function update_radio_band_on_selected_phy_mode(inst_num, phy_mode)
+        {
+            radio[inst_num].band = ((4 & phy_mode) || (16 & phy_mode)) ? A_BAND_ONLY : G_BAND_ONLY;
+        }
+
+        /*
+         * wireless_band_selector()
+         */
+        function wireless_band_selector(inst_num, value)
+        {
+            var band_radio;
+
+            radio[inst_num].band = value;
+            band_radio = mf["wireless_band_radio_" + inst_num];
+            band_radio[value].checked = true;
+
+            /*
+             * Hide/Show the phy mode drop down list based on the selected band.
+             */
+            var select_to_display = "wireless_phy_mode_G_band_select_div_" + inst_num;
+            var select_to_hide = "wireless_phy_mode_A_band_select_div_" + inst_num;
+            current_phy_mode_select_id[inst_num] = mf["wireless_phy_mode_G_band_select_" + inst_num];
+
+            if (value == A_BAND_ONLY) {
+                select_to_display = "wireless_phy_mode_A_band_select_div_" + inst_num;
+                select_to_hide = "wireless_phy_mode_G_band_select_div_" + inst_num;
+                current_phy_mode_select_id[inst_num] = mf["wireless_phy_mode_A_band_select_" + inst_num];
+            }
+
+            document.getElementById(select_to_display).style.display = "block";
+            document.getElementById(select_to_hide).style.display = "none";
+
+            /*
+             *  Update phy mode.
+             */
+            wireless_phy_mode_selector(inst_num, current_phy_mode_select_id[inst_num].value);
+        }
+        //
+
+        /*
+         * update_radio_type_on_selected_phy_mode()
+         * Radio types: type_A, type_B; type_G; type_NG; and type_NA.
+         * Radio is defined in pkg/ipWireless/config/wlan_radio_inc.html.
+         * Phy_mode:
+         *      '1': 802.11b only
+         *      '2': 802.11g only
+         *      '3': Mixed 802.11g and 802.11b
+         *      '4': 802.11a only
+         *      '8': 802.11ng only
+         *      '10': Mixed 802.11ng and 802.11g
+         *      '11': Mixed 802.11ng, 802.11g and 802.11b
+         *      '16': 802.11na only
+         *      '20': Mixed 802.11na and 802.11a
+         *      '31': Mixed 802.11na 802.11a 802.11ng 802.11g 802.11b
+         */
+        function update_radio_type_on_selected_phy_mode(inst_num, phy_mode)
+        {
+            radio[inst_num].type_B = (1 & phy_mode) ? true : false;
+            radio[inst_num].type_G = (2 & phy_mode) ? true : false;
+            radio[inst_num].type_A = (4 & phy_mode) ? true : false;
+            radio[inst_num].type_NG = (8 & phy_mode) ? true : false;
+            radio[inst_num].type_NA = (16 & phy_mode) ? true : false;
+        }
+
+        /*
+         * is_option_exist()
+         *  Check if the list of options of the select contains a specific value.
+         */
+        function is_option_exist(select_id, value) {
+            for (var i = 0; i < select_id.options.length; i++) {
+                if (select_id.options[i].value == value) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /*
+         * populate_selectors()
+         *  Populate selectors, show/hide channels, tx_rate, etc based on the phy mode selected.
+         */
+        function populate_selectors(inst_num)
+        {
+            /*
+             * Clear existing option list.
+             */
+            mf["wireless_channel_select_" + inst_num].options.length = 0;
+            mf["wireless_tx_rate_select_" + inst_num].options.length = 0;
+            mf["wireless_cwm_mode_select_" + inst_num].options.length = 0;
+            mf["wireless_num_streams_select_" + inst_num].options.length = 0;
+
+            radio[inst_num].populate_channel_selector(mf["wireless_channel_select_" + inst_num]);
+            radio[inst_num].populate_txrate_selector(mf["wireless_tx_rate_select_" + inst_num]);
+            radio[inst_num].populate_cwm_selector(mf["wireless_cwm_mode_select_" + inst_num]);
+            radio[inst_num].populate_streams_selector(mf["wireless_num_streams_select_" + inst_num]);
+
+            /*
+             * Reset previously selected option to selected state.
+             * If the previously selected option is gone now, we select the default one for the phy mode in use.
+             */
+            var wireless_channel_value = mf["wireless_channel_" + inst_num].value;
+            if (!is_option_exist(mf["wireless_channel_select_" + inst_num], wireless_channel_value)) {
+                /*
+                 * Use default channel defined in wlan_radio_inc.html.
+                 */
+                wireless_channel_value = radio[inst_num].get_default_channel();
+            }
+            wireless_channel_selector(inst_num, wireless_channel_value);
+
+            var wireless_tx_rate_value = mf["wireless_tx_rate_" + inst_num].value;
+            if (!is_option_exist(mf["wireless_tx_rate_select_" + inst_num], wireless_tx_rate_value)) {
+                /*
+                 * Select "Best (automatic)".
+                 */
+                wireless_tx_rate_value = 0;
+            }
+            wireless_tx_rate_selector(inst_num, wireless_tx_rate_value);
+
+            wireless_cwm_mode_selector(inst_num, mf["wireless_cwm_mode_" + inst_num].value);
+            wireless_num_streams_selector(inst_num, mf["wireless_num_streams_" + inst_num].value);
+        }
+
+        /*
+         * show_hide_form_fields()
+         */
+        function show_hide_form_fields(inst_num)
+        {
+            document.getElementById("box_wireless_auto_channel_" + inst_num).style.display = radio[inst_num].auto_channel ? "block" : "none";
+            document.getElementById("box_wireless_cwm_mode_" + inst_num).style.display = radio[inst_num].type_NG || radio[inst_num].type_NA ? "block" : "none";
+            document.getElementById("box_wireless_num_streams_" + inst_num).style.display = (radio[inst_num].extra_ui_config && (radio[inst_num].type_NG || radio[inst_num].type_NA)) ? "block" : "none";
+        }
+
+        /*
+         * invisibility_selector()
+         */
+        function wireless_invisibility_selector(inst_num, value)
+        {
+            mf["wireless_invisibility_" + inst_num].value = value;
+            if (value == 0)
+                mf["wireless_invisibility_radio_" + inst_num][0].checked = true;
+            else
+                mf["wireless_invisibility_radio_" + inst_num][1].checked = true;
+        }
+
+        /*
+         * qos_selector()
+         */
+        function qos_selector(inst_num, value)
+        {
+            mf["qos_" + inst_num].value = value;
+            mf["qos_select_" + inst_num].value = value;
+        }
+
+        /*
+         * guest_zone_schedule_control_selector()
+         */
+        function guest_zone_schedule_control_selector(inst_num, value)
+        {
+            mf["guest_zone_schedule_control_" + inst_num].value = value;
+        }
+
+        /*
+         * add_new_schedule()
+         */
+        function add_new_schedule()
+        {
+            top.location = "/Tools/Schedules.html";
+        }
+
+        /*
+         * save_default_radio_type()
+         */
+        function save_default_radio_type(inst_num)
+        {
+            radio_type_B[inst_num] = radio[inst_num].type_B;
+            radio_type_G[inst_num] = radio[inst_num].type_G;
+            radio_type_A[inst_num] = radio[inst_num].type_A;
+            radio_type_NG[inst_num] = radio[inst_num].type_NG;
+            radio_type_NA[inst_num] = radio[inst_num].type_NA;
+        }
+
+        /*
+         * reset_radio_type_to_default()
+         */
+        function reset_radio_type_to_default(inst_num)
+        {
+            radio[inst_num].type_B = radio_type_B[inst_num];
+            radio[inst_num].type_G = radio_type_G[inst_num];
+            radio[inst_num].type_A = radio_type_A[inst_num];
+            radio[inst_num].type_NG = radio_type_NG[inst_num];
+            radio[inst_num].type_NA = radio_type_NA[inst_num];
+        }
+
+        /*
+         * invisibility_selector()
+         */
+        function invisibility_selector(inst_num, value)
+        {
+            document.getElementById("invisibility_" + inst_num).value = value;
+            document.getElementById("invisibility_" + inst_num + "_radio_0").checked = (value == "0") ? true : false;
+            document.getElementById("invisibility_" + inst_num + "_radio_1").checked = (value == "1") ? true : false;
+        }
+
+        /*
+         * init_guest_selector()
+         */
+        function init_guest_selector(inst_num, value)
+        {
+            document.getElementById("guest_select_" + inst_num).checked = !value;
+        }
+
+        /*
+         * guest_selector()
+         */
+        function guest_selector(inst_num, value)
+        {
+            document.getElementById("guest_" + inst_num).value = !value;
+        }
+
+        /*
+         * qos_selector()
+         */
+        function qos_selector(inst_num, value)
+        {
+            document.getElementById("qos_" + inst_num).value = value;
+            document.getElementById("qos_select_" + inst_num).value = value;
+        }
+
+        /*
+         * do_add_new_schedule()
+         */
+        function do_add_new_schedule()
+        {
+            top.location = "Schedules.html";
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                wireless_channel_selector(6);
+                wireless_auto_channel_selector(true);
+                wireless_radio_control_selector(true);
+                return;
+            }
+
+            /*
+             * Display wireless network name, only for devices that support more than one radio.
+             */
+            radio_count = parseInt(document.getElementById("radio_count").value, 10);
+
+            for (var inst_num=0 ;inst_num < radio_count; inst_num++) {
+                radio[inst_num] = new Radio(inst_num + 1);
+
+                // 2007.07.02
+                schedule_populate_select(mf["guest_zone_schedule_control_select_" + inst_num]);
+                mf["guest_zone_schedule_control_select_" + inst_num].value = mf["guest_zone_schedule_control_" + inst_num].value;
+
+                document.getElementById("radio_name_" + inst_num).innerHTML = radio_name[inst_num];
+
+                invisibility_selector(inst_num, mf["invisibility_" + inst_num].value);
+                init_guest_selector(inst_num, (mf["guest_" + inst_num].value == "true"));
+                qos_selector(inst_num, mf["qos_" + inst_num].value);
+
+                /*
+                 * Save the default radio types.
+                 */
+                save_default_radio_type(inst_num);
+
+                /*
+                 * Clear existing option lists, otherwise when doing page_load again in "page_cancel" we will have duplicate list.
+                 * Populate phy mode selectors with all the modes we support for that band.
+                 */
+                //mf["wireless_phy_mode_G_band_select_" + inst_num].options.length = 0;
+                //radio[inst_num].populate_phy_selector(mf["wireless_phy_mode_G_band_select_" + inst_num],  G_BAND_ONLY);
+
+                /*
+                 *  Only if we support A Band in this product.
+                 */
+                if (inst_num == 0) {
+                //
+                    //current_phy_mode_select_id[0] = mf.wireless_phy_mode_G_band_select_0;
+                    //wireless_phy_mode_selector(0, mf.wireless_phy_mode_0.value);
+                //
+                }
+                else if (inst_num == 1) {
+                //
+                    //current_phy_mode_select_id[1] = mf.wireless_phy_mode_G_band_select_1;
+                    //wireless_phy_mode_selector(1, mf.wireless_phy_mode_1.value);
+                //
+                }
+
+                guest_zone_checkbox_control_selector(inst_num, mf["guest_zone_enabled_" + inst_num].value == "true");
+                wireless_checkbox_control_selector(inst_num, mf["wireless_checkbox_control_" + inst_num].value == "1");
+
+                //wireless_radio_control_selector(inst_num, mf["wireless_radio_control_" + inst_num].value == "1");
+                //wireless_auto_channel_selector(inst_num, mf["wireless_auto_channel_" + inst_num].value == "true");
+                //wireless_invisibility_selector(inst_num, mf["wireless_invisibility_" + inst_num].value);
+                var security_mode = (mf["wireless_wepon_" + inst_num].value == "true" ? WEPON : 0)
+                                  | (mf["wireless_wpa_enabled_" + inst_num].value == "true" ? WPA_ENABLED : 0)
+                                  | (mf["wireless_ieee8021x_enabled_" + inst_num].value == "true" ? IEEE8021X_ENABLED : 0);
+                wireless_security_mode_selector(inst_num, security_mode);
+                wireless_wpa_mode_selector(inst_num, mf["wireless_wpa_mode_" + inst_num].value);
+                wireless_wpa_cipher_selector(inst_num, mf["wireless_wpa_cipher_" + inst_num].value);
+                wireless_radius_auth_mac_selector(inst_num, mf["wireless_radius_auth_mac_" + inst_num].value == "true");
+                wireless_second_radius_auth_mac_selector(inst_num, mf["wireless_second_radius_auth_mac_" + inst_num].value == "true");
+
+                /* Show/hide WEP fields */
+                wireless_keylen_selector(inst_num, mf["wireless_keylen_" + inst_num].value);
+                wireless_use_key_selector(inst_num, mf["wireless_use_key_" + inst_num].value);
+                wireless_auth_selector(inst_num, mf["wireless_auth_" + inst_num].value);
+            }
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+                save_form_default_values("mainform");
+
+                /*
+                 * Check for validation errors.
+                 */
+                if (verify_failed != "") {
+                    set_form_always_modified("mainform");
+                    alert(verify_failed);
+                }
+            }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                    return;
+            }
+
+            for (var inst_num=0 ;inst_num < radio_count; inst_num++) {
+                /*
+                 * Trim blanks to check empty string in validator.
+                 */
+                mf["wireless_SSID_" + inst_num].value = mf["wireless_SSID_" + inst_num].value.trim();
+
+                /*
+                 * If wireless_phy_mode include b, set extra wireless protection to true and hide it in advanced wireless page.
+                 */
+
+                //if (mf["wireless_phy_mode_" + inst_num].value & 1) {
+                //    mf["wireless_erp_protection_" + inst_num].value = true;
+                //}
+
+                if (mf["wireless_wepon_" + inst_num].value == "true") {
+                    if (!validate_wep_keys(inst_num)) {
+                        return;
+                    }
+                }
+
+                if (mf["wireless_wpa_enabled_" + inst_num].value == "true") {
+                    if (!validate_wpa_psk(inst_num, mf["wireless_wpa_psk_" + inst_num].value)) {
+                        return;
+                    }
+                    if (!validate_wpa_rekey(inst_num, mf["wireless_wpa_rekey_time_" + inst_num].value)) {
+                        return;
+                    }
+                }
+
+                if (mf["wireless_ieee8021x_enabled_" + inst_num].value == "true") {
+                    if (mf["wireless_radius_server_address_" + inst_num].value.trim() == "") {
+                        mf["wireless_radius_server_address_" + inst_num].value = "0.0.0.0";
+                    }
+                    if (!validate_ip(mf["wireless_radius_server_address_" + inst_num].value)) {
+                        mf["wireless_radius_server_address_" + inst_num].select();
+                        mf["wireless_radius_server_address_" + inst_num].focus();
+                        return;
+                    }
+                    if (!validate_port(mf["wireless_radius_server_port_" + inst_num].value)) {
+                        mf["wireless_radius_server_port_" + inst_num].select();
+                        mf["wireless_radius_server_port_" + inst_num].focus();
+                        return;
+                    }
+                    if (!validate_1x_rekey(inst_num, mf["wireless_ieee8021x_reauth_time_" + inst_num].value)) {
+                        return;
+                    }
+                }
+            }
+
+            
+
+            mf.submit();
+        }
+
+         /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") && confirm ("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed != "") {
+                    top.location = "/Advanced/Guest_Zone.html";
+                } else {
+                    reset_form("mainform");
+                    /*
+                     * Reset radio types to default state, as they could have been modified due to wireless mode changes.
+                     * We always populate the phy mode based on default radio types.
+                     */
+                    for (var inst_num=0; inst_num < radio_count; inst_num++) {
+                        reset_radio_type_to_default(inst_num);
+                    }
+                    page_load();
+                }
+            }
+        }
+
+
+    //]]>
+    </script>
+    <!-- InstanceEndEditable -->
+</head><body onload="template_load();">
+<div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+<div id="outside">
+    <table id="table_shell" summary="" cellspacing="0"><col span="1">
+    <tbody><tr>
+        <td>
+            <div id="header_container">
+                <div id="info_bar">
+                    <div class="fwv">Firmware Version:
+                    1.32NA
+                    </div>
+                    <div class="hwv">Hardware Version:
+                    A4
+                    </div>
+                    <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                </div>
+            </div>
+            <table id="masthead_container" summary="" cellspacing="0">
+            <tbody><tr>
+                <td><div id="masthead_image"></div></td>
+            </tr>
+            </tbody></table>
+
+            <table id="topnav_container" summary="" border="0" cellspacing="1">
+            <tbody><tr>
+                <td id="modnum">
+                    <div id="modnum_image"></div>
+                </td>
+                <td class="topnavoff">
+                    <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                </td>
+                <td class="topnavon">
+                    <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                </td>
+                <td class="topnavoff">
+                    <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                </td>
+                <td class="topnavoff">
+                    <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                </td>
+                <td class="topnavoff">
+                    <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                </td>
+            </tr>
+            </tbody></table>
+
+            <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+            <tbody><tr>
+                <td id="sidenav_container">
+                    <div id="sidenav">
+
+                        <ul id="Basic_subnav" class="subnav_group">
+                            <li class="">
+                                <div>
+                                    <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <ul style="display: block;" id="Advanced_subnav" class="subnav_group">
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                </div>
+                            </li>
+                            
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                </div>
+                            </li>
+                            
+                            
+                            <li class="">
+                                <div>
+                                    <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                </div>
+                            </li>
+                            
+                            
+                            <li class="">
+                                <div>
+                                    <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                </div>
+                            </li>
+                          	
+										        <li>
+											          <div>
+												            <a id="Advanced_Bsecure_nav_link" href="Bsecure.html" onclick="return jump_if();">securespot</a>
+											          </div>
+										        </li>
+										        
+                            
+                            <li class="here">
+                                <div>
+                                     <a href="Guest_Zone.html" onclick="return jump_if();">Guest Zone</a>
+                                </div>
+                            </li>
+                            
+                        </ul>
+
+                        <ul id="Tools_subnav" class="subnav_group">
+                            <li class="">
+                                <div>
+                                    <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                </div>
+                            </li>
+                            <li>
+                               <div>
+                                    <a href="Time.html" onclick="return jump_if();">Time</a>
+                               </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="System.html" onclick="return jump_if();">System</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                </div>
+                            </li>
+                            
+                            
+                            <li>
+                                <div>
+                                    <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                </div>
+                            </li>
+
+                            
+                        </ul>
+
+                        <ul id="Status_subnav" class="subnav_group">
+                            <li class="">
+                                <div>
+                                    <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                </div>
+                            </li>
+                            
+                            <li>
+                                <div>
+                                    <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                </div>
+                            </li>
+                            <li class="">
+                                <div>
+                                    <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                </div>
+                            </li>
+                            
+                            <li class="">
+                                <div>
+                                    <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                </div>
+                            </li>
+                            
+                            
+                            <li class="">
+                                <div>
+                                    <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                </div>
+                            </li>
+                            
+                        </ul>
+
+                        <ul id="Help_subnav" class="subnav_group">
+                            <li class="">
+                                <div>
+                                    <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="Status.html" onclick="return jump_if();">Status</a>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                </div>
+                            </li>
+                        </ul>
+
+                    </div>
+                </td>
+                <td id="maincontent_container">
+                    <div id="rebootcontent" style="display: none;">
+                        <div class="section">
+                            <div class="section_head">
+                                <h2>Reboot needed</h2>
+                                <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                <form id="rebootdummy" action="#" method="get">
+
+                                <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                </form>
+                            </div>
+                        </div> <!-- reboot_warning -->
+                    </div>
+                    <div id="warnings_section" style="display: none;">
+                        <div class="section">
+                            <div class="section_head">
+                                <h2>
+                                    Configuration Warnings
+                                </h2>
+                                <div style="display: block;" id="warnings_section_content">
+                                        <!-- This division will be populated with configuration warning information -->
+                                </div><!-- box warnings_section_content -->
+                            </div>
+                        </div>
+                    </div> <!-- warnings_section -->
+                    <input id="radio_count" value="1" type="hidden">
+                    <div id="maincontent" style="display: block;">
+                        <!-- InstanceBeginEditable name="Main Content" -->
+                        <form saved="true" id="mainform" action="/Advanced/Guest_Zone.html" method="post" onsubmit="return false;">
+                            <div class="section">
+                                <div class="section_head">
+                                    <h2>Guest Zone</h2>
+                                    <p>Use
+this section to configure the guest zone settings of your router. The
+guest zone provide a separate network zone for guest to access Internet.</p>
+                                    <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                    <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                    <input class="button_submit" value="Don't Save Settings" onclick="page_cancel()" type="button">
+                                </div>
+                                
+                                
+                                <div class="box">
+                                    <h3>Guest Zone Selection</h3>
+                                    <p class="box_msg"> </p>
+                                    <fieldset>
+                                        <p>
+                                            <input default="false" id="guest_zone_used_0" name="config.wireless[0].ssid_profiles[1].used" value="false" type="hidden">
+                                            <input default="false" id="guest_zone_enabled_0" name="config.wireless[0].ssid_profiles[1].enabled" value="false" type="hidden">
+                                            <label class="duple">Enable Guest Zone&nbsp;:</label>
+                                            <input default="false" id="guest_zone_checkbox_control_select_0" onclick="guest_zone_checkbox_control_selector(0, this.checked);" type="checkbox">
+                                            <!-- 2007.07.02 -->
+                                            <input default="Always" id="guest_zone_schedule_control_0" name="config.wireless[0].wlan_schedule_name" value="Always" type="hidden">
+                                            <select disabled="disabled" class="disabled" id="guest_zone_schedule_control_select_0" onchange="guest_zone_schedule_control_selector(0, this.value);">
+                                            <option default="true" value="Always">Always</option><option default="false" value="Never">Never</option></select>
+                                            <input class="button_submit" id="add_new_schedule_0" value="New Schedule" onclick="do_add_new_schedule(true)" type="button">
+                                        </p>
+                                        <p style="display: none;">
+                                            <input default="" id="lan_port_checkbox_control_1" name=" " value="" type="hidden">
+                                            <input default="" id="lan_port_checkbox_control_2" name=" " value="" type="hidden">
+                                            <input default="" id="lan_port_checkbox_control_3" name=" " value="" type="hidden">
+                                            <input default="" id="lan_port_checkbox_control_4" name=" " value="" type="hidden">
+                                            <label class="duple">Include LAN Port&nbsp;:</label>
+                                            <input default="false" id="lan_port_checkbox_control_select_1" onclick="lan_port_checkbox_control_selector(1, this.checked);" type="checkbox"> 1&nbsp;
+                                            <input default="false" id="lan_port_checkbox_control_select_2" onclick="lan_port_checkbox_control_selector(2, this.checked);" type="checkbox"> 2&nbsp;
+                                            <input default="false" id="lan_port_checkbox_control_select_3" onclick="lan_port_checkbox_control_selector(3, this.checked);" type="checkbox"> 3&nbsp;
+                                            <input default="false" id="lan_port_checkbox_control_select_4" onclick="lan_port_checkbox_control_selector(4, this.checked);" type="checkbox"> 4&nbsp;
+                                        </p>
+                                        <p>
+                                            <label class="duple">Wireless Band&nbsp;:</label>
+                                            <b><span id="radio_name_0">2.4GHz Band</span></b>
+                                        </p>
+                                        <p style="display: none;">
+                                            <input default="1" id="wireless_checkbox_control_0" name="config.wireless[0].radio_control" value="1" type="hidden">
+                                            <label class="duple">Include Wireless&nbsp;:</label>
+                                            <input default="true" id="wireless_checkbox_control_select_0" onclick="wireless_checkbox_control_selector(0, this.checked);" type="checkbox">
+                                        </p>
+                                        <p>
+                                            <label class="duple">Wireless Network Name&nbsp;:</label>
+                                            <input autocomplete="off" default="dlink_guest" disabled="disabled" class="disabled" id="wireless_SSID_0" size="20" maxlength="32" value="dlink_guest" name="config.wireless[0].ssid_profiles[1].ssid" type="text">(Also called the SSID)
+                                        </p>
+                                        <p style="display: none;">
+                                            <input default="0" id="invisibility_0" name="config.wireless[0].ssid_profiles[1].invisibility" value="0" type="hidden">
+                                            <label class="duple">Visibility Status:</label>
+                                            <input default="true" id="invisibility_0_radio_0" name="invisibility_0_radio" value="0" onclick="invisibility_selector(0, this.value);" checked="checked" type="radio">
+                                            <label for="invisibility_0_radio_0">Visible</label>
+                                            <input default="false" id="invisibility_0_radio_1" name="invisibility_0_radio" value="1" onclick="invisibility_selector(0, this.value);" type="radio">
+                                            <label for="invisibility_0_radio_1">Invisible</label>
+                                        </p>
+                                        <p style="display: block;">
+                                            <input default="true" id="guest_0" name="config.wireless[0].ssid_profiles[1].guest" value="true" type="hidden">
+                                            <label class="duple" for="guest_select_0">Enable Routing Between Zones:</label>
+                                            <input default="false" disabled="disabled" class="disabled" id="guest_select_0" onclick="guest_selector(0, this.checked);" type="checkbox">
+                                        </p>
+                                        <p style="display: none;">
+                                            <input default="1" id="qos_0" name="config.wireless[0].ssid_profiles[1].qos" value="1" type="hidden">
+                                            <label for="qos_select_0" class="duple">Priority:</label>
+                                            <select id="qos_select_0" onchange="qos_selector(0, this.value);">
+                                                <option default="false" value="0">Equal to Wireless Network</option>
+                                                <option default="true" value="1" selected="selected">Lower than Wireless Network</option>
+                                                <option default="false" value="2">Lowest</option>
+                                            </select>&nbsp;(Bandwidth priority)
+                                        </p>
+                                        <p>
+                                        </p><div style="display: none;" id="box_security_0">
+                                            <input default="false" id="wireless_wepon_0" name="config.wireless[0].ssid_profiles[1].wepon" value="false" type="hidden">
+                                            <input default="false" id="wireless_ieee8021x_enabled_0" name="config.wireless[0].ssid_profiles[1].ieee8021x_enabled" value="false" type="hidden">
+                                            <input default="false" id="wireless_wpa_enabled_0" name="config.wireless[0].ssid_profiles[1].wpa_enabled" value="false" type="hidden">
+                                            <label class="duple">Security Mode&nbsp;:</label>
+                                            <select id="wireless_security_mode_select_0" onchange="wireless_security_mode_selector(0, this.value);">
+                                                <option default="true" value="0" selected="selected">None</option>
+                                                <option default="false" value="1">WEP</option>
+                                                <option default="false" value="2">WPA-Personal</option>
+                                                <option default="false" value="6">WPA-Enterprise</option>
+                                            </select>
+                                         </div>
+                                         
+                                       </fieldset>
+                                </div>
+                                <div style="display: none;" id="box_wireless_security_0">
+                                <div id="box_wireless_wepon_0" class="box" style="display: none;">
+                                        <h3>WEP</h3>
+                                        <p>WEP is the wireless encryption standard. To use it
+                                        you must enter the same key(s) into the router and the wireless
+                                        stations. For 64 bit keys you must enter 10 hex digits into each key
+                                        box. For 128 bit keys you must enter 26 hex digits into each key box. A
+                                        hex digit is either a number from 0 to 9 or a letter from A to F. For the most
+                                        secure use of WEP set the authentication type to "Shared Key" when WEP
+                                        is enabled.</p>
+                                        <p>You may also enter any text string into a WEP key
+                                        box, in which case it will be converted into a hexadecimal key using the ASCII
+                                        values of the characters. A maximum of 5 text characters can be entered for
+                                        64 bit keys, and a maximum of 13 characters for 128 bit keys.</p>
+                                        <p>If you choose the WEP security option this device
+                                        will <strong>ONLY</strong> operate in <strong>Legacy Wireless mode (802.11B/G)</strong>.
+                                        This means you will <strong>NOT</strong> get 11N performance due to the fact that WEP
+                                        is not supported by the Draft 11N specification.</p>
+                                        <fieldset>
+                                            <p>
+                                                <input default="0" id="wireless_keylen_0" name="config.wireless[0].ssid_profiles[1].keylen" value="0" type="hidden">
+                                                <label class="duple">WEP Key Length&nbsp;:</label>
+                                                <select id="wireless_keylen_select_0" onchange="wireless_keylen_selector(0, this.value);">
+                                                    <option default="true" value="0">64 bit (10 hex digits)</option>
+                                                    <option default="false" value="1">128 bit (26 hex digits)</option>
+                                                </select>
+                                                (length applies to all keys)
+                                            </p>
+                                            <p>
+                                                <label class="duple">WEP Key 1&nbsp;:</label>
+                                                <input default="1234567890" id="wep_0_key0" name="config.wireless[0].ssid_profiles[1].wep_key[0]" size="30" maxlength="10" value="12345678902551234567890255" type="password">
+                                            </p>
+                                            <p style="display: none;">
+                                                <label class="duple">WEP Key 2&nbsp;:</label>
+                                                <input default="1234567890" id="wep_0_key1" name="config.wireless[0].ssid_profiles[1].wep_key[1]" size="30" maxlength="10" value="12345678902551234567890255" type="password">
+                                            </p>
+
+                                            <p style="display: none;">
+                                                <label class="duple">WEP Key 3&nbsp;:</label>
+                                                <input default="1234567890" id="wep_0_key2" name="config.wireless[0].ssid_profiles[1].wep_key[2]" size="30" maxlength="10" value="12345678902551234567890255" type="password">
+                                            </p>
+
+                                            <p style="display: none;">
+                                                <label class="duple">WEP Key 4&nbsp;:</label>
+                                                <input default="1234567890" id="wep_0_key3" name="config.wireless[0].ssid_profiles[1].wep_key[3]" size="30" maxlength="10" value="12345678902551234567890255" type="password">
+                                            </p>
+                                            <p style="display: none;">
+                                                <input default="0" id="wireless_use_key_0" name="config.wireless[0].ssid_profiles[1].use_key" value="0" type="hidden">
+                                                <label class="duple">Default WEP Key&nbsp;:</label>
+                                                <select id="wireless_use_key_select_0" onchange="wireless_use_key_selector(0, this.value);">
+                                                    <option default="true" value="0">WEP Key 1</option>
+                                                    <option default="false" value="1">WEP Key 2</option>
+                                                    <option default="false" value="2">WEP Key 3</option>
+                                                    <option default="false" value="3">WEP Key 4</option>
+                                                </select>
+                                            </p>
+                                            <p>
+                                                <input default="1" id="wireless_auth_0" name="config.wireless[0].ssid_profiles[1].auth" value="1" type="hidden">
+                                                <label class="duple">Authentication&nbsp;:</label>
+                                                <select id="wireless_auth_select_0" onchange="wireless_auth_selector(0, this.value);">
+                                                    <option default="true" value="1">Both</option>
+                                                    <option default="false" value="2">Shared Key</option>
+                                                </select>
+                                            </p>
+                                        </fieldset>
+                                    </div>
+                                    <div id="box_wireless_wpa_0" class="box" style="display: none;">
+                                        <h3>WPA</h3>
+                                        <p>Use <strong>WPA or WPA2</strong>
+mode to achieve a balance of strong security and best compatibility.
+This mode uses WPA for legacy clients while maintaining higher security
+with stations that are WPA2 capable. Also the strongest cipher that the
+client supports will be used. For best security, use <strong>WPA2 Only</strong>
+mode. This mode uses AES(CCMP) cipher and legacy stations are not
+allowed access with WPA security. For maximum compatibility, use <strong>WPA Only</strong>. This mode uses TKIP cipher. Some gaming and legacy devices work only in this mode.</p>
+                                        <p>To achieve better wireless performance use <strong>WPA2 Only</strong> security mode (or in other words AES cipher).</p>
+                                        <fieldset>
+                                            <p>
+                                                <input default="2" id="wireless_wpa_mode_0" name="config.wireless[0].ssid_profiles[1].wpa_mode" value="2" type="hidden">
+                                                <label class="duple">WPA Mode&nbsp;:</label>
+                                                <select id="wireless_wpa_mode_select_0" onchange="wireless_wpa_mode_selector(0, this.value);">
+                                                    <option default="true" value="2">Auto (WPA or WPA2)</option>
+                                                    <option default="false" value="3">WPA2 Only</option>
+                                                    <option default="false" value="1">WPA Only</option>
+                                                </select>
+                                            </p>
+                                            <p id="box_wireless_wpa_cipher_0">
+                                                <input default="3" id="wireless_wpa_cipher_0" name="config.wireless[0].ssid_profiles[1].wpa_cipher" value="3" type="hidden">
+                                                <label class="duple">Cipher Type&nbsp;:</label>
+                                                <select id="wireless_wpa_cipher_select_0" onchange="wireless_wpa_cipher_selector(0, this.value);">
+                                                    <option default="false" value="1">TKIP</option>
+                                                    <option default="false" value="2">AES</option>
+                                                    <option default="true" value="3">TKIP and AES</option>
+                                                </select>
+                                            </p>
+                                            <p>
+                                                <label class="duple">Group Key Update Interval&nbsp;:</label>
+                                                <input autocomplete="off" default="3600" id="wireless_wpa_rekey_time_0" name="config.wireless[0].ssid_profiles[1].wpa_rekey_time" size="10" maxlength="5" value="3600" onchange="validate_wpa_rekey(0, this.value)" type="text">
+                                                (seconds)
+                                            </p>
+                                        </fieldset>
+                                    </div>
+                                    <div id="box_wireless_wpa_personal_0" class="box" style="display: none;">
+                                        <h3>Pre-Shared Key</h3>
+                                        <p>
+Enter an 8- to 63-character alphanumeric pass-phrase. For good security
+it should be of ample length and should not be a commonly known phrase.
+</p>
+                                        <fieldset>
+                                            <p>
+                                                <label class="duple">Pre-Shared Key&nbsp;:</label>
+                                                <input default="12345678" id="wireless_wpa_psk_0" name="config.wireless[0].ssid_profiles[1].wpa_psk" size="20" maxlength="64" value="12345678" onchange="validate_wpa_psk(0, this.value)" type="password">
+                                            </p>
+                                        </fieldset>
+                                    </div>
+                                    <div id="box_wireless_wpa_enterprise_0" class="box" style="display: none;">
+                                    <h3>EAP (802.1x)</h3>
+                                    <p class="box_msg">When WPA enterprise is enabled, the router uses EAP (802.1x) to authenticate clients via a remote RADIUS server. </p>
+                                    <fieldset>
+                                        <p>
+                                            <label class="duple">Authentication Timeout&nbsp;:</label>
+                                            <input autocomplete="off" default="60" id="wireless_ieee8021x_reauth_time_0" size="10" value="60" name="config.wireless[0].ssid_profiles[1].ieee8021x_reauth_time" onchange="validate_1x_rekey(0, this.value)" type="text">
+                                            (minutes)
+                                        </p>
+                                        <p>
+                                            <label class="duple">RADIUS server IP Address&nbsp;:</label>
+                                            <input autocomplete="off" default="0.0.0.0" id="wireless_radius_server_address_0" name="config.wireless[0].ssid_profiles[1].radius_server_address" size="20" maxlength="15" value="0.0.0.0" onchange="validate_ip(this.value)" type="text">
+                                        </p>
+                                        <p>
+                                            <label class="duple">RADIUS server Port&nbsp;:</label>
+                                            <input autocomplete="off" default="1812" id="wireless_radius_server_port_0" size="10" name="config.wireless[0].ssid_profiles[1].radius_server_port" value="1812" onchange="validate_port(this.value)" type="text">
+                                        </p>
+                                        <p>
+                                            <label class="duple">RADIUS server Shared Secret&nbsp;:</label>
+                                            <input default="radius_shared" id="wireless_radius_shared_secret_0" size="20" maxlength="64" value="radius_shared" name="config.wireless[0].ssid_profiles[1].radius_shared_secret" type="password">
+                                        </p>
+                                        <p>
+                                            <input default="true" id="wireless_radius_auth_mac_0" name="config.wireless[0].ssid_profiles[1].radius_auth_mac" value="true" type="hidden">
+                                            <label class="duple">MAC Address Authentication&nbsp;:</label>
+                                            <input default="true" id="wireless_radius_auth_mac_select_0" onclick="wireless_radius_auth_mac_selector(0, this.checked);" type="checkbox">
+                                        </p>
+                                        <p>
+                                            <input id="wireless_wpa_enterprise_advanced_0" value="Advanced &gt;&gt;" class="button_submit" onclick="do_expanse_collapse(this.id, '<< Advanced', 'box_wireless_wpa_enterprise_advanced_0');" type="button">
+                                        </p>
+                                        <div id="box_wireless_wpa_enterprise_advanced_0" style="display: none;">
+                                            <p class="box_msg">Optional backup RADIUS server&nbsp;:</p>
+                                            <p>
+                                                <label class="duple">Second RADIUS server IP Address&nbsp;:</label>
+                                                <input autocomplete="off" default="0.0.0.0" id="wireless_second_radius_server_address_0" size="20" value="0.0.0.0" name="config.wireless[0].ssid_profiles[1].second_radius_server_address" onchange="validate_ip(this.value)" type="text">
+                                            </p>
+                                            <p>
+                                                <label class="duple">Second RADIUS server Port&nbsp;:</label>
+                                                <input autocomplete="off" default="1812" id="wireless_second_radius_server_port_0" size="10" value="1812" name="config.wireless[0].ssid_profiles[1].second_radius_server_port" onchange="validate_port(this.value)" type="text">
+                                            </p>
+                                            <p>
+                                                <label class="duple">Second RADIUS server Shared Secret&nbsp;:</label>
+                                                <input default="radius_shared" id="wireless_second_radius_shared_secret_0" size="20" maxlength="64" value="radius_shared" name="config.wireless[0].ssid_profiles[1].second_radius_shared_secret" type="password">
+                                            </p>
+                                            <p>
+                                                <input default="true" id="wireless_second_radius_auth_mac_0" name="config.wireless[0].ssid_profiles[1].second_radius_auth_mac" value="true" type="hidden">
+                                                <label class="duple">Second MAC Address Authentication&nbsp;:</label>
+                                                <input default="true" id="wireless_second_radius_auth_mac_select_0" onclick="wireless_second_radius_auth_mac_selector(0, this.checked);" type="checkbox">
+                                            </p>
+                                        </div><!-- box_wireless_wpa_enterprise_advanced -->
+                                    </fieldset>
+                                </div>
+                                </div><!-- box_wireless_security -->
+                                
+
+                                <div class="box" style="display: none;">
+                                    <h3>ROUTER SETTING FOR Guest Zone</h3>
+                                    <p>
+Use this section to configure the quest zone settings of your router.
+The quest zone provide a separate network zone for guest to access
+Internet.</p>
+                                    <fieldset>
+                                    <p>
+                                        <label class="duple">Router IP Address&nbsp;:</label>
+                                        <input autocomplete="off" default="" id="router_ip_address" size="20" maxlength="15" value="" name="" type="text">
+                                    </p>
+                                    <p>
+                                        <label class="duple">Default Subnet Mask&nbsp;:</label>
+                                        <input autocomplete="off" default="" id="default_subnet_mask" size="20" maxlength="15" value="" name="" type="text">
+                                    </p>
+                                    </fieldset>
+                                </div>
+                                <div class="box" style="display: none;">
+                                    <h3>Guest Zone Client Isolation</h3>
+                                    <p>
+Enable the function to prevent one guest client to access other clients
+in the Guest Zone. The guest client can access to the Internet only.</p>
+                                    <fieldset>
+                                    <p>
+                                         <input default="" id="GZCIsolation_checkbox_control" name="" type="hidden">
+                                         <label class="duple">Enable Client Isolation :</label>
+                                         <input default="false" id="GZCIsolation_checkbox_control_select" onclick="GZCIsolation_checkbox_control_selector(this.checked);" type="checkbox">
+                                    </p>
+                                    </fieldset>
+                                </div>
+                                <div class="box" style="display: none;">
+                                    <h3>ROUTING BETWEEN HOST ZONE AND GUEST ZONE</h3>
+                                    <p>
+Use this section to enable routing between Host Zone and Guest Zone,
+Guest clients can not access Host clients' data without enable the
+function.</p>
+                                    <fieldset>
+                                    <p>
+                                         <input default="" id="routing_between_zones_checkbox_control" name="" type="hidden">
+                                         <label class="duple">Enable Routing Between Zones :</label>
+                                         <input default="false" id="routing_between_zones_checkbox_control_select" onclick="routing_between_zones_checkbox_control_selector(this.checked);" type="checkbox">
+                                    </p>
+                                    </fieldset>
+                                </div>
+
+                                <div class="box" style="display: none;">
+                                    <h3>DHCP SERVER SETTINGS FOR GUEST ZONE</h3>
+                                    <p> Use this section to configure the built-in DHCP server to assign IP address to the computers on your network.</p>
+                                    <fieldset>
+                                    <p>
+                                         <input default="" id="dhcp_server_checkbox_control" name="" type="hidden">
+                                         <label class="duple">Enable DHCP Server :</label>
+                                         <input default="false" id="dhcp_server_checkbox_control_select" onclick="dhcp_server_checkbox_control_selector(this.checked);" type="checkbox">
+                                    </p>
+                                    <p>
+                                        <label class="duple">DHCP IP Address Range&nbsp;:</label>
+                                        <input autocomplete="off" default="" id="dhcp_ip_address_start" size="4" maxlength="3" value="" name="" type="text"> to&nbsp;
+                                        <input autocomplete="off" default="" id="dhcp_ip_address_end" size="4" maxlength="3" value="" name="" type="text"> (addresses within the LAN subnet)
+                                    </p>
+                                    <p>
+                                        <label class="duple">DHCP Lease Time&nbsp;:</label>
+                                        <input autocomplete="off" default="" id="dhcp_lease_time" size="7" maxlength="6" value="" name="" type="text"> (minutes)
+                                    </p>
+                                    </fieldset>
+                                </div>
+                                <div class="box" id="dhcp_client_list" style="display: none;">
+                                </div>
+
+                                <div class="box" style="display: none;">
+                                    <h3>LOCK CLIENT LIST FOR GUEST ZONE</h3>
+                                    <p>Use
+this section to lock all PC clients which are on network to an IP/MAC
+address bundle list, only PCs on the list can access the network after
+enable the function. It makes sure that no unauthorized client can
+access Guest Zone network.</p>
+                                    <fieldset>
+                                    <p>
+                                         <input default="" id="lock_client_list_checkbox_control" name="" type="hidden">
+                                         <label class="duple">Enable Lock Client List :</label>
+                                         <input default="false" id="lock_client_list_checkbox_control_select" onclick="lock_client_list_checkbox_control_selector(this.checked);" type="checkbox">
+                                    </p>
+                                    </fieldset>
+                                </div>
+
+                            </div><!-- section -->
+                        </form>
+                        <!-- InstanceEndEditable -->
+                    </div>
+                </td>
+
+                <td id="sidehelp_container">
+                    <div id="help_text">
+                    <!-- InstanceBeginEditable name="Help_Text" -->
+                        <strong>Helpful Hints...</strong>
+                        <p>Use
+this section to configure the guest zone settings of your router. The
+guest zone provide a separate network zone for guest to access Internet.</p>
+                        <p class="more">
+                            <!-- Link to more help -->
+                            <a href="Advanced.html#GuestZone" onclick="return jump_if();">More...</a>
+                        </p>
+                    <!-- InstanceEndEditable -->
+                    </div>
+                </td>
+            </tr>
+            </tbody></table>
+            <table id="footer_container" summary="" border="0" cellspacing="0">
+            <tbody><tr>
+                <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                <td>&nbsp;</td>
+            </tr>
+            </tbody></table>
+        </td>
+    </tr>
+    </tbody></table>
+
+    <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+</div><!-- outside -->
+<!-- InstanceEnd --></body></html>

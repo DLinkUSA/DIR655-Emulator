@@ -1,0 +1,2912 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Advanced / Access Control
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        .rule_details {
+                border-width: 1px;
+                border-style: solid;
+                border-color: #D0D0D0;
+        }
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                            return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Advanced/Access_Control.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+        // 
+/*
+ * This script is to be SSI included in an HTML page.
+ *	It defines schedule options to be added to a select list, provides a function
+ *	to populate <select>'s and a function that return a schedule details.
+ */
+
+var schedule_options = [
+	{ value: "Always", text: "Always", days: "", stime: "", etime: "" },
+	{ value: "Never", text: "Never", days: "", stime: "", etime: ""},
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+];
+
+/*
+ * schedule_populate_select()
+ *	Add options from the schedule_options array to a specified <select>.
+ */
+function schedule_populate_select(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = schedule_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!schedule_options[k - 1]) {
+		k--;
+	}
+	for (var i = 0; i < k; i++) {
+		select_id.options.add(new Option(schedule_options[i].text, schedule_options[i].value));
+	}
+}
+
+/*
+ * schedule_populate_select_without_always()
+ *	Add options from the schedule_options array to a specified <select> but skip "Always".
+ */
+function schedule_populate_select_without_always(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = schedule_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!schedule_options[k - 1]) {
+		k--;
+	}
+	for (var i = 1; i < k; i++) {
+		select_id.options.add(new Option(schedule_options[i].text, schedule_options[i].value));
+	}
+}
+
+/*
+ * schedule_details()
+ *	Return a string describing the currently selected schedule in a specified <select>.
+ */
+function schedule_details(select_id, without_always)
+{
+	var days = [
+		"Sun",
+		"Mon",
+		"Tue",
+		"Wed",
+		"Thu",
+		"Fri",
+		"Sat"
+	];
+	var str = "";
+	var idx = select_id.selectedIndex;
+
+	if (select_id.value === "") {
+		return "";
+	}
+	if (select_id.value == "Always" || select_id.value == "Never") {
+		return select_id.options[idx].text;
+	}
+
+	idx += (without_always ? 1 : 0);
+
+	/* Compute week days. */
+	var bits = parseInt(schedule_options[idx].days, 10);
+	if (bits === 127) {
+		str = "Every Day ";
+	} else {
+		for (var i = 0; i < 7; i++) {
+			if (bits & (1 << i)) {
+				str += days[i] + " ";
+			}
+		}
+	}
+
+	/* Compute times. */
+	var stime = parseInt(schedule_options[idx].stime, 10);
+	var etime = parseInt(schedule_options[idx].etime, 10);
+	if (stime === 0 && etime === 86400) {
+		return str + "All Day";
+	}
+
+	var m = Math.floor(stime / 60);
+	var h = Math.floor(m / 60);
+	m = m - h * 60;
+	var sh;
+	var sm = m * 1;
+	var sampm;
+	if (h < 12) {
+		if (h === 0) {
+			sh = 12;
+		} else {
+			sh = h;
+		}
+		sampm = "AM";
+	} else {
+		if (h != 12) {
+			sh = h - 12;
+		} else {
+			sh = h;
+		}
+		sampm = "PM";
+	}
+
+	m = Math.floor (etime / 60);
+	h = Math.floor (m / 60);
+	m = m - h * 60;
+	var eh;
+	var em = m * 1;
+	var eampm;
+	if (h < 12) {
+		if (h === 0) {
+			eh = 12;
+		} else {
+			eh = h;
+		}
+		eampm = "AM";
+	} else {
+		if (h != 12) {
+			eh = h - 12;
+		} else {
+			eh = h;
+		}
+		eampm = "PM";
+	}
+
+	if (sh < 10) {
+		sh = "0" + sh;
+	}
+	if (sm < 10) {
+		sm = "0" + sm;
+	}
+	if (eh < 10) {
+		eh = "0" + eh;
+	}
+	if (em < 10) {
+		em = "0" + em;
+	}
+	return str + sh + ':' + sm + ' ' + sampm + ' - ' + eh + ':' + em + ' ' + eampm;
+}
+
+
+        // 
+		/*
+		 * General array editor (AE) functions
+		 */
+
+		/*extern add_class, remove_class */
+
+		/*
+		 * The currently selected AE row, or null
+		 */
+		var ae_selected_row = null;
+
+		/*
+		 * Call this function when you are finished
+		 *  with a specific row of the array.
+		 */
+		function deselect_ae_row()
+		{
+			if (ae_selected_row !== null) {
+				remove_class(ae_selected_row, 'ae_selected_row');
+				ae_selected_row = null;
+			}
+		}
+
+		/*
+		 * Call this function anytime you want to talk to the user
+		 *  about a specific row of the array (i.e. edit or delete it).
+		 */
+		function select_ae_row(child_element)
+		{
+			deselect_ae_row();
+
+			/*
+			 * Find the table row that contains the given element.
+			 * Allowing caller to specify a row by passing
+			 *  a child element of the row is simply a convenience,
+			 *  so you don't have to add an ID to the TR element.
+			 * Follow the parent chain up the tree, but stop if you leave the table.
+			 * The child_element parameter can be either an element id or element object.
+			 */
+
+			var el = child_element;
+			if (typeof(el) === 'string') {
+				el = document.getElementById(el);
+				if (el === null) {
+					//alert('select_ae_row: Element "' + child_element + '" does not exist.');
+					return;
+				}
+			}
+			if (typeof(el) !== 'object') {
+				//alert('select_ae_row: Invalid parameter: ' + child_element);
+				return;
+			}
+			if (el === null) {
+				//alert('select_ae_row: Invalid null parameter');
+				return;
+			}
+			if ('' === el.getAttribute('tagName'))  {
+				//alert('select_ae_row: Parameter has no attribute "tagName": ' + child_element);
+				return;
+			}
+
+			while (el.tagName !== 'TR') {
+				if (el.tagName === 'TABLE') {
+					return;
+				}
+				el = el.parentNode;
+			}
+			/*
+			 * Highlight the row with CSS properties
+			 *  so the user is sure which row will be operated on.
+			 */
+			add_class(el, 'ae_selected_row');
+			/*
+			 * Remember which row it is, so we don't have to look it up later.
+			 */
+			ae_selected_row = el;
+		}
+
+
+
+        /*
+         * Handle for document.forms.
+         */
+        var mf, ef, rf;
+
+        /*
+         * Constants.
+         */
+        var MAX_RULES = "24";
+        var MAX_MACHINES_PER_RULE = "8";
+        var MAX_MAC_MACHINES = "24";
+        var MAX_IP_MACHINES = "24";
+        var ADDR_TYPE_IP = 0;
+        var ADDR_TYPE_MAC = 1;
+        var ADDR_TYPE_OTHERS = 2;
+        var PORT_FILTERS_PER_RULE = "8";
+        var LAN_IP = ipv4_to_unsigned_integer("192.168.0.1");
+        var LAN_MASK = ipv4_to_unsigned_integer("255.255.255.0");
+        var IPBSECURE;
+
+        //
+        IPBSECURE = "0";
+        //
+
+        /*
+         * If a rule or machine is being edited, this holds its index. -1 means not under edit.
+         */
+        var rule_under_edit = -1;
+        var machine_under_edit = -1;
+
+        /*
+         * Number of machines used accross all rules.
+         */
+        var machines_mac;
+        var machines_ip;
+
+        /*
+         * Number of machines used in one rule.
+         */
+        var machines_in_rule;
+
+        /*
+         * Computer list retrieval.
+         */
+        var ipaddr_list_xsl_loader = new ajax_xslproc("/computer_ipaddr_list.sxsl", ipaddr_list_xsl_ready);
+        var macaddr_list_xsl_loader = new ajax_xslproc("select_mac.sxsl", macaddr_list_xslt_ready);
+        var computer_list_xml_loader = new ajax_xmlhttp("/dhcp_clients.xml", computer_list_xml_ready, computer_list_xml_timeout, 20000);
+        var ipaddr_list_xsl_data_ready = false;
+        var macaddr_list_xsl_data_ready = false;
+        var computer_list_xml_data_ready = false;
+        var computer_list_xml_data;
+        var computer_list_timer = "";
+
+        /*
+         * Wizard pages.
+         */
+        var wz_min = 1;
+        var wz_cur = 1;
+        var wz_max = 8;
+		var wz_filter_method = 5;
+        var wz_bsecure = 6;
+        var wz_portfilter = 7;
+        var wz_weblog = 8;
+
+        /*
+         * Show/Hide machine table array editor.
+         * true to show array editor; false to hide array editor and show "table is full" message.
+         */
+        function machine_editor_showhide(val)
+        {
+            document.getElementById("wz_page_4").style.display = val ? "block" : "none";
+            document.getElementById("wz_page_4_table_full").style.display = val ? "none" : "block";
+        }
+
+        /*
+         * wz_showhide()
+         * Show/Hide wizard pages and buttons.
+         */
+        function wz_showhide()
+        {
+            for (var i = 1; i <= wz_max; i++) {
+                var page = document.getElementById("wz_page_" + i);
+                if (page) {
+                    page.style.display = wz_cur == i ? "block" : "none";
+                    if (wz_cur != 4) {
+                        document.getElementById("wz_page_4_machine_list").style.display = "none";
+                        document.getElementById("wz_page_4_table_full").style.display = "none";
+                    } else {
+                        document.getElementById("wz_page_4_machine_list").style.display = "block";
+                        machines_count();
+                        machine_editor_showhide(machines_in_rule < MAX_MACHINES_PER_RULE);
+                    }
+                }
+            }
+            disable_form_field(ef.wz_prev_b, wz_cur == wz_min);
+            disable_form_field(ef.wz_next_b, wz_cur == wz_max);
+            disable_form_field(ef.wz_save_b, wz_cur != wz_max && rule_under_edit == -1);
+            scroll(0, 0);
+        }
+
+        /*
+         * wz_next()
+         * Validate current page and then show next page.
+         */
+        function wz_next()
+        {
+            if (typeof(wz_verifers[wz_cur - 1]) == "function" && !wz_verifers[wz_cur - 1]()) {
+                return;
+            }
+            wz_cur++;
+            /*
+             * Skip BSecure page if not enabled.
+             */
+            if (wz_cur == wz_bsecure && (IPBSECURE == "0" || ef.bsecure_web_access.value == "0")) {
+                wz_cur++;
+            }
+            /*
+             * Skip port filters page if not enabled.
+             */
+            if (wz_cur == wz_portfilter && !ef.port_filter_select.checked) {
+                wz_cur++;
+            }
+            wz_showhide();
+        }
+
+        /*
+         * wz_prev()
+         * Show previous page.
+         */
+        function wz_prev()
+        {
+            wz_cur--;
+            if (wz_cur == wz_portfilter && !ef.port_filter_select.checked) {
+                wz_cur--;
+            }
+            if ((wz_cur == wz_bsecure) && (IPBSECURE == "0" || ef.bsecure_web_access.value == "0")) {
+                wz_cur--;
+            }
+            wz_showhide();
+        }
+
+        /*
+         * wz_verify_policy_name()
+         */
+        function wz_verify_policy_name()
+        {
+            ef.policy_name.value = ef.policy_name.value.trim();
+            if (is_blank(ef.policy_name.value)) {
+                alert("The Policy Name cannot be blank");
+                return false;
+            }
+
+            /*
+             * Verify that policy name is not used in another rule.
+             */
+            for (var i = 0; i < MAX_RULES; i++) {
+                if (typeof(rf["used_" + i]) == "object" && rf["used_" + i].value == "1" && rule_under_edit != i &&
+                    ef.policy_name.value == document.getElementById("policy_name_" + i + "_span").innerText) {
+                    alert("This Policy Name is already used.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * wz_verify_machines()
+         */
+        function wz_verify_machines()
+        {
+            if (machines_in_rule < 1) {
+                alert("Please enter one machine");
+                return false;
+            }
+
+            /*
+             * Update the filter page's buttons states.
+             */
+            filter_method_selector(ef.filter_method.value);
+            return true;
+        }
+
+        /*
+         * wz_verify_filter_choice()
+         */
+        function wz_verify_filter_choice()
+        {
+            /*
+             * A filter must be selected if method is "block some".
+             */
+            if (ef.filter_method_radio_0.checked) {
+                if ((IPBSECURE == "1" && !ef.bsecure_web_access_select.checked && !ef.web_access_select.checked && !ef.port_filter_select.checked) || (IPBSECURE == "0" && !ef.web_access_select.checked && !ef.port_filter_select.checked)) {
+                    alert("Please select a filter");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * wz_verifier_portfilters()
+         */
+        function wz_verifier_portfilters()
+        {
+            for (var i = 0; i < PORT_FILTERS_PER_RULE; i++) {
+                if (ef["pf_" + i + "_enabled"].value != "true") {
+                    continue;
+                }
+                var rule_name = ef["pf_" + i + "_entry_name"].value;
+                if (is_blank(rule_name)) {
+                    alert("A Port Filter rule name cannot be blank.");
+                    return false;
+                }
+                for (var j = i + 1; j < PORT_FILTERS_PER_RULE; j++) {
+                    if (ef["pf_" + j + "_entry_name"].value != "" && rule_name == ef["pf_" + j + "_entry_name"].value) {
+                        alert("Port Filter rule names cannot be duplicated.");
+                        return false;
+                    }
+                }
+                if (!is_ipv4_valid(ef["pf_" + i + "_dest_ip_start"].value)) {
+                    alert("Invalid Destination IP Start address for Port Filter '" + rule_name + "'.");
+                    return false;
+                }
+                var ipstart = ipv4_to_unsigned_integer(ef["pf_" + i + "_dest_ip_start"].value);
+                if ((ipstart & LAN_MASK) == (LAN_IP & LAN_MASK)) {
+                    alert("Destination IP Start address should not be in LAN subnet; " + "Port Filter name: '" + rule_name + "'.");
+                    return false;
+                }
+                if (!is_ipv4_valid(ef["pf_" + i + "_dest_ip_end"].value)) {
+                    alert("Invalid Destination IP End address for Port Filter '" + rule_name + "'.");
+                    return false;
+                }
+                var ipend = ipv4_to_unsigned_integer(ef["pf_" + i + "_dest_ip_end"].value);
+                if ((ipend & LAN_MASK) == (LAN_IP & LAN_MASK)) {
+                    alert("Destination IP End address should not be in LAN subnet; " + "Port Filter name: '" + rule_name + ".");
+                    return false;
+                }
+                if (ipend < ipstart) {
+                    alert("Invalid Destination IP range for Port Filter '" + rule_name + "'.");
+                    return false;
+                }
+                if (parseInt(ef["pf_" + i + "_protocol"].value, 10) > 1) {
+                    if (!is_port_valid(ef["pf_" + i + "_dest_port_start"].value)) {
+                        alert("Invalid Destination Port Start for Port Filter '" + rule_name + "'.");
+                        return false;
+                    }
+                    if (!is_port_valid(ef["pf_" + i + "_dest_port_end"].value)) {
+                        alert("Invalid Destination Port End for Port Filter '" + rule_name + "'.");
+                        return false;
+                    }
+                    if (ef["pf_" + i + "_dest_port_start"].value - ef["pf_" + i + "_dest_port_end"].value > 0) {
+                        alert("Destination Port Start should not be greater than Destination Port End for Port Filter '" + rule_name + "'.");
+                        return false;
+                    }
+                    // 2007.07.04 0 and 0 is not allow
+                    if ((ef["pf_" + i + "_dest_port_start"].value == 0) || (ef["pf_" + i + "_dest_port_end"].value == 0) ) {
+                        alert("Destination Port and Start Port should not be equal to 0 for Port Filter  '" + rule_name + "'.");
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        var wz_verifers = [ null, wz_verify_policy_name, null, wz_verify_machines, wz_verify_filter_choice, null, wz_verifier_portfilters ];
+
+        /*
+         * wz_start()
+         * Switch from main page to first wizard page.
+         */
+        function wz_start()
+        {
+            document.getElementById("sidehelp_container").style.display = "none";
+            document.getElementById("main_page").style.display = "none";
+            document.getElementById("wizard_page").style.display = "block";
+            wz_cur = wz_min;
+            wz_showhide();
+        }
+
+        /*
+         * wz_cancel()
+         * Switch from wizard pages to main page.
+         */
+        function wz_cancel()
+        {
+            document.getElementById("wizard_page").style.display = "none";
+            document.getElementById("main_page").style.display = "block";
+            document.getElementById("sidehelp_container").style.display = "block";
+        }
+
+        /*
+         * enable_access_ctrl_selector()
+         */
+        function enable_access_ctrl_selector(checked)
+        {
+            ef.enable_access_ctrl_edit.value = checked;
+            mf.enable_access_ctrl.value = checked;
+            mf.enable_access_ctrl_select.checked = checked;
+            disable_form_field(mf.add_policy, !checked || rf.free.value == "");
+            document.getElementById("policy_table").style.display = checked ? "block" : "none";
+        }
+
+        /*
+         * access_ctrl_entry_enable()
+         */
+        function access_ctrl_entry_enable(index)
+        {
+            select_ae_row("policy_name_" + index + "_span");
+            var name = document.getElementById("policy_name_" + index + "_span").innerText;
+            var box = rf["enabled_select_" + index];
+            if (!confirm("Are you sure you want to enable/disable " + name)) {
+                box.checked = !box.checked;
+            }
+            ef.enabled.name = "config.access_ctrl_table[" + index + "].enabled";
+            ef.enabled.value = box.checked;
+            ef.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * sched_name_selector()
+         */
+        function sched_name_selector(value)
+        {
+            if (value == "new_sched") {
+                if (confirm("You must abandon all your changes in order to define a new schedule.\n" +
+                            "Press 'Ok' to abandon these changes and display the Schedule page.\n" +
+                            "Otherwise press 'Cancel'.")) {
+                    top.location = "Schedules.html";
+                }
+                ef.sched_name_select.selectedIndex = 0;
+            }
+            ef.sched_detail.value = schedule_details(ef.sched_name_select);
+        }
+
+        /*
+         * addr_type_selector()
+         */
+        function addr_type_selector(mode)
+        {
+            /*
+             * User cannot save machine if not editing one or if the maximum per rule is reached.
+             */
+            ef.addr_type_radio[mode].checked = true;
+            var ip_disabled = mode != ADDR_TYPE_IP || (machine_under_edit == -1 && machines_in_rule >= MAX_MACHINES_PER_RULE);
+            disable_form_field(ef.ipaddr, ip_disabled);
+            disable_form_field(ef.ipaddr_select, ip_disabled);
+            var mac_disabled = mode != ADDR_TYPE_MAC || (machine_under_edit == -1 && machines_in_rule >= MAX_MACHINES_PER_RULE);
+            disable_form_field(ef.macaddr, mac_disabled);
+            disable_form_field(ef.macaddr_select, mac_disabled);
+            disable_form_field(ef.macaddr_clone_b, mac_disabled);
+            disable_form_field(ef.machine_save_b, machine_under_edit == -1 && machines_in_rule >= MAX_MACHINES_PER_RULE);
+            disable_form_field(ef.machine_cancel_b, machine_under_edit == -1 && machines_in_rule >= MAX_MACHINES_PER_RULE);
+        }
+
+        /*
+         * ipaddr_selector()
+         */
+        function ipaddr_selector(value)
+        {
+            if (value != -1) {
+                ef.ipaddr.value = value;
+            }
+            ef.ipaddr_select.value = -1;
+        }
+
+        /*
+         * macaddr_selector()
+         */
+        function macaddr_selector(value)
+        {
+            if (value != -1) {
+                ef.macaddr.value = value;
+            }
+            ef.macaddr_select.value = -1;
+        }
+
+        /*
+         * macaddr_clone()
+         */
+        function macaddr_clone()
+        {
+            ef.macaddr.value = "00:05:5d:ce:b3:8d";
+        }
+
+        /*
+         * filters_selector()
+         */
+        function filters_selector()
+        {
+            /*
+             * Change which wizard page is the last, depending on filter method.
+             */
+			if (ef.filter_method.value != 0) {
+				wz_max = wz_filter_method;
+				return;
+			}
+            if (IPBSECURE == "1" && ef.bsecure_web_access_select.checked) {
+                wz_max = wz_bsecure;
+            }
+            if (ef.port_filter_select.checked) {
+                wz_max = wz_portfilter;
+            }
+            if (ef.web_access_select.checked) {
+                wz_max = wz_weblog;
+            }
+        }
+
+        /*
+         * filter_method_selector()
+         */
+        function filter_method_selector(mode)
+        {
+            for (var i = 0; i < ef.filter_method_radio.length; i++) {
+                if (ef.filter_method_radio[i].value == mode) {
+                    ef.filter_method_radio[i].checked = true;
+                    break;
+                }
+            }
+            ef.filter_method.value = mode;
+
+            /*
+             * Force logging to be on and reset filters when filtering is not "block some".
+             */
+            if (mode != 0) {
+                ef.log_access.value = "1";
+                ef.web_access.value = "0";
+                ef.port_filter.value = "0";
+                if (IPBSECURE == "1") {
+                    ef.bsecure_web_access.value = "0";
+                }
+            }
+            document.getElementById("box_filters").style.display = ef.filter_method_radio_0.checked ? "block" : "none";
+
+            /*
+             * If filter method is not "block some", disable Next and enable Save buttons.
+             */
+            disable_form_field(ef.wz_next_b, !ef.filter_method_radio_0.checked);
+            disable_form_field(ef.wz_save_b, ef.filter_method_radio_0.checked);
+            filters_selector();
+        }
+
+        /*
+		 * bsecure_web_access_selector()
+         */
+        function bsecure_web_access_selector(checked)
+        {
+            if (IPBSECURE == "1") {
+                ef.bsecure_web_access_select.checked = checked;
+                ef.bsecure_web_access.value = checked ? "1" : "0";
+            }
+            filters_selector();
+        }
+
+        /*
+         * web_access_selector()
+         */
+        function web_access_selector(checked)
+        {
+            ef.web_access_select.checked = checked;
+            ef.web_access.value = checked;
+            filters_selector();
+        }
+
+        /*
+         * port_filter_selector()
+         */
+        function port_filter_selector(checked)
+        {
+            ef.port_filter_select.checked = checked;
+            ef.port_filter.value = checked;
+            filters_selector();
+        }
+
+        /*
+         * bsecure_categories_selector
+         *  mode: 1 = by age, 0 = manually
+         */
+        function bsecure_categories_selector(mode)
+        {
+            ef.bsecure_categories_radio_0.checked = mode == "0";
+            ef.bsecure_categories_radio_1.checked = mode == "1";
+            document.getElementById("box_bsecure_web_categories").style.display = mode == "0" ? "block" : "none";
+            document.getElementById("box_bsecure_age_categories").style.display = mode == "1" ? "block" : "none";
+        }
+
+        /*
+         * bsecure_web_access_categories_check_all()
+         */
+        function bsecure_web_access_categories_check_all(checked)
+        {
+            var input_array = document.getElementsByName("bsecure_web_access_categories_select");
+            for (var i = 0; i < input_array.length; i++) {
+                input_array[i].checked = checked;
+            }
+        }
+
+        /*
+         * bsecure_mapping_to_form()
+         * Initialize the BSecure wizard page.
+         */
+        function bsecure_mapping_to_form()
+        {
+            /*
+             * Tick the BSecure categories checkboxes from mapping.
+             */
+            var allchecked = true;
+            var input_array = document.getElementsByName("bsecure_web_access_categories_select");
+            for (var i = 0; i < BSECURE_MAPPING.length; i++) {
+                input_array[i].checked = ((ef.bsecure_web_access_categories_0.value & BSECURE_MAPPING[i][0]) || BSECURE_MAPPING[i][0] == 0) &&
+                                         ((ef.bsecure_web_access_categories_1.value & BSECURE_MAPPING[i][1]) || BSECURE_MAPPING[i][1] == 0) &&
+                                         ((ef.bsecure_web_access_categories_2.value & BSECURE_MAPPING[i][2]) || BSECURE_MAPPING[i][2] == 0);
+                if (!input_array[i].checked) {
+                    allchecked = false;
+                }
+            }
+            bsecure_web_access_categories_check_all(allchecked);
+
+            /*
+             * Set the BSecure age category from mapping.
+             */
+            var unrated_index = BSECURE_MAPPING.length - 1;
+            for (i = 0; i < BSECURE_AGE_MAPPING.length; i++) {
+                if ((((ef.bsecure_web_access_categories_0.value & ~BSECURE_MAPPING[unrated_index][0]) >>> 0) == BSECURE_AGE_MAPPING[i][0]) &&
+                    (((ef.bsecure_web_access_categories_1.value & ~BSECURE_MAPPING[unrated_index][1]) >>> 0) == BSECURE_AGE_MAPPING[i][1]) &&
+                    (((ef.bsecure_web_access_categories_2.value & ~BSECURE_MAPPING[unrated_index][2]) >>> 0) == BSECURE_AGE_MAPPING[i][2])) {
+                    bsecure_categories_selector("1");
+                    ef.bsecure_age_select.value = i;
+                    break;
+                }
+            }
+        }
+
+        /*
+         * bsecure_form_to_mapping()
+         * Set the BSecure mappings from the wizard page controls.
+         */
+        function bsecure_form_to_mapping()
+        {
+            var mapping = 0;
+            var i, j;
+            if (ef.bsecure_categories_radio_1.checked) {
+                var unrated_index = BSECURE_MAPPING.length - 1;
+                for (i = 0; i < 3; i++) {
+                    /*
+                     * Mapping by age categories.
+                     */
+                    mapping = BSECURE_AGE_MAPPING[ef.bsecure_age_select.value][i];
+
+                    /*
+                     * Block unrated sites for age categories.
+                     */
+                    if (ef.bsecure_block_unrated_select.checked) {
+                        mapping |= BSECURE_MAPPING[unrated_index][i];
+                    }
+                    ef["bsecure_web_access_categories_" + i].value = mapping;
+                }
+            } else {
+                var input_array = document.getElementsByName("bsecure_web_access_categories_select");
+                for (i = 0; i < BSECURE_MAPPING.length; i++) {
+                    if (input_array[i].checked) {
+                        mapping = 0;
+                        for (j = 0; j < 3; j ++) {
+                            mapping |= BSECURE_MAPPING[i][j];
+                            ef["bsecure_web_access_categories_" + j].value = mapping;
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+         * pf_enabled_selector()
+         */
+        function pf_enabled_selector(index, checked)
+        {
+            ef["pf_" + index + "_enabled"].value = checked;
+            ef["pf_" + index + "_enabled_select"].checked = checked;
+        }
+
+        /*
+         * pf_protocol_selector()
+         */
+        function pf_protocol_selector(index, value)
+        {
+            ef["pf_" + index + "_protocol"].value = value;
+            ef["pf_" + index + "_protocol_select"].value = value;
+            disable_form_field(ef["pf_" + index + "_dest_port_start"], value == "0" || value == "1");
+            disable_form_field(ef["pf_" + index + "_dest_port_end"], value == "0" || value == "1");
+        }
+
+        /*
+         * log_access_selector()
+         */
+        function log_access_selector(value)
+        {
+            ef.log_access.value = value;
+            ef.log_access_radio[value].checked = true;
+        }
+
+        /*
+         * Machines array editor.
+         *      There is a maximum of MAX_MACHINES_PER_RULE per rule, and also a maximum of
+         *              MAX_MAC_MACHINES and MAX_IP_MACHINES for all of the rules.
+         *      The form ef contains sets of hidden fields, one per machine.
+         *      The form ef has editable fields to add/edit a machine.
+         *      The table machines_list shows the list of machines.
+         */
+
+        /*
+         * machine_editform_to_hiddenform()
+         *  Copy editable fields to hidden fields.
+         */
+        function machine_editform_to_hiddenform(index)
+        {
+            for (var addr_type = 0; addr_type < ef.addr_type_radio.length; addr_type++) {
+                if (ef.addr_type_radio[addr_type].checked) {
+                    break;
+                }
+            }
+            ef["machine_" + index + "_used"].value = "1";
+            ef["machine_" + index + "_enabled"].value = "1";
+            ef["machine_" + index + "_addr_type"].value = addr_type;
+            if (addr_type == ADDR_TYPE_IP) {
+                ef["machine_" + index + "_machine"].value = ef.ipaddr.value;
+            } else if (addr_type == ADDR_TYPE_MAC) {
+                ef["machine_" + index + "_machine_mac"].value = ef.macaddr.value;
+            }
+        }
+
+        /*
+         * machines_tablelist_update()
+         *  Update a given table list row with a hidden machine fields.
+         */
+        function machines_tablelist_update(index)
+        {
+            var rownum = parseInt(index, 10);
+            var cell = document.getElementById("machines_list_tbody").rows[rownum].cells[0];
+            if (ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_IP) {
+                cell.innerHTML = ef["machine_" + index + "_machine"].value;
+            } else if (ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_MAC) {
+                cell.innerHTML = ef["machine_" + index + "_machine_mac"].value;
+            } else {
+                cell.innerHTML = "Other Machines";
+            }
+        }
+
+        /*
+         * machines_tablelist_delete()
+         *  Delete a table list row.
+         */
+        function machines_tablelist_delete(machine)
+        {
+            var tbody = document.getElementById("machines_list_tbody");
+            for (var row = tbody.rows.length - 1; row >= 0; row--) {
+                if (tbody.rows[row].cells[0].innerHTML == machine) {
+                    tbody.deleteRow(row);
+                    return;
+                }
+            }
+        }
+
+        /*
+         * machines_tablelist_clear()
+         */
+        function machines_tablelist_clear()
+        {
+            var tbody = document.getElementById("machines_list_tbody");
+            for (var row = tbody.rows.length - 1; row >= 0; row--) {
+                tbody.deleteRow(row);
+            }
+        }
+
+        /*
+         * machines_tablelist_add()
+         *  Create a new table list row and populate it with a hidden machine fields.
+         */
+        function machines_tablelist_add(index)
+        {
+            var tbody = document.getElementById("machines_list_tbody");
+            var trow = tbody.insertRow(-1);
+            var cell0 = trow.insertCell(0);
+            if (ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_IP) {
+                cell0.innerHTML = ef["machine_" + index + "_machine"].value;
+            } else if (ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_MAC) {
+                cell0.innerHTML = ef["machine_" + index + "_machine_mac"].value;
+            } else {
+                cell0.innerHTML = "Other Machines";
+            }
+            var cell1 = trow.insertCell(1);
+            cell1.innerHTML = "<a href='javascript:machine_edit(" + index + ");'><img src='img_edit.gif' alt='Edit' title='Edit' border='0'/><\/a>";
+            var cell2 = trow.insertCell(2);
+            cell2.innerHTML = "<a href='javascript:machine_delete(" + index + ");'><img src='img_delete.gif' alt='Delete' title='Delete' border='0'/><\/a>";
+        }
+
+        /*
+         * machine_clear_editform()
+         *  Clear and reset the editable fields.
+         */
+        function machine_clear_editform()
+        {
+            ef.ipaddr.value = "";
+            ef.macaddr.value = "";
+            machine_under_edit = -1;
+            addr_type_selector(ADDR_TYPE_IP);
+        }
+
+        /*
+         * machine_count()
+         */
+        function machines_count()
+        {
+
+            var ip_array = [];
+            var mac_array = [];
+            var found;
+            var i, j, k;
+
+            /*
+             * Count machines in other rules than the edited one.
+             */
+            for (i = 0; i < MAX_RULES; i++) {
+                if (typeof(rf["used_" + i]) == "object" && rf["used_" + i].value == "1" && rule_under_edit != i) {
+                    for (j = 0; j < MAX_MACHINES_PER_RULE; j++) {
+                        if (rf["rule_" + i + "_machine_" + j + "_used"].value == "0") {
+                            continue;
+                        }
+                        found = false;
+                        if (rf["rule_" + i + "_machine_" + j + "_addr_type"].value == ADDR_TYPE_IP) {
+                            for (k = 0; k < ip_array.length; k++) {
+                                if (ip_array[k] == rf["rule_" + i + "_machine_" + j + "_machine"].value) {
+                                    found = true;
+                                }
+                            }
+                            if (!found) {
+                                    ip_array.push(rf["rule_" + i + "_machine_" + j + "_machine"].value);
+                            }
+                        } else if (rf["rule_" + i + "_machine_" + j + "_addr_type"].value == ADDR_TYPE_MAC) {
+                            for (k = 0; k < mac_array.length; k++) {
+                                if (mac_array[k] == rf["rule_" + i + "_machine_" + j + "_machine_mac"].value) {
+                                    found = true;
+                                }
+                            }
+                            if (!found) {
+                                mac_array.push(rf["rule_" + i + "_machine_" + j + "_machine_mac"].value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*
+             * Add machines from the currently edited rule.
+             */
+            machines_in_rule = 0;
+            for (j = 0; j < MAX_MACHINES_PER_RULE; j++) {
+                if (ef["machine_" + j + "_used"].value != "1") {
+                        continue;
+                }
+                machines_in_rule++;
+                found = false;
+                if (ef["machine_" + j + "_addr_type"].value == ADDR_TYPE_IP) {
+                    for (k = 0; k < ip_array.length; k++) {
+                        if (ip_array[k] == ef["machine_" + j + "_machine"].value) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        ip_array.push(ef["machine_" + j + "_machine"].value);
+                    }
+                } else if (ef["machine_" + j + "_addr_type"].value == ADDR_TYPE_MAC) {
+                    for (k = 0; k < mac_array.length; k++) {
+                        if (mac_array[k] == ef["machine_" + j + "_machine_mac"].value) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        mac_array.push(ef["machine_" + j + "_machine_mac"].value);
+                    }
+                    continue;
+                }
+            }
+
+            machines_ip = ip_array.length;
+            machines_mac = mac_array.length;
+        }
+
+        /*
+         * machine_delete()
+         *  Delete a machine from hidden fields and table list.
+         */
+        function machine_delete(index)
+        {
+            var machine;
+            var addr_type = ef["machine_" + index + "_addr_type"].value;
+            if (addr_type == ADDR_TYPE_IP) {
+                machine = ef["machine_" + index + "_machine"].value;
+            } else if (addr_type == ADDR_TYPE_MAC) {
+                machine = ef["machine_" + index + "_machine_mac"].value;
+            } else {
+                machine = "Other Machines";
+            }
+            if (!confirm("Are you sure you want to delete " + machine)) {
+                return;
+            }
+            ef["machine_" + index + "_used"].value = "0";
+            ef["machine_" + index + "_enabled"].value = "0";
+            machines_count();
+            machine_editor_showhide(machines_in_rule < MAX_MACHINES_PER_RULE);
+            machines_tablelist_delete(machine);
+            machine_clear_editform();
+        }
+
+        /*
+         * machine_edit()
+         */
+        function machine_edit(index)
+        {
+            var addr_type = ef["machine_" + index + "_addr_type"].value;
+            if (addr_type == ADDR_TYPE_IP) {
+                ef.ipaddr.value = ef["machine_" + index + "_machine"].value;
+            } else if (addr_type == ADDR_TYPE_MAC) {
+                ef.macaddr.value = ef["machine_" + index + "_machine_mac"].value;
+            }
+            machine_under_edit = index;
+            addr_type_selector(addr_type);
+            machine_editor_showhide(true);
+        }
+
+        /*
+         * machine_save()
+         *  Save a new machine from editable fields to hidden fields, add it to table list.
+         */
+        function machine_save()
+        {
+            if (ef.addr_type_radio[ADDR_TYPE_IP].checked) {
+                if (!is_ipv4_valid(ef.ipaddr.value)) {
+                    alert("Invalid IP address" + ": " + ef.ipaddr.value + ".");
+                    return;
+                }
+                var mach = ipv4_to_unsigned_integer(ef.ipaddr.value);
+                if ((mach & LAN_MASK) != (LAN_IP & LAN_MASK)) {
+                    alert(ef.ipaddr.value + " -- IP address should be in LAN subnet.");
+                    return;
+                }
+                var lan_network_address = "192.168.0.1";
+                if (ef.ipaddr.value == lan_network_address) {
+                    alert("IP address cannot be the same as LAN IP address of the router.");
+                    return 0;
+                }
+            }
+            if (ef.addr_type_radio[ADDR_TYPE_MAC].checked && !is_mac_valid(ef.macaddr.value)) {
+                alert(" Invalid MAC Address" + ": " + ef.macaddr.value + ".");
+                return;
+            }
+
+            /*
+             * Verify that this machine is not already in the current policy's machines.
+             */
+            for (var index = 0; index < MAX_MACHINES_PER_RULE; index++) {
+                if ((ef["machine_" + index + "_used"].value == "1") &&
+                    ((ef.addr_type_radio[ADDR_TYPE_IP].checked && ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_IP && ef["machine_" + index + "_machine"].value == ef.ipaddr.value) ||
+                    (ef.addr_type_radio[ADDR_TYPE_MAC].checked && ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_MAC && ef["machine_" + index + "_machine_mac"].value == ef.macaddr.value) ||
+                    (ef.addr_type_radio[ADDR_TYPE_OTHERS].checked && ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_OTHERS))) {
+                    alert("This Machine rule is already used");
+                    return;
+                }
+
+                // 2007.08.01
+                if ((ef["machine_" + index + "_used"].value == "1" )) {
+                    var count = ef.ipaddr_select.options.length;
+                    for (var i = 0; i < count; i++) {
+                        if (ef.addr_type_radio[ADDR_TYPE_IP].checked) {
+                            if( ef.ipaddr.value     == ef.ipaddr_select.options[i].value) {
+                                // find ip, so check MAC
+                                if (ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_MAC &&
+                                    ef["machine_" + index + "_machine_mac"].value == ef.macaddr_select.options[i].value )
+                                {
+                                    //find
+                                    var s;
+                                    var s2;
+                                    s2 = "";
+                                    s = "are same Machine.";
+                                    s2 = s2 + " '" + ef.ipaddr_select.options[i].value + "' and '" +  ef.macaddr_select.options[i].value + "' ";
+                                    s2 = s2 + s;
+                                    alert(s2);
+                                    return;
+                                }
+                            }
+                        }
+                        else if (ef.addr_type_radio[ADDR_TYPE_MAC].checked ) {
+                            if (ef.macaddr.value == ef.macaddr_select.options[i].value) {
+                                // find mac, so check IP
+                                if (ef["machine_" + index + "_addr_type"].value == ADDR_TYPE_IP &&
+                                    ef["machine_" + index + "_machine"].value == ef.ipaddr_select.options[i].value )
+                                {
+                                    //find
+                                    var s;
+                                    var s2;
+                                    s2 = "";
+                                    s = "are same Machine.";
+                                    s2 = s2 + " '" + ef.ipaddr_select.options[i].value + "' and '" +  ef.macaddr_select.options[i].value + "' ";
+                                    s2 = s2 + s;
+                                    alert(s2);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            if (machine_under_edit == -1) {
+                /*
+                 * Find the first free entry in the machine list.
+                 */
+                for (index = 0; index < MAX_MACHINES_PER_RULE; index++) {
+                    if (ef["machine_" + index + "_used"].value == "0") {
+                        break;
+                    }
+                }
+            } else {
+                index = machine_under_edit;
+            }
+
+            machine_editform_to_hiddenform(index);
+            machines_count();
+            if (machines_ip > MAX_IP_MACHINES) {
+                alert("You cannot add new IP addresses. You can only reuse IP addresses from other policies.");
+                ef["machine_" + index + "_used"].value = "0";
+                ef["machine_" + index + "_enabled"].value = "0";
+                machines_in_rule--;
+                return;
+            }
+            if (machines_mac > MAX_MAC_MACHINES) {
+                alert("You cannot add new MAC addresses. You can only reuse MAC addresses from other policies.");
+                ef["machine_" + index + "_used"].value = "0";
+                ef["machine_" + index + "_enabled"].value = "0";
+                machines_in_rule--;
+                return;
+            }
+
+            machine_editor_showhide(machines_in_rule < MAX_MACHINES_PER_RULE);
+            document.getElementById("wz_page_4_machine_list").style.display = "block";
+
+            if (machine_under_edit == -1) {
+                machines_tablelist_add(index);
+            } else {
+                machines_tablelist_update(index);
+            }
+            machine_clear_editform();
+        }
+
+        /*
+         * Rules editor.
+         *      The form ef contains a set of hidden fields, which will be populated with the new rule
+         *      or the new value of an edited rule.
+         */
+
+        /*
+         * rule_submit()
+         *  Assign name attributes to the edit form's hidden fields and submit the form.
+         */
+        function rule_submit(index)
+        {
+            ef.used.value = "1";
+            ef.used.name = "config.access_ctrl_table[" + index + "].used";
+            ef.enabled.value = "true";
+            ef.enabled.name = "config.access_ctrl_table[" + index + "].enabled";
+            ef.policy_name.name = "config.access_ctrl_table[" + index + "].policy_name";
+            ef.sched_name.value = ef.sched_name_select.value;
+            ef.sched_name.name = "config.access_ctrl_table[" + index + "].sched_name";
+            for (var mach = 0; mach < MAX_MACHINES_PER_RULE; mach++) {
+                ef["machine_" + mach + "_enabled"].value = (ef["machine_" + mach + "_used"].value == "1") ? "true" : "false";
+                ef["machine_" + mach + "_enabled"].name = "config.access_ctrl_table[" + index + "].machine_table[" + mach + "].enabled";
+                ef["machine_" + mach + "_used"].name = "config.access_ctrl_table[" + index + "].machine_table[" + mach + "].used";
+                if (ef["machine_" + mach + "_used"].value == "1") {
+                    ef["machine_" + mach + "_addr_type"].name = "config.access_ctrl_table[" + index + "].machine_table[" + mach + "].addr_type";
+                    ef["machine_" + mach + "_machine"].name = "config.access_ctrl_table[" + index + "].machine_table[" + mach + "].machine";
+                    ef["machine_" + mach + "_machine_mac"].name = "config.access_ctrl_table[" + index + "].machine_table[" + mach + "].machine_mac";
+                }
+            }
+            ef.filter_method.name= "config.access_ctrl_table[" + index + "].filter_method";
+            if (IPBSECURE == "1") {
+                ef.bsecure_web_access.name = "config.access_ctrl_table[" + index + "].bsecure_web_access";
+                if (ef.bsecure_web_access.value == "1") {
+                    bsecure_form_to_mapping();
+                    ef.bsecure_web_access_categories_0.name = "config.access_ctrl_table[" + index + "].bsecure_web_access_categories_0";
+                    ef.bsecure_web_access_categories_1.name = "config.access_ctrl_table[" + index + "].bsecure_web_access_categories_1";
+                    ef.bsecure_web_access_categories_2.name = "config.access_ctrl_table[" + index + "].bsecure_web_access_categories_2";
+                }
+            }
+            ef.port_filter.name = "config.access_ctrl_table[" + index + "].port_filter";
+            for (var pf = 0; pf < PORT_FILTERS_PER_RULE; pf++) {
+                ef["pf_" + pf + "_enabled"].name = "config.access_ctrl_table[" + index + "].port_filter_table[" + pf + "].enabled";
+                ef["pf_" + pf + "_entry_name"].name = "config.access_ctrl_table[" + index + "].port_filter_table[" + pf + "].entry_name";
+                ef["pf_" + pf + "_dest_ip_start"].name = "config.access_ctrl_table[" + index + "].port_filter_table[" + pf + "].dest_ip_start";
+                ef["pf_" + pf + "_dest_ip_end"].name = "config.access_ctrl_table[" + index + "].port_filter_table[" + pf + "].dest_ip_end";
+                ef["pf_" + pf + "_protocol"].name = "config.access_ctrl_table[" + index + "].port_filter_table[" + pf + "].protocol";
+                ef["pf_" + pf + "_dest_port_start"].name = "config.access_ctrl_table[" + index + "].port_filter_table[" + pf + "].dest_port_start";
+                ef["pf_" + pf + "_dest_port_end"].name = "config.access_ctrl_table[" + index + "].port_filter_table[" + pf + "].dest_port_end";
+            }
+            ef.log_access.name= "config.access_ctrl_table[" + index + "].log_access";
+            ef.web_access.name= "config.access_ctrl_table[" + index + "].web_access";
+            ef.submit();
+        }
+
+        /*
+         * rule_save_edit()
+         */
+        function rule_save_edit()
+        {
+            if (typeof(wz_verifers[wz_cur - 1]) == "function" && !wz_verifers[wz_cur - 1]()) {
+                return;
+            }
+            rule_submit(rule_under_edit);
+        }
+
+        /*
+         * rule_save()
+         */
+        function rule_save()
+        {
+            wz_cancel();
+        }
+
+        /*
+         * rule_cancel()
+         */
+        function rule_delete(index)
+        {
+            if (!is_admin) {
+                return;
+            }
+
+            select_ae_row("enabled_select_" + index);
+            if (!confirm("Are you sure you want to delete this entry?")) {
+                deselect_ae_row();
+                return;
+            }
+            ef.used.value = "0";
+            ef.used.name = "config.access_ctrl_table[" + index + "].used";
+            ef.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * rule_cancel()
+         */
+        function rule_cancel()
+        {
+            if (is_form_modified("editform") && !confirm("Do you want to abandon all changes you made to this wizard?")) {
+                return;
+            }
+            wz_cancel();
+        }
+
+        /*
+         * rule_edit()
+         *  Edit an existing rule by copying its values from the rules list to the edit form's hidden fields and start the wizard on second page.
+         */
+        function rule_edit(index)
+        {
+            if (!is_admin) {
+                return;
+            }
+
+            machines_tablelist_clear();
+            rule_under_edit = index;
+            ef.enabled.value = rf["enabled_" + index].value;
+            ef.policy_name.value = document.getElementById("policy_name_" + index + "_span").innerText;
+            // 2007.08.07
+            var s;
+            s = ef.policy_name.value;
+            s = s.replace(/&gt;/g,">");
+            s = s.replace(/&lt;/g,"<");
+            ef.policy_name.value = s;
+
+            ef.sched_name_select.value = document.getElementById("sched_name_" + index + "_span").innerText;
+            ef.sched_detail.value = schedule_details(ef.sched_name_select);
+            for (var mach = 0; mach < MAX_MACHINES_PER_RULE; mach++) {
+                if (rf["rule_" + index + "_machine_" + mach + "_used"].value == "1") {
+                    ef["machine_" + mach + "_used"].value = "1";
+                    ef["machine_" + mach + "_enabled"].value = rf["rule_" + index + "_machine_" + mach + "_enabled"].value;
+                    ef["machine_" + mach + "_addr_type"].value = rf["rule_" + index + "_machine_" + mach + "_addr_type"].value;
+                    ef["machine_" + mach + "_machine"].value = rf["rule_" + index + "_machine_" + mach + "_machine"].value;
+                    ef["machine_" + mach + "_machine_mac"].value = rf["rule_" + index + "_machine_" + mach + "_machine_mac"].value;
+                    machines_tablelist_add(mach);
+                } else {
+                    ef["machine_" + mach + "_used"].value = "0";
+                }
+            }
+            machines_count();
+            ef.filter_method.value = rf["filter_method_" + index].value;
+            filter_method_selector(ef.filter_method.value);
+            if (IPBSECURE == "1") {
+                ef.bsecure_web_access.value = rf["bsecure_web_access_" + index].value;
+                if (ef.bsecure_web_access.value == "1") {
+                    bsecure_web_access_selector(true);
+                    ef.bsecure_web_access_categories_0.value = rf["bsecure_web_access_categories_0_" + index].value;
+                    ef.bsecure_web_access_categories_1.value = rf["bsecure_web_access_categories_1_" + index].value;
+                    ef.bsecure_web_access_categories_2.value = rf["bsecure_web_access_categories_2_" + index].value;
+                    bsecure_mapping_to_form();
+                }
+            }
+            ef.web_access.value = rf["web_access_" + index].value;
+            web_access_selector(ef.web_access.value == "true");
+            ef.port_filter.value = rf["port_filter_" + index].value;
+            port_filter_selector(ef.port_filter.value == "true");
+            for (var pf = 0; pf < PORT_FILTERS_PER_RULE; pf++) {
+                ef["pf_" + pf + "_enabled"].value = rf["rule_" + index + "_pf_" + pf + "_enabled"].value;
+                pf_enabled_selector(pf, rf["rule_" + index + "_pf_" + pf + "_enabled"].value == "true");
+                ef["pf_" + pf + "_entry_name"].value = rf["rule_" + index + "_pf_" + pf + "_entry_name"].value;
+                ef["pf_" + pf + "_dest_ip_start"].value = rf["rule_" + index + "_pf_" + pf + "_dest_ip_start"].value;
+                if (ef["pf_" + pf + "_dest_ip_start"].value == "") {
+                    ef["pf_" + pf + "_dest_ip_start"].value = "0.0.0.0";
+                }
+                ef["pf_" + pf + "_dest_ip_end"].value = rf["rule_" + index + "_pf_" + pf + "_dest_ip_end"].value;
+                if (ef["pf_" + pf + "_dest_ip_end"].value == "") {
+                    ef["pf_" + pf + "_dest_ip_end"].value = "255.255.255.255";
+                }
+                pf_protocol_selector(pf, rf["rule_" + index + "_pf_" + pf + "_protocol"].value);
+                ef["pf_" + pf + "_dest_port_start"].value = rf["rule_" + index + "_pf_" + pf + "_dest_port_start"].value;
+                if (ef["pf_" + pf + "_dest_port_start"].value == "") {
+                    ef["pf_" + pf + "_dest_port_start"].value = "0";
+                }
+                ef["pf_" + pf + "_dest_port_end"].value = rf["rule_" + index + "_pf_" + pf + "_dest_port_end"].value;
+                if (ef["pf_" + pf + "_dest_port_end"].value == "") {
+                    ef["pf_" + pf + "_dest_port_end"].value = "65535";
+                }
+            }
+            log_access_selector(rf["log_access_" + index].value);
+            machine_clear_editform();
+            ef.wz_save_b.onclick = rule_save_edit;
+            save_form_default_values("editform");
+            wz_min = 2;
+            wz_start();
+        }
+
+        /*
+         * rule_add()
+         *  Start the wizard on first page with empty edit form's hidden fields.
+         */
+        function rule_add()
+        {
+            machines_tablelist_clear();
+            machines_count();
+            machines_in_rule = 0;
+            rule_under_edit = -1;
+            ef.sched_name_select.selectedIndex = 0;
+            ef.sched_detail.value = schedule_details(ef.sched_name_select);
+            machine_clear_editform();
+            for (var mach = 0; mach < MAX_MACHINES_PER_RULE; mach++) {
+                ef["machine_" + mach + "_used"].value = "0";
+            }
+            ef.wz_save_b.onclick = rule_save;
+            ef.policy_name.value = "";
+            filter_method_selector(0);
+            if (IPBSECURE == "1") {
+                bsecure_web_access_selector(false);
+                ef.bsecure_web_access_categories_0.value = "";
+                ef.bsecure_web_access_categories_1.value = "";
+                ef.bsecure_web_access_categories_2.value = "";
+                bsecure_web_access_categories_check_all(false);
+                ef.bsecure_age_select.value = "0";
+                bsecure_categories_selector("1");
+            }
+            web_access_selector(false);
+            port_filter_selector(false);
+            for (var pf = 0; pf < PORT_FILTERS_PER_RULE; pf++) {
+                pf_enabled_selector(pf, false);
+                ef["pf_" + pf + "_entry_name"].value = "";
+                ef["pf_" + pf + "_dest_ip_start"].value = "0.0.0.0";
+                ef["pf_" + pf + "_dest_ip_end"].value = "255.255.255.255";
+                pf_protocol_selector(pf, "0");
+                ef["pf_" + pf + "_dest_port_start"].value = "0";
+                ef["pf_" + pf + "_dest_port_end"].value = "65535";
+            }
+            log_access_selector("0");
+            save_form_default_values("mainform");
+            save_form_default_values("editform");
+            wz_min = 1;
+            wz_start();
+        }
+
+        /*
+         * populate_ipaddr_list()
+         */
+        function populate_ipaddr_list()
+        {
+            if (!ipaddr_list_xsl_data_ready || !computer_list_xml_data_ready) {
+                return;
+            }
+            var parent = document.getElementById("xsl_ipaddr_select");
+            if (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+            ipaddr_list_xsl_loader.transform(computer_list_xml_data, window.document, parent);
+            copy_select_options(ef.xml_ipaddr_select, ef.ipaddr_select);
+        }
+
+        /*
+         * populate_macaddr_list()
+         */
+        function populate_macaddr_list()
+        {
+            if (!macaddr_list_xsl_data_ready || !computer_list_xml_data_ready) {
+                return;
+            }
+            var parent = document.getElementById("xsl_macaddr_select");
+            if (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+            macaddr_list_xsl_loader.transform(computer_list_xml_data, window.document, parent);
+            /* XXX copy_select_options(ef.xml_macaddr_select, ef.macaddr_select); */
+            copy_select_options(ef.select_mac, ef.macaddr_select);
+        }
+
+        /*
+         * ipaddr_list_xsl_ready()
+         */
+        function ipaddr_list_xsl_ready()
+        {
+            ipaddr_list_xsl_data_ready = true;
+            ipaddr_list_xsl_loader.add_param("id_spec", "xml_ipaddr_select");
+            populate_ipaddr_list();
+        }
+
+        /*
+         * macaddr_list_xslt_ready()
+         */
+        function macaddr_list_xslt_ready()
+        {
+            macaddr_list_xsl_data_ready = true;
+            /* XXX  macaddr_list_xsl_loader.add_param("id_spec", "xml_macaddr_select"); */
+            populate_macaddr_list();
+        }
+
+        /*
+         * computer_list_xml_ready()
+         */
+        function computer_list_xml_ready(xml_doc)
+        {
+            computer_list_xml_data = xml_doc;
+            computer_list_xml_data_ready = true;
+            populate_ipaddr_list();
+            populate_macaddr_list();
+            computer_list_timer = window.setTimeout(computer_list_xml_loader.retrieve_xml, 20000);
+        }
+
+        /*
+         * computer_list_xml_timeout()
+         */
+        function computer_list_xml_timeout()
+        {
+            computer_list_timer = window.setTimeout(computer_list_xml_loader.retrieve_xml, 60000);
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+            ef = document.forms.editform;
+            rf = document.forms.rulesform;
+            var i, j, k;
+
+            if (local_debug) {
+                enable_access_ctrl_selector(false);
+                hide_all_ssi_tr();
+                return;
+            }
+
+            /*
+             * Delete initial empty row from table.
+             */
+            machines_tablelist_clear();
+
+            /*
+             * Populate schedule select list.
+             */
+            schedule_populate_select(ef.sched_name_select);
+            ef.sched_name_select.options.add(new Option("Define a new schedule", "new_sched"));
+            ef.sched_detail.value = schedule_details(ef.sched_name_select);
+
+            enable_access_ctrl_selector(ef.enable_access_ctrl_edit.value == "true");
+
+            /*
+             * Update the rules list, only if Access Control is enabled.
+             */
+            for (i = 0; i < MAX_RULES; i++) {
+                if (typeof(rf["used_" + i]) == "object" && rf["used_" + i].value == "1") {
+                    /*
+                     * Update the "enabled" checkbox.
+                     */
+                    rf["enabled_select_" + i].checked = rf["enabled_" + i].value == "true";
+                    /*
+                     * Update the machine field.
+                     */
+                    var span_hdle = document.getElementById("machine_" + i + "_span");
+                    for (j = 0; j < MAX_MACHINES_PER_RULE; j++) {
+                        if (rf["rule_" + i + "_machine_" + j + "_used"].value == "1"
+                            && rf["rule_" + i + "_machine_" + j + "_enabled"].value == "true") {
+                            if (span_hdle.innerHTML == "&nbsp;") {  // "&nbsp;" is the initial value
+                                span_hdle.innerHTML = "";
+                            }
+                            if (span_hdle.innerHTML.length > 0) {
+                                span_hdle.innerHTML += ", ";
+                            }
+                            switch (rf["rule_" + i + "_machine_" + j + "_addr_type"].value) {
+                            case "0":
+                                span_hdle.innerHTML += rf["rule_" + i + "_machine_" + j +"_machine"].value;
+                                break;
+                            case "1":
+                                span_hdle.innerHTML += rf["rule_" + i + "_machine_" + j + "_machine_mac"].value;
+                                break;
+                            default:
+                                span_hdle.innerHTML += "Other Machines";
+                                break;
+                            }
+                        }
+                    }
+                    /*
+                     * Update the filter field.
+                     */
+                    span_hdle = document.getElementById("filter_method_" + i + "_span");
+                    switch (rf["filter_method_" + i].value) {
+                    case "2":
+                        span_hdle.innerHTML = "Log Web Access Only";
+                        break;
+                    case "1":
+                        span_hdle.innerHTML = "Block All Access";
+                        break;
+                    default:
+                        span_hdle.innerHTML = "Block Some Access";
+                    }
+                    /*
+                     * Update the log filter.
+                     */
+                    span_hdle = document.getElementById("log_access_" + i + "_span");
+                    if (rf["log_access_" + i].value == "1") {
+                        span_hdle.innerHTML = "Yes";
+                    } else {
+                        span_hdle.innerHTML = "No";
+                    }
+                }
+            }
+
+            /*
+             * Count the initial number of IP and MAC machines.
+             */
+            var ip_array = [];
+            var mac_array = [];
+            var found;
+            for (i = 0; i < MAX_RULES; i++) {
+                if (typeof(rf["used_" + i]) == "object" && rf["used_" + i].value == "1") {
+                    for (j = 0; j < MAX_MACHINES_PER_RULE; j++) {
+                        if (rf["rule_" + i + "_machine_" + j + "_used"].value == "0") {
+                            continue;
+                        }
+                        found = false;
+                        if (rf["rule_" + i + "_machine_" + j + "_addr_type"].value == ADDR_TYPE_IP) {
+                            for (k = 0; k < ip_array.length; k++) {
+                                if (ip_array[k] == rf["rule_" + i + "_machine_" + j + "_machine"].value) {
+                                    found = true;
+                                }
+                            }
+                            if (!found) {
+                                ip_array.push(rf["rule_" + i + "_machine_" + j + "_machine"].value);
+                            }
+                            continue;
+                        }
+                        found = false;
+                        if (rf["rule_" + i + "_machine_" + j + "_addr_type"].value == ADDR_TYPE_MAC) {
+                            for (k = 0; k < mac_array.length; k++) {
+                                if (mac_array[k] == rf["rule_" + i + "_machine_" + j + "_machine_mac"].value) {
+                                    found = true;
+                                }
+                            }
+                            if (!found) {
+                                mac_array.push(rf["rule_" + i + "_machine_" + j + "_machine_mac"].value);
+                            }
+                            continue;
+                        }
+                    }
+                }
+            }
+            machines_ip = ip_array.length;
+            machines_mac = mac_array.length;
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                do_block_enable(rf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            /*
+             * Retrieve LAN computer list.
+             */
+           
+
+            ef.ipaddr_select.setAttribute("modified", "ignore");
+            ef.macaddr_select.setAttribute("modified", "ignore");
+            save_form_default_values("mainform");
+
+            /*
+             * Check for validation errors.
+             */
+            var verify_failed = "";
+            if (verify_failed != "") {
+                wz_min = 2;
+                wz_cur = 2;
+                wz_showhide();
+                alert(verify_failed);
+                verify_failed = "";
+            }
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            mf.submit();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            reset_form("mainform");
+            enable_access_ctrl_selector(mf.enable_access_ctrl_select.checked);
+        }
+
+        /*
+         * window.onunload()
+         */
+        window.onunload = function () {
+            if (computer_list_timer != "") {
+                window.clearTimeout(computer_list_timer);
+                computer_list_timer = "";
+            }
+        };
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.<span id="fw_minor_head">21</span>
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                        
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+										                                                             <li>
+										                                                                   	<div>
+											                                                                        	<a id="Advanced_Bsecure_nav_link" href="Bsecure.html" onclick="return jump_if();">securespot</a>
+										                                                                  	</div>
+									                                                              	</li>
+									                                                            	
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Guest_Zone.html" onclick="return jump_if();">Guest Zone</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                 
+                                                                        </ul>
+
+                                                                        <ul id="Tools_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <div id="main_page">
+                                                                                <div class="section">
+                                                                                        <form saved="true" id="mainform" action="/Advanced/Access_Control.html" method="post" onsubmit="return false;">
+                                                                                                <div class="section_head">
+                                                                                                        <h2>Access Control</h2>
+                                                                                                        <p>The
+Access Control option allows you to control access in and out of your
+network. Use this feature as Access Controls to only grant access to
+approved sites, limit web access based on time or dates, and/or block
+internet access for applications like P2P utilities or games.</p>
+                                                                                                        <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                                                                                        <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                                                                        <input class="button_submit" value="Don't Save Settings" onclick="page_cancel()" type="button">
+                                                                                                </div>
+                                                                                                <div class="box">
+                                                                                                        <h3>Access Control</h3>
+                                                                                                        <fieldset>
+                                                                                                                <p>
+                                                                                                                        <input default="false" value="false" id="enable_access_ctrl" name="config.enable_access_ctrl" type="hidden">
+                                                                                                                        <label class="duple" for="enable_access_ctrl_select">Enable Access Control&nbsp;:</label>
+                                                                                                                        <input default="false" id="enable_access_ctrl_select" onclick="enable_access_ctrl_selector(this.checked);" type="checkbox">
+                                                                                                                </p>
+                                                                                                                <p>
+                                                                                                                        <label class="duple">&nbsp;</label>
+                                                                                                                        <input disabled="disabled" class="button_submit disabled" id="add_policy" value="Add Policy" onclick="rule_add();" type="button">
+                                                                                                                </p>
+                                                                                                        </fieldset>
+                                                                                                </div>
+                                                                                        </form>
+                                                                                        <!-- policy table -->
+                                                                                        <div class="box" id="policy_table" style="display: none;">
+                                                                                                <h3>Policy Table</h3>
+                                                                                                <form id="rulesform" action="/Advanced/Access_Control.html" method="post" onsubmit="return false;">
+                                                                                                        <table class="formlisting" summary="" cellpadding="0" cellspacing="1" width="100%">
+                                                                                                                <col>
+                                                                                                                <col>
+                                                                                                                <col>
+                                                                                                                <col>
+                                                                                                                <col width="20">
+                                                                                                                <col width="20">
+                                                                                                                <tbody><tr class="form_label_row">
+                                                                                                                        <th>Enable</th>
+                                                                                                                        <th>Policy</th>
+                                                                                                                        <th>Machine</th>
+                                                                                                                        <th>Filtering</th>
+                                                                                                                        <th>Logged</th>
+                                                                                                                        <th>Schedule</th>
+                                                                                                                        <th>&nbsp;</th>
+                                                                                                                        <th>&nbsp;</th>
+                                                                                                                </tr>
+                                 
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                                        
+                                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                
+                                                                                                        </tbody></table>
+                                                                                                        <input id="free" value="0" type="hidden">
+                                                                                                </form>
+                                                                                        </div><!-- policy_table -->
+                                                                                </div><!-- section -->
+                                                                        </div><!-- main_page -->
+                                                                        <div class="box" id="wizard_page" style="display: none;">
+                                                                                <form id="editform" action="/Advanced/Access_Control.html" method="post" onsubmit="return false;">
+                                                                                        <input id="enable_access_ctrl_edit" name="config.enable_access_ctrl" value="false" type="hidden">
+                                                                                        <input id="used" type="hidden">
+                                                                                        <input id="enabled" type="hidden">
+                                                                                        <div id="wz_page_1" style="display: none;">
+                                                                                                <h3>Add New Policy</h3>
+                                                                                                <p class="box_msg">This wizard will guide you through the following steps to add a new policy for Access Control.</p>
+                                                                                                <fieldset>
+                                                                                                        <p>Step 1 - Choose a unique name for your policy</p>
+                                                                                                        <p>Step 2 - Select a schedule</p>
+                                                                                                        <p>Step 3 - Select the machine to which this policy applies</p>
+                                                                                                        <p>Step 4 - Select filtering method</p>
+                                                                                                        <p>Step 5 - Select filters</p>
+                                                                                                        <p>Step 6 - Configure Web Access Logging</p>
+                                                                                                </fieldset>
+                                                                                        </div><!-- wz_page_1" -->
+                                                                                        <div id="wz_page_2" style="display: none;">
+                                                                                                <h3>Step 1: Choose Policy Name</h3>
+                                                                                                <p class="box_msg">Choose a unique name for your policy.</p>
+                                                                                                <fieldset>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="policy_name">Policy Name&nbsp;:</label>
+                                                                                                                <input id="policy_name" size="20" maxlength="16" type="text">
+                                                                                                        </p>
+                                                                                                </fieldset>
+                                                                                        </div>
+                                                                                        <div id="wz_page_3" style="display: none;">
+                                                                                                <h3>Step 2: Select Schedule</h3>
+                                                                                                <p class="box_msg">Choose a schedule to apply to this policy.</p>
+                                                                                                <fieldset>
+                                                                                                        <p>
+                                                                                                                <input id="sched_name" type="hidden">
+                                                                                                                <label class="duple" for="sched_name_select">&nbsp;</label>
+                                                                                                                <select id="sched_name_select" onchange="sched_name_selector(this.value)">
+                                                                                                                    
+                                                                                                                <option value="Always">Always</option><option value="Never">Never</option><option value="new_sched">Define a new schedule</option></select>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="sched_detail">Details&nbsp;:</label>
+                                                                                                                <input id="sched_detail" class="rule_details" size="48" maxlength="48" readonly="readonly" type="text">
+                                                                                                        </p>
+                                                                                                </fieldset>
+                                                                                        </div>
+
+                                                                                        <div id="wz_page_4_table_full" style="display: none;">
+                                                                                                <h3>Step 3: Select Machine</h3>
+You cannot add more machines because the table is full. </div>
+
+                                                                                        <div id="wz_page_4" style="display: none;">
+                                                                                                <h3>Step 3: Select Machine</h3>
+                                                                                                <p class="box_msg">Select the machine to which this policy applies.</p>
+                                                                                                <p>Specify a machine with its IP or MAC address, or select "Other Machines" for machines that do not have a policy.</p>
+                                                                                                <fieldset>
+                                                                                                        
+                                                                                                                <input id="machine_0_used" value="0" type="hidden">
+                                                                                                                <input id="machine_0_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_0_addr_type" type="hidden">
+                                                                                                                <input id="machine_0_machine" type="hidden">
+                                                                                                                <input id="machine_0_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                                <input id="machine_1_used" value="0" type="hidden">
+                                                                                                                <input id="machine_1_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_1_addr_type" type="hidden">
+                                                                                                                <input id="machine_1_machine" type="hidden">
+                                                                                                                <input id="machine_1_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                                <input id="machine_2_used" value="0" type="hidden">
+                                                                                                                <input id="machine_2_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_2_addr_type" type="hidden">
+                                                                                                                <input id="machine_2_machine" type="hidden">
+                                                                                                                <input id="machine_2_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                                <input id="machine_3_used" value="0" type="hidden">
+                                                                                                                <input id="machine_3_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_3_addr_type" type="hidden">
+                                                                                                                <input id="machine_3_machine" type="hidden">
+                                                                                                                <input id="machine_3_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                                <input id="machine_4_used" value="0" type="hidden">
+                                                                                                                <input id="machine_4_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_4_addr_type" type="hidden">
+                                                                                                                <input id="machine_4_machine" type="hidden">
+                                                                                                                <input id="machine_4_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                                <input id="machine_5_used" value="0" type="hidden">
+                                                                                                                <input id="machine_5_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_5_addr_type" type="hidden">
+                                                                                                                <input id="machine_5_machine" type="hidden">
+                                                                                                                <input id="machine_5_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                                <input id="machine_6_used" value="0" type="hidden">
+                                                                                                                <input id="machine_6_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_6_addr_type" type="hidden">
+                                                                                                                <input id="machine_6_machine" type="hidden">
+                                                                                                                <input id="machine_6_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                                <input id="machine_7_used" value="0" type="hidden">
+                                                                                                                <input id="machine_7_enabled" value="false" type="hidden">
+                                                                                                                <input id="machine_7_addr_type" type="hidden">
+                                                                                                                <input id="machine_7_machine" type="hidden">
+                                                                                                                <input id="machine_7_machine_mac" type="hidden">
+                                                                                                        
+                                                                                                        <p>
+                                                                                                                <label class="duple">Address Type&nbsp;:</label>
+                                                                                                                <span>
+                                                                                                                <input id="addr_type_radio_0" name="addr_type_radio" value="0" onclick="addr_type_selector(this.value)" type="radio"><label for="addr_type_radio_0">IP</label>&nbsp;
+                                                                                                                <input id="addr_type_radio_1" name="addr_type_radio" value="1" onclick="addr_type_selector(this.value)" type="radio"><label for="addr_type_radio_1">MAC</label>&nbsp;
+                                                                                                                <input id="addr_type_radio_2" name="addr_type_radio" value="2" onclick="addr_type_selector(this.value)" type="radio"><label for="addr_type_radio_2">Other Machines</label>
+                                                                                                                </span>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="ipaddr">IP Address&nbsp;:</label>
+                                                                                                                <input id="ipaddr" size="20" maxlength="17" type="text">
+                                                                                                                <span> &lt;&lt; </span>
+                                                                                                                <span id="xsl_ipaddr_select" style="display: none;"><select modified="ignore" onchange="" id="xml_ipaddr_select"><option value="-1">Computer Name</option></select></span>
+                                                                                                                <select modified="ignore" id="ipaddr_select" style="width: 150px;" onchange="ipaddr_selector(this.value)">
+                                                                                                                        <option value="-1">Computer Name</option>
+                                                                                                                </select>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="macaddr">Machine Address&nbsp;:</label>
+                                                                                                                <input id="macaddr" size="20" maxlength="17" type="text">
+                                                                                                                <span> &lt;&lt; </span>
+                                                                                                                <span id="xsl_macaddr_select" style="display: none;"><select modified="ignore" id="select_mac"><option value="-1">Computer Name</option></select></span>
+                                                                                                                <select modified="ignore" id="macaddr_select" style="width: 150px;" onchange="macaddr_selector(this.value)">
+                                                                                                                        <option value="-1">Computer Name</option>
+                                                                                                                </select>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="macaddr_clone_b">&nbsp;</label>
+                                                                                                                <input class="button_submit" id="macaddr_clone_b" value="Copy Your PC's MAC Address" onclick="macaddr_clone();" type="button">
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="machine_save_b">&nbsp;</label>
+                                                                                                                <input class="button_submit" id="machine_save_b" value="OK" onclick="machine_save()" type="button">
+                                                                                                                <input class="button_submit" id="machine_cancel_b" value="Cancel" onclick="machine_clear_editform()" type="button">
+                                                                                                        </p>
+                                                                                                </fieldset>
+                                                                                        </div><!-- wz_page_4 -->
+                                                                                        <div id="wz_page_4_machine_list" style="display: none;">
+                                                                                                <table class="formlisting" id="machines_list" cellpadding="0" cellspacing="1" width="100%">
+                                                                                                        <col>
+                                                                                                        <col width="20">
+                                                                                                        <col width="20">
+                                                                                                        <thead>
+                                                                                                                <tr class="form_label_row">
+                                                                                                                        <th>Machine</th>
+                                                                                                                        <th>&nbsp;</th>
+                                                                                                                        <th>&nbsp;</th>
+                                                                                                                </tr>
+                                                                                                        </thead>
+                                                                                                        <tbody id="machines_list_tbody"></tbody>
+                                                                                                </table>
+                                                                                        </div><!-- wz_page_4_machine_list -->
+                                                                                        <div id="wz_page_5" style="display: none;">
+                                                                                                <h3>Step 4: Select Filtering Method</h3>
+                                                                                                <p class="box_msg">Select the method for filtering.</p>
+                                                                                                <fieldset>
+                                                                                                        <input id="filter_method" type="hidden">
+                                                                                                        <p>
+                                                                                                                <label class="duple">Method&nbsp;:</label>
+                                                                                                                <input id="filter_method_radio_2" name="filter_method_radio" value="2" onclick="filter_method_selector(this.value)" type="radio">
+                                                                                                                <label for="filter_method_radio_2">Log Web Access Only</label>
+                                                                                                                <input id="filter_method_radio_1" name="filter_method_radio" value="1" onclick="filter_method_selector(this.value)" type="radio">
+                                                                                                                <label for="filter_method_radio_1">Block All Access</label>
+                                                                                                                <input id="filter_method_radio_0" name="filter_method_radio" value="0" onclick="filter_method_selector(this.value)" type="radio">
+                                                                                                                <label for="filter_method_radio_0">Block Some Access</label>
+                                                                                                        </p>
+                                                                                                        <p>&nbsp;</p>
+                                                                                                        <div id="box_filters">
+                                                                                                                
+                                                                                                                <p>
+                                                                                                                        <input id="web_access" type="hidden">
+                                                                                                                        <label class="duple" for="web_access_select">Apply Web Filter&nbsp;:</label>
+                                                                                                                        <input id="web_access_select" onclick="web_access_selector(this.checked)" type="checkbox">
+                                                                                                                </p>
+                                                                                                                <p>
+                                                                                                                        <input id="port_filter" type="hidden">
+                                                                                                                        <label class="duple" for="port_filter_select">Apply Advanced Port Filters&nbsp;:</label>
+                                                                                                                        <input id="port_filter_select" onclick="port_filter_selector(this.checked)" type="checkbox">
+                                                                                                                </p>
+                                                                                                        </div>
+                                                                                                </fieldset>
+                                                                                        </div><!-- wz_page_5 -->
+                                                                                        
+                                                                                        <div id="wz_page_7" style="display: none;">
+                                                                                                <h3>Step 5: Port Filter</h3>
+                                                                                                <p class="box_msg">Add Port Filters Rules.</p>
+                                                                                                <p>Specify rules to prohibit access to specific IP addresses and ports.</p>
+                                                                                                <table class="formlisting" cellpadding="0" cellspacing="1" width="100%">
+                                                                                                        <tbody><tr class="form_label_row">
+                                                                                                                <th>Enable</th>
+                                                                                                                <th>Name</th>
+                                                                                                                <th>Dest IP<br>Start</th>
+                                                                                                                <th>Dest IP<br>End</th>
+                                                                                                                <th>Protocol</th>
+                                                                                                                <th>Dest<br>Port<br>Start</th>
+                                                                                                                <th>Dest<br>Port<br>End</th>
+                                                                                                        </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_0_enabled" type="hidden">
+                                                                                                                                <input id="pf_0_enabled_select" onclick="pf_enabled_selector(0, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_0_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_0_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_0_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_0_protocol" type="hidden">
+                                                                                                                                <select id="pf_0_protocol_select" onchange="pf_protocol_selector(0, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_0_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_0_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_1_enabled" type="hidden">
+                                                                                                                                <input id="pf_1_enabled_select" onclick="pf_enabled_selector(1, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_1_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_1_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_1_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_1_protocol" type="hidden">
+                                                                                                                                <select id="pf_1_protocol_select" onchange="pf_protocol_selector(1, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_1_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_1_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_2_enabled" type="hidden">
+                                                                                                                                <input id="pf_2_enabled_select" onclick="pf_enabled_selector(2, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_2_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_2_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_2_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_2_protocol" type="hidden">
+                                                                                                                                <select id="pf_2_protocol_select" onchange="pf_protocol_selector(2, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_2_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_2_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_3_enabled" type="hidden">
+                                                                                                                                <input id="pf_3_enabled_select" onclick="pf_enabled_selector(3, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_3_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_3_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_3_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_3_protocol" type="hidden">
+                                                                                                                                <select id="pf_3_protocol_select" onchange="pf_protocol_selector(3, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_3_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_3_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_4_enabled" type="hidden">
+                                                                                                                                <input id="pf_4_enabled_select" onclick="pf_enabled_selector(4, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_4_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_4_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_4_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_4_protocol" type="hidden">
+                                                                                                                                <select id="pf_4_protocol_select" onchange="pf_protocol_selector(4, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_4_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_4_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_5_enabled" type="hidden">
+                                                                                                                                <input id="pf_5_enabled_select" onclick="pf_enabled_selector(5, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_5_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_5_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_5_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_5_protocol" type="hidden">
+                                                                                                                                <select id="pf_5_protocol_select" onchange="pf_protocol_selector(5, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_5_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_5_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_6_enabled" type="hidden">
+                                                                                                                                <input id="pf_6_enabled_select" onclick="pf_enabled_selector(6, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_6_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_6_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_6_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_6_protocol" type="hidden">
+                                                                                                                                <select id="pf_6_protocol_select" onchange="pf_protocol_selector(6, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_6_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_6_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                                <tr>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_7_enabled" type="hidden">
+                                                                                                                                <input id="pf_7_enabled_select" onclick="pf_enabled_selector(7, this.checked);" type="checkbox">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_7_entry_name" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_7_dest_ip_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="15" maxlength="15" id="pf_7_dest_ip_end" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input id="pf_7_protocol" type="hidden">
+                                                                                                                                <select id="pf_7_protocol_select" onchange="pf_protocol_selector(7, this.value);">
+<option value="0">Any</option>
+<option value="1">ICMP</option>
+<option value="6">TCP</option>
+<option value="17">UDP</option>
+                                                                                                                                </select>
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_7_dest_port_start" type="text">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                                <input size="5" maxlength="5" id="pf_7_dest_port_end" type="text">
+                                                                                                                        </td>
+                                                                                                                </tr>
+                                                                                                        
+                                                                                                </tbody></table>
+                                                                                        </div><!-- wz_page_7 -->
+                                                                                        <div id="wz_page_8" style="display: none;">
+                                                                                                <h3>Step 6: Configure Web Access Logging</h3>
+                                                                                                <fieldset>
+                                                                                                        <p>
+                                                                                                                <label class="duple" for="log_access">Web Access Logging&nbsp;:</label>
+                                                                                                                <input id="log_access" type="hidden">
+                                                                                                                <input id="log_access_radio_0" name="log_access_radio" value="0" onclick="log_access_selector(this.value)" type="radio">
+                                                                                                                <label for="log_access_radio_0">Disabled</label>
+                                                                                                        </p>
+                                                                                                        <p>
+                                                                                                                <label class="duple">&nbsp;</label>
+                                                                                                                <input id="log_access_radio_1" name="log_access_radio" value="1" onclick="log_access_selector(this.value)" type="radio">
+                                                                                                                <label for="log_access_radio_1">Enabled</label>
+                                                                                                        </p>
+                                                                                                </fieldset>
+                                                                                        </div><!-- wz_page_8 -->
+                                                                                        <fieldset>
+                                                                                                <p>
+                                                                                                        </p><hr>
+                                                                                                
+                                                                                                <p>
+                                                                                                        <label class="duple">&nbsp;</label>
+                                                                                                        <input class="button_submit" id="wz_prev_b" value="Prev" onclick="wz_prev();" type="button">
+                                                                                                        <input class="button_submit" id="wz_next_b" value="Next" onclick="wz_next();" type="button">
+                                                                                                        <input class="button_submit" id="wz_save_b" value="Save" onclick="rule_save();" type="button">
+                                                                                                        <input class="button_submit" id="wz_cancel_b" value="Cancel" onclick="rule_cancel();" type="button">
+                                                                                                </p>
+                                                                                        </fieldset>
+                                                                                </form>
+                                                                        </div><!-- wizard_page -->
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                                                                        <p>Check <strong>Enable Access Control</strong> if you want to enforce rules that limit Internet access from specific LAN computers.</p>
+                                                                        <p>Click <strong>Add Policy</strong>
+to start the processes of creating a rule. You can cancel the process
+at any time. When you are finished creating a rule it will be added to
+the <strong>Policy Table</strong> below.</p>
+                                                                        <p>Click the <strong>Edit</strong> icon to modify an existing rule using the Policy Wizard.</p>
+                                                                        <p>Click the <strong>Delete</strong> icon to permanently remove a rule.</p>
+                                                                        <p class="more">
+                                                                                <!-- Link to more help -->
+                                                                                <a href="Advanced.html#Access_Control" onclick="return jump_if();">More...</a>
+                                                                        </p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                            <tbody><tr>
+                                                <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                                                <td>&nbsp;</td>
+                                            </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

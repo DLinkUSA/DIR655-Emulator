@@ -1,0 +1,244 @@
+﻿/* *****************( Defaults )******************* */
+/*for mozilla as IE treats height as min-height anyway*/
+html, body, form
+{
+	height: 100%;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+body
+{
+	font-family: Arial;
+	font-size: 13px;
+	line-height: 15px;
+	background-color: #FFF;
+}
+/* *****************( End Defaults )******************* */
+
+/* *****************( Buttons )******************* */
+/* Used on Registraion and Quick Tour */
+
+.BlueAlias{background: url('../images/QuickTour/RoundedButtonsBlueAlias.gif') no-repeat 0px 0px;}
+.WhiteAlias{background: url('../images/QuickTour/RoundedButtonsWhiteAlias.gif') no-repeat 0px 0px;}
+
+.BlueAlias,
+.WhiteAlias,
+.BlueAlias a,
+.WhiteAlias a,
+.btnHov,
+.btnBlue,
+.btnBlueHov,
+.btnGreen,
+.btnGreenHov,
+.btnGray,
+.btnGrayHov
+{
+	/* default orange */
+	width: 100px;
+	height: 26px;
+	float: right;
+	clear: left;
+	/*position: relative; Not sure why I was using this*/
+	text-align: center;
+	font-weight: 700;
+	text-decoration: none;
+	line-height:19pt;
+	cursor:pointer;
+	color:Black;
+}
+.btnHov{background-position:0px -26px;}
+.btnBlue{background-position:0px -52px;}
+.btnBlueHov{background-position:0px -78px;}
+.btnGreen{background-position:0px -104px;}
+.btnGreenHov{background-position:0px -130px;}
+.btnGray{background-position:0px -156px;}
+.btnGrayHov{background-position:0px -182px;}
+
+/* *****************( End Buttons )******************* */
+
+/* *****************( OS logos )******************* */
+
+#OS_Logos, 
+#OS_Windows, 
+#OS_Mac, 
+#OS_Linux
+{
+	background: white url('../images/icon_OS.gif') no-repeat 0px 0px;
+	width: 120px;
+	height: 30px;
+}
+#OS_Windows{width: 40px;}
+#OS_Mac
+{
+	background-position: -40px 0px;
+	width: 40px;
+}
+#OS_Linux
+{
+	background-position: -80px 0px;
+	width: 40px;
+}
+
+/* *****************( End OS logos )******************* */
+
+/* *****************( Misc )******************* */
+
+.clear
+{
+	clear: both;
+	line-height:0px; /* causes IE to add 3px to the height */
+	font-size:0pt; /* fixes the issue caused by line-height in IE */
+	height:0px;
+	padding:0px;
+	margin:0px;
+}
+
+sup 
+{
+  font-size: 80%; 
+  vertical-align: top;
+}
+
+/* *****************( End Misc )******************* */
+
+/* *****************( Free Trial Offers )******************* */
+
+#CartOffersContainer{min-width:745px;}
+.CartOptionsContainer
+{
+  border:#DDDDDD solid 1px;
+  width: 360px;
+  padding:4px;
+  background-color:#fbf0db;
+}
+.CartOptions
+{
+  font-family: Arial;
+  text-align: center;
+  font-size: 12px;
+  background:#FFFFFF url(../images/bg_gradient_cart.jpg) bottom repeat-x;
+  width:99%;
+  border:#CCCCCC solid 1px;
+  height:100%;
+  padding-top:8px;
+}
+.CartOptions h1
+{
+  background-color: Blue;
+  color: white;
+  font-size: 15px;
+  text-align: center;
+  padding: 10px;
+}
+.CartOptions h2
+{
+  color: #990000;
+  font-size: 15px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom:5px;
+}
+.CartOptions h3
+{
+  color: #98A910;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+.CartOptions li
+{
+  color: Blue;
+  list-style-image: url(../images/checkMark.gif);
+}
+.CartOptions .Note{font-size: 10px;}
+.CartOptions ul
+{
+	margin-left:30px;
+	margin-bottom:10px;
+	text-align:left;
+	white-space:normal;
+}
+.CartOptions ul li ul li{margin-left:-10px;}
+.CartOptions li.Benefit
+{
+  color: #990000;
+  font-size: 13px;
+  font-weight: bold;
+}
+/* Title of each offer section */
+.OfferTitleBtn
+{
+	background: url('../images/button_offers.gif') no-repeat;
+	width:341px;
+	height:53px;
+	text-align:center;
+}
+.OfferTitleBtn,
+.OfferTitleBtn a
+{
+	color:White;
+	font-weight:bold;
+	font-size:13pt;
+	text-decoration:none;
+}
+.OfferTitleBtn img
+{
+	vertical-align:middle; /* Works in IE - go figure */
+	height:47px;
+	width:1px;
+}
+/* Table assimilation */
+.OfferTable
+{
+	display: table;
+	padding:0px;
+	margin:0px;
+	width:100%;
+	white-space:nowrap;
+}
+.OfferTableData{display:inline-block;} /* For IE correction - needs to be first */
+.OfferTableData{display:inline;} /* For IE correction  - needs to be second */
+.OfferTableData
+{
+	display:table-cell; /* For IE correction  - needs to be third */
+	padding:0px;
+	margin:0px;
+	vertical-align:top;
+	text-align:center;	
+	width:49%;
+}
+
+/* Loading animation styles */
+#LoadingContainer
+{
+	height:20px;
+	width:335px;
+	white-space:nowrap;
+}
+.loadingAnim
+{
+	float:left;
+	width:16px;
+	height:16px;
+	margin-top:2px;
+	background-image:url('../images/loading_sprite.gif');
+}
+.loadingAnim1{background-position:-16px 0px;}
+.loadingAnim2{background-position:-32px 0px;}
+.loadingAnim3{background-position:-48px 0px;}
+.loadingAnim4{background-position:-64px 0px;}
+.loadingAnim5{background-position:-80px 0px;}
+.loadingAnim6{background-position:-96px 0px;}
+.loadingAnim7{background-position:-0px 0px;}
+
+.loadingText
+{
+	margin-top:1px;
+	float:left;
+	height:16px;
+	width:300px;
+	text-align:left;
+	line-height:12pt;
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SECURESPOT</title>
+<script type="text/JavaScript">
+<!--
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+//-->
+</script>
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-image: url(firewall_bg.jpg);
+	background-repeat: repeat-y;
+}
+
+select.dropdownmenu {width:150px}
+
+input.textfield { backgorund-color:#FFFFFF; font:Arial; font-size:11px; line-height:10px; width:147}
+
+
+
+-->
+</style>
+
+<script type="text/javascript">
+
+function device(val){
+
+		if (val == "01"){
+		document.getElementById("computing").style.display= "none";
+		document.getElementById("gaming").style.display= "none";
+		document.getElementById("peripherals").style.display= "none";
+		document.getElementById("voice").style.display= "none";
+						}
+
+		if (val == "02"){
+		document.getElementById("computing").style.display= "block";
+		document.getElementById("gaming").style.display= "none";
+		document.getElementById("peripherals").style.display= "none";
+		document.getElementById("voice").style.display= "none";
+						}
+						
+		if (val == "03"){
+		document.getElementById("computing").style.display= "none";
+		document.getElementById("gaming").style.display= "block";
+		document.getElementById("peripherals").style.display= "none";
+		document.getElementById("voice").style.display= "none";
+						}
+						
+		if (val == "04"){
+		document.getElementById("computing").style.display= "none";
+		document.getElementById("gaming").style.display= "none";
+		document.getElementById("peripherals").style.display= "block";
+		document.getElementById("voice").style.display= "none";
+						}
+						
+		if (val == "05"){
+		document.getElementById("computing").style.display= "none";
+		document.getElementById("gaming").style.display= "none";
+		document.getElementById("peripherals").style.display= "none";
+		document.getElementById("voice").style.display= "block";
+						}
+						
+						
+						
+		else if(val == "022"){
+		document.getElementById("mpeg4_2").style.display= "none";
+		document.getElementById("jpeg_2").style.display= "block";
+							}
+}
+
+</script>
+</head>
+
+<body>
+<table width="370" height="600" border="0" cellspacing="0" cellpadding="0" background="">
+  <tr>
+    <td><img src="right_dir655_firewall_top1.jpg" border="0" usemap="#Map" /><br />
+    	<img src="right_dir655_firewall_2.jpg" /><br />
+        <img src="right_dir655_firewall_3a.jpg" />
+      <select class="dropdownmenu" onChange="device(this.value)">
+        <option value="01">Please Select</option>
+        <option value="02">Computing</option>
+        <option value="03">Gaming</option>
+        <option value="04">Peripherals</option>
+        <option value="05">Voice</option>
+      </select>
+        <br />
+        <!-- -->
+        
+        <!-- computing -->
+      <div id="computing" style="display:none">
+        <img src="right_dir655_firewall_4a.jpg" />
+        		<select class="dropdownmenu">
+       			  <option selected="selected">Laptop</option>
+        			<option>PC</option>
+        		</select>
+<img src="right_dir655_firewall_5a.jpg" />
+        		<select class="dropdownmenu">
+        			<option>Linux</option>
+        			<option>Macintosh</option>
+                  <option selected="selected">Unknown</option>
+                    <option>Windows</option>
+        		</select> 
+              <img src="right_dir655_firewall_6a.jpg" />
+             	<input type="text"/> 
+        <img src="right_dir655_firewall_7a.jpg" />
+				<input type="text"/> 
+      </div>
+        
+      	<!-- gaming -->
+      <div id="gaming" style="display:none">
+            <img src="right_dir655_firewall_8a.jpg" />
+   		  <select class="dropdownmenu">
+        			<option selected="selected">DS</option>
+        			<option>PS2</option>
+                    <option>PS3</option>
+                    <option>PSP</option>
+                    <option>WII</option>
+                    <option>XBox</option>
+                    <option>XBox360</option>
+        		</select> 
+              <img src="right_dir655_firewall_6a.jpg" />
+             	<input type="text"/> 
+             <img src="right_dir655_firewall_7a.jpg" />
+				<input type="text"/> 
+            <img src="right_dir655_firewall_9a.jpg" />
+            	<input type="text"/> 
+      </div>
+            
+            
+       <!-- peripherals -->
+      <div id="peripherals" style="display:none">
+            <img src="right_dir655_firewall_8a.jpg" />
+        		<select class="dropdownmenu">
+        			<option selected="selected">DVR</option>
+        			<option>PDA</option>
+                    <option>Printer</option>
+                    <option>Smartphone</option>
+                    <option>USBPrinter</option>
+                    <option>USBStorage</option>
+                    <option>WebCam</option>
+        		</select> 
+              <img src="right_dir655_firewall_6a.jpg" />
+             	<input type="text"/> 
+             <img src="right_dir655_firewall_7a.jpg" />
+				<input type="text"/> 
+            <img src="right_dir655_firewall_9a.jpg" />
+            	<input type="text"/> 
+      </div>
+            
+       <!-- voice -->
+      <div id="voice" style="display:none">
+            <img src="right_dir655_firewall_8a.jpg" />
+        		<select class="dropdownmenu">
+        			<option selected="selected">Skype</option>
+        			<option>VOIP</option>
+        		</select> 
+              <img src="right_dir655_firewall_6a.jpg" />
+             	<input type="text"/> 
+             <img src="right_dir655_firewall_7a.jpg" />
+				<input type="text"/> 
+            <img src="right_dir655_firewall_9a.jpg" />
+            	<input type="text"/> 
+      </div>
+            <br />
+            
+            
+      <!-- -->
+      	<img src="right_dir655_firewall_10a.jpg" />
+   	  <a href="#" onClick='alert("This feature has been disabled on this emulator.")' onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('save','','button_save2.jpg',1)"><img src="button_save1.jpg" id="save" border="0" /></a>
+        <img src="right_dir655_firewall_bottom.jpg" />
+    </td>
+  </tr>
+</table>
+
+
+
+<map name="Map" id="Map"><area shape="circle" coords="350,40,13" href="right_dir655_firewall.html" /></map></body>
+</html>

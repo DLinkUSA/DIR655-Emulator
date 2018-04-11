@@ -1,0 +1,1814 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+        	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+        <!-- InstanceBeginEditable name="Page Title" -->
+        <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+                Tools / Admin
+        </title>
+        <!-- InstanceEndEditable -->
+
+        <!-- InstanceBeginEditable name="Local Styles" -->
+        <style type="text/css">
+        /*
+         * Styles used only on this page.
+         */
+        </style>
+        <!-- InstanceEndEditable -->
+
+        
+                
+        
+
+        
+            
+        
+
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="navigation.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Tools/Admin.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+        //]]>
+        </script>
+
+        <!-- InstanceBeginEditable name="Scripts" -->
+        <script type="text/javascript">
+        //<![CDATA[
+        // 
+/*
+ * This script is to be SSI included in an HTML page.
+ *	It defines ingress filter options to be added to a select list, provides a function
+ *	to populate <select>'s and a function that return a filter's details.
+ */
+
+var ingress_filter_options = [
+	{ value: "Allow All", text: "Allow All", action: "" },
+	{ value: "Deny All", text: "Deny All", action: "" },
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+		// 
+	// 
+];
+
+/*
+ * ingress_filter_populate_select()
+ *	Add options from the ingress_filter_options array to a specified <select>.
+ */
+function ingress_filter_populate_select(select_id)
+{
+	/*
+	 * Clear existing options as we are now going to refresh the list
+	 */
+	select_id.options.length = 0;
+
+	var k = ingress_filter_options.length;
+	/* Overrun may occurs in an array if there is a comma but no ending elements. */
+	if (!ingress_filter_options[k - 1]) {
+		k--;
+	}
+
+	for (var i = 0; i < k; i++) {
+		select_id.options.add(new Option(ingress_filter_options[i].text, ingress_filter_options[i].value));
+	}
+}
+
+/*
+ * ingress_filter_details()
+ *	Return a string describing the currently selected ingress filter in a specified <select>.
+ */
+function ingress_filter_details(select_id)
+{
+	var str = "";
+	var idx = select_id.selectedIndex;
+
+	/* If the input is disabled, set index to zero. */
+	if (idx == -1) {
+		idx = 0;
+	}
+
+	if (idx == 0 || idx == 1) {
+		return select_id.options[idx].text;
+	}
+
+	/* 0=Allow, 1=Deny */
+	if (ingress_filter_options[idx].action === "0") {
+		str = "Allow ";
+	} else {
+		str = "Deny ";
+	}
+
+	for (var i = 0; i < ingress_filter_options[idx].ipranges.length; i++) {
+		/* Overrun may occurs in an array if there is a comma but no ending elements. */
+		if (!ingress_filter_options[idx].ipranges[i]) {
+			break;
+		}
+		ipstart = ingress_filter_options[idx].ipranges[i].ipstart;
+		ipend = ingress_filter_options[idx].ipranges[i].ipend;
+		if (i > 0) {
+			str += ", ";
+		}
+		if (ipstart == "0.0.0.0" && ipend == "255.255.255.255") {
+			str += "All";
+		} else if (ipstart == ipend) {
+			str += ipstart;
+		} else {
+			str += ingress_filter_options[idx].ipranges[i].ipstart + "-" + ingress_filter_options[idx].ipranges[i].ipend;
+		}
+	}
+
+	return str;
+}
+
+
+
+        var mf;
+
+        var is_router_mode = "0" == "0";
+
+        /*
+         * password_verify_ok()
+         */
+        function password_verify_ok()
+        {
+            if (mf.password.value != mf.password_verify.value) {
+                alert("Password and Verify Password do not match. Please reconfirm admin password.");
+                mf.password.value = "";
+                mf.password.focus();
+                mf.password_verify.value = "";
+                return false;
+            }
+
+            if (!is_ascii(mf.password.value)) {
+                alert("Password can only contain printable characters.");
+                mf.password.value = "";
+                mf.password.focus();
+                mf.password_verify.value = "";
+                return false;
+            }
+
+            if (mf.user_password.value != mf.user_password_verify.value) {
+                alert("Password and Verify Password do not match. Please reconfirm user password.");
+                mf.user_password.value = "";
+                mf.user_password.focus();
+                mf.user_password_verify.value = "";
+                return false;
+            }
+
+            if (!is_ascii(mf.user_password.value)) {
+                alert("Password can only contain printable characters.");
+                mf.user_password.value = "";
+                mf.user_password.focus();
+                mf.user_password_verify.value = "";
+                return false;
+            }
+
+            return true;
+        }
+
+        /*
+         * web_server_wan_port_http_verify_ok()
+         */
+        function web_server_wan_port_http_verify_ok()
+        {
+            var val = mf.web_server_wan_port.value;
+            if (!is_number(val)) {
+                alert("The remote admin port number is not valid.");
+                mf.web_server_wan_port.select();
+                mf.web_server_wan_port.focus();
+                return false;
+            }
+            if (val < 1 || val > 65535) {
+                alert("The remote admin port should be in the range of 1 to 65535.");
+                mf.web_server_wan_port.select();
+                mf.web_server_wan_port.focus();
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * enable_https_selector()
+         */
+        function enable_https_selector(checked)
+        {
+            mf.web_server_allow_https.value = checked;
+            disable_form_field(mf.wan_use_https_checkbox, !(checked && mf.web_server_allow_wan_http_checkbox.checked));
+            if (!mf.web_server_allow_wan_http_checkbox.checked || !checked) {
+                wan_use_https_selector(false);
+            }
+        }
+
+        /*
+         * web_server_allow_wan_http_selector()
+         */
+        function web_server_allow_wan_http_selector(checked)
+        {
+            mf.web_server_allow_wan_http_checkbox.checked = checked;
+            disable_form_field(mf.wan_use_https_checkbox, !(checked && mf.enable_https_checkbox.checked));
+            disable_form_field(mf.web_server_wan_port, !checked);
+            disable_form_field(mf.wan_web_ingress_filter_name_select, !checked);
+            disable_form_field(mf.wan_ingress_filter_details, !checked);
+        }
+
+        /*
+         * wan_use_https_selector()
+         */
+        function wan_use_https_selector(checked)
+        {
+            mf.wan_use_https_checkbox.checked = checked;
+            mf.web_server_allow_wan_http.value = !checked;
+            mf.web_server_allow_wan_https.value = checked;
+            mf.web_server_wan_port.value = checked ? mf.web_server_wan_port_https.value : mf.web_server_wan_port_http.value;
+        }
+
+        /*
+         * wan_web_ingress_filter_name_selector()
+         */
+        function wan_web_ingress_filter_name_selector(value)
+        {
+            mf.wan_web_ingress_filter_name.value = value;
+            mf.wan_web_ingress_filter_name_select.value = value;
+            ingress_filter_details_selector();
+        }
+
+        /*
+         * ingress_filter_details_selector()
+         */
+        function ingress_filter_details_selector()
+        {
+            mf.wan_ingress_filter_details.value = ingress_filter_details(mf.wan_web_ingress_filter_name_select);
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            if (local_debug) {
+                    hide_all_ssi_tr();
+                    wan_web_ingress_filter_name_selector(true);
+                    return;
+            }
+
+            /*
+             * Get the current admin password (empty if logged in as user).
+             */
+            var admin_pwd = "";
+            if ("true" == "true") {
+                    mf.password.value = admin_pwd;
+                    mf.password_verify.value = admin_pwd;
+            }
+
+            if (is_router_mode) {
+                /*
+                 * Initialize HTTPS and remote admin controls.
+                 */
+                mf.enable_https_checkbox.checked = mf.web_server_allow_https.value == "true";
+                disable_form_field(mf.wan_use_https_checkbox, !mf.enable_https_checkbox.checked);
+                mf.web_server_allow_wan_http_checkbox.checked = mf.web_server_allow_wan_http.value == "true" || mf.web_server_allow_wan_https.value == "true";
+                mf.wan_use_https_checkbox.checked = mf.web_server_allow_wan_https.value == "true";
+                mf.web_server_wan_port.value = mf.wan_use_https_checkbox.checked ? mf.web_server_wan_port_https.value : mf.web_server_wan_port_http.value;
+                disable_form_field(mf.web_server_wan_port, !mf.web_server_allow_wan_http_checkbox.checked);
+
+                /*
+                 * Populate ingress filter select element before we access ingress filter details.
+                 */
+                ingress_filter_populate_select(mf.wan_web_ingress_filter_name_select);
+                wan_web_ingress_filter_name_selector(mf.wan_web_ingress_filter_name.value);
+            } else {
+                /*
+                 * If WAN port mode selected is Bridge mode, we hide  "Remote Management" section.
+                 * Disable related elements as we do not want to submit the elements not used in the selected mode.
+                 */
+                document.getElementById("remote_administration_box").style.display = "none";
+            }
+
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            save_form_default_values("mainform");
+
+            /*
+             * Check for validation errors.
+             */
+            var verify_failed = "";
+            if (verify_failed != "") {
+                alert(verify_failed);
+                verify_failed = "";
+            }
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+
+            if (!password_verify_ok()) {
+                return;
+            }
+
+            /*
+             * We have done enough validation, if it is bridge mode.
+             */
+            if (!is_router_mode) {
+                mf.submit();
+                return;
+            }
+
+            var idle_timeout = mf.web_server_idle_timeout.value;
+            if (!is_number(idle_timeout)) {
+                alert("The administration idle time must be a number");
+                return;
+            }
+            if (idle_timeout < 1 || idle_timeout > 65535) {
+                alert("The administration idle time should be in the range of 1 to 65535.");
+                return;
+            }
+
+            if (mf.web_server_allow_wan_http_checkbox.checked ) {
+                mf.web_server_allow_wan_http.value = !mf.wan_use_https_checkbox.checked;
+                mf.web_server_allow_wan_https.value = mf.wan_use_https_checkbox.checked;
+                if (!web_server_wan_port_http_verify_ok()) {
+                    return;
+                }
+                if (mf.wan_use_https_checkbox.checked) {
+                    mf.web_server_wan_port_https.value = mf.web_server_wan_port.value;
+                } else {
+                    mf.web_server_wan_port_http.value = mf.web_server_wan_port.value;
+                }
+                var value = mf.web_server_wan_port_http.value;
+
+                if (Check_VS_Port(value)) {
+                    return;
+                }
+
+                if (Check_PF_Port(value)) {
+                    return;
+                }
+            } else {
+                mf.web_server_allow_wan_http.value = false;
+                mf.web_server_allow_wan_https.value = false;
+            }
+
+            mf.submit();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") &&
+                confirm("Do you want to abandon all changes you made to this page?")) {
+                reset_form("mainform");
+                page_load();
+            }
+        }
+
+// 2007.04.17
+// Simple Port Range Check, No comma
+        function CheckCheck_PortRangeSimple(range,port)
+        {
+                var p;
+                var r = range;
+//              alert(range);
+
+                p = r.indexOf('-');
+                if( p == -1) {
+                        // no -
+                        var i;
+                        i = parseInt(range);
+                        if( i == port) {
+                            return true;
+                        }
+                }
+                else {
+                        // find -
+                        var i1,i2;
+                        var rr;
+                        rr = r.substring(0,p);
+                        i1 = parseInt(rr);
+                        rr = r.substring(p+1,r.length);
+                        i2 = parseInt(rr);
+
+                        //alert(i1 + ' ' + i2);
+                        if( i1 > i2) {
+                                var temp;
+                                temp = i2;
+                                i2 = i1;
+                                i1 = temp;
+                        }
+                        //alert(i1 + ' ' + i2);
+                        if( (i1 <= port) && (port <= i2)) {
+                                return true;
+                        }
+                }
+                return false;
+        }
+
+// input  range(incuding ,) like 1-2,3-99,200,...
+        function CheckCheck_PortRange(range,port)
+        {
+
+                var r=range;
+                while(1) {
+
+                        var s;
+                        var p;
+
+                        p = r.indexOf(',');
+
+                        //alert(r+" "+ p);
+
+                        if( p == -1) {
+                                // no ,
+                                // r is number or -
+                                if( CheckCheck_PortRangeSimple(r,port)) {
+                                        return true;
+                                }
+                                // process last
+                                break;
+                        }
+                        else {
+                                // find ,
+                                var rr;
+                                rr = r.substring(0,p);
+                                //alert(rr);
+                                if( CheckCheck_PortRangeSimple(rr,port)) {
+                                        return true;
+                                }
+                                r = r.substring(p+1,r.length);
+                                //alert(r);
+                        }
+                };
+                return false;
+        }
+
+        // 2007.04.17 Check Port issue (Remote Managemnet)
+
+        // Virtual Server
+        var VS_Port = [
+            
+            { id: "0",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "1",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "2",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "3",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "4",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "5",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "6",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "7",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "8",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "9",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "10",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "11",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "12",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "13",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "14",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "15",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "16",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "17",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "18",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "19",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "20",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "21",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "22",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+            { id: "23",
+              name: "",
+              enabled: "false",
+              used: "0",
+              public_port: "0",
+              protocol: "6"
+            },
+            
+
+            { id: "-1", // end word
+              name: "",
+              enabled: "0",
+              used: "0",
+              public_port: "0",
+              protocol: "0"
+            }
+        ];
+
+
+        function Check_VS_Port(value)
+        {   // return true if find value == port
+            // check protocol = 6 or 257
+            var i;
+
+            for (i=0;i<24;i++) {
+                if (VS_Port[i].id == "-1") {
+                    break;
+                }
+
+                if (VS_Port[i].enabled == "true") {
+                    if (VS_Port[i].protocol == "6" || VS_Port[i].protocol == "257" ) {
+                        if (CheckCheck_PortRange( VS_Port[i].public_port,value)) {
+                            var msg;
+                            var s;
+
+                            s = "Remote Admin Port conflict with ";
+                            msg = s;
+
+                            s = "Virtual Server Item ";
+                            msg = msg +  s + "'" + VS_Port[i].name + "'";
+
+                            s = " , Please check";
+                            msg = msg + s;
+
+                            alert(msg);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+
+        // PORT FORWARD
+        var PF_Port = [
+            
+            { id: "0",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "1",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "2",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "3",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "4",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "5",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "6",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "7",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "8",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "9",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "10",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "11",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "12",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "13",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "14",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "15",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "16",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "17",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "18",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "19",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "20",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "21",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "22",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+            { id: "23",
+              name: "",
+              enabled: "false",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            },
+            
+
+            { id: "-1", // end word
+              name: "",
+              enabled: "0",
+              used: "0",
+              tcp_port: "",
+              udp_port: ""
+            }
+        ];
+
+
+        function Check_PF_Port(value)
+        {   // return true if find value == port
+            // check tcp_port
+            var i;
+
+            for (i=0;i<24;i++) {
+                if (PF_Port[i].id == "-1") {
+                    break;
+                }
+
+                if (PF_Port[i].enabled == "true") {
+                    if (CheckCheck_PortRange( PF_Port[i].tcp_port,value)) {
+                        var msg;
+                        var s;
+
+                        s = "Remote Admin Port conflict with ";
+                        msg = s;
+
+                        s = "Port Forwarding Item ";
+                        msg = msg + s + "'" + PF_Port[i].name + "'";
+
+                        s = " , Please check";
+                        msg = msg + s;
+
+                        alert(msg);
+                        return true;
+                    }
+                }
+            }
+             return false;
+        }
+
+
+        // APPLICATION RULE
+        var AR_Port = [
+            
+            { id: "0",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "1",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "2",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "3",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "4",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "5",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "6",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "7",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "8",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "9",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "10",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "11",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "12",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "13",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "14",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "15",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "16",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "17",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "18",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "19",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "20",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "21",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "22",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+            { id: "23",
+              name: "",
+              enabled: "false",
+              used: "0",
+              port: "",
+              protocol: "6"
+            },
+            
+
+            { id: "-1", // end word
+              name: "",
+              enabled: "0",
+              used: "0",
+              port: "",
+              protocol: ""
+            }
+        ];
+
+        function Check_AR_Port(value)
+        {   // return true if find value == port
+            // check  protocol 0 or 6
+            return false;
+        }
+        //]]>
+        </script>
+        <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+        <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+        <div id="outside">
+                <table id="table_shell" summary="" cellspacing="0"><col span="1">
+                        <tbody><tr>
+                                <td>
+                                        <div id="header_container">
+                                                <div id="info_bar">
+                                                        <div class="fwv">Firmware Version:
+                                                        1.<span id="fw_minor_head">21</span>
+                                                        </div>
+                                                        <div class="hwv">Hardware Version:
+                                                        A4
+                                                        </div>
+                                                        <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                                                </div>
+                                        </div>
+                                        <table id="masthead_container" summary="" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td><div id="masthead_image"></div></td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="topnav_container" summary="" border="0" cellspacing="1">
+                                                <tbody><tr>
+                                                        <td id="modnum">
+                                                                <div id="modnum_image"></div>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                                                        </td>
+                                                        <td class="topnavon">
+                                                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                                                        </td>
+                                                        <td class="topnavoff">
+                                                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+
+                                        <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                                                <tbody><tr>
+                                                        <td id="sidenav_container">
+                                                                <div id="sidenav">
+
+                                                                        <ul id="Basic_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul id="Advanced_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                        <ul style="display: block;" id="Tools_subnav" class="subnav_group">
+                                                                                <li class="here">
+                                                                                        <div>
+                                                                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                                                                        </div>
+                                                                                </li>
+
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Status_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                                
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                
+                                                                        </ul>
+
+                                                                        <ul id="Help_subnav" class="subnav_group">
+                                                                                <li class="">
+                                                                                        <div>
+                                                                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                        <div>
+                                                                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                                                                        </div>
+                                                                                </li>
+                                                                        </ul>
+
+                                                                </div>
+                                                        </td>
+                                                        <td id="maincontent_container">
+                                                                <div id="rebootcontent" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>Reboot needed</h2>
+                                                                                        <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                                                                        <form id="rebootdummy" action="#" method="get">
+
+                                                                                        <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                                                                        <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                                                                        </form>
+                                                                                </div>
+                                                                        </div> <!-- reboot_warning -->
+                                                                </div>
+                                                                <div id="warnings_section" style="display: none;">
+                                                                        <div class="section">
+                                                                                <div class="section_head">
+                                                                                        <h2>
+                                                                                                Configuration Warnings
+                                                                                        </h2>
+                                                                                        <div style="display: block;" id="warnings_section_content">
+                                                                                                <!-- This division will be populated with configuration warning information -->
+                                                                                        </div><!-- box warnings_section_content -->
+                                                                                </div>
+                                                                        </div>
+                                                                </div> <!-- warnings_section -->
+                                                                <input id="radio_count" value="1" type="hidden">
+                                                                <div id="maincontent" style="display: block;">
+                                                                        <!-- InstanceBeginEditable name="Main Content" -->
+                                                                        <form saved="true" id="mainform" action="/Tools/Admin.html" method="post" onsubmit="return false;">
+                                                                                <div class="section">
+                                                                                        <div class="section_head">
+                                                                                                <h2>Administrator Settings</h2>
+                                                                                                <p>The
+'admin' and 'user' accounts can access the management interface. The
+admin has read/write access and can change passwords, while the user
+has read-only access.</p>
+                                                                                                <p>By default there is no password configured. It is highly recommended that you create a password to keep your router secure.</p>
+                                                                                                <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                                                                                <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                                                                <input class="button_submit" value="Don't Save Settings" onclick="page_cancel();" type="button">
+                                                                                        </div>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>Admin Password</h3>
+                                                                                        <p class="box_msg">Please enter the same password into both boxes, for confirmation.</p>
+                                                                                        <fieldset id="admin_password_fieldset">
+                                                                                        <p>
+                                                                                                <label class="duple" for="password">Password&nbsp;:</label>
+                                                                                                <input default="" id="password" maxlength="15" size="20" value="" name="config.password" type="password">
+                                                                                        </p>
+                                                                                        <p>
+                                                                                                <label class="duple" for="password_verify">Verify Password&nbsp;:</label>
+                                                                                                <input default="" id="password_verify" maxlength="15" size="20" value="" type="password">
+                                                                                        </p>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>User Password</h3>
+                                                                                        <p class="box_msg">Please enter the same password into both boxes, for confirmation.</p>
+                                                                                        <fieldset>
+                                                                                        <p>
+                                                                                                <label class="duple" for="user_password">Password&nbsp;:</label>
+                                                                                                <input default="" id="user_password" maxlength="15" size="20" value="" name="config.user_password" type="password">
+                                                                                        </p>
+                                                                                        <p>
+                                                                                                <label class="duple" for="user_password_verify">Verify Password&nbsp;:</label>
+                                                                                                <input default="" id="user_password_verify" maxlength="15" size="20" value="" type="password">
+                                                                                        </p>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div class="box">
+                                                                                        <h3>System Name</h3>
+                                                                                        <fieldset id="system_name_fieldset">
+                                                                                        <p>
+                                                                                                <label class="duple" for="gw_name">Gateway Name&nbsp;:</label>
+                                                                                                <input autocomplete="off" default="D-Link Systems DIR-655" id="gw_name" name="config.gw_name" size="20" maxlength="32" value="D-Link Systems DIR-655" type="text">
+                                                                                        </p>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                                <div class="box" id="administration_box">
+                                                                                        <h3>Administration</h3>
+                                                                                        <fieldset id="administration_fieldset">
+                                                                                        <p style="display: none;">
+                                                                                                <label class="duple" for="web_server_idle_timeout">Inactivity Time Out&nbsp;:</label>
+                                                                                                <input autocomplete="off" default="15" maxlength="5" id="web_server_idle_timeout" name="config.web_server_idle_timeout" value="15" type="text"> (minutes)
+                                                                                        </p>
+                                                                                        <div id="remote_administration_box">
+                                                                                        <p>
+                                                                                                <input default="false" id="web_server_allow_https" name="config.web_server_allow_https" value="false" type="hidden">
+                                                                                                <label class="duple" for="enable_https_checkbox">Enable HTTPS Server&nbsp;:</label>
+                                                                                                <input default="false" id="enable_https_checkbox" onclick="enable_https_selector(this.checked)" type="checkbox">
+                                                                                        </p>
+                                                                                        <p>
+                                                                                                <input default="false" id="web_server_allow_wan_http" name="config.web_server_allow_wan_http" value="false" type="hidden">
+                                                                                                <input default="false" id="web_server_allow_wan_https" name="config.web_server_allow_wan_https" value="false" type="hidden">
+                                                                                                <label class="duple" for="web_server_allow_wan_http_checkbox">Enable Remote Management&nbsp;:</label>
+                                                                                                <input default="false" id="web_server_allow_wan_http_checkbox" onclick="web_server_allow_wan_http_selector(this.checked)" type="checkbox">
+                                                                                        </p>
+                                                                                        <p>
+                                                                                                <input default="8080" name="config.web_server_wan_port_http" id="web_server_wan_port_http" value="8080" type="hidden">
+                                                                                                <input default="8181" name="config.web_server_wan_port_https" id="web_server_wan_port_https" value="8181" type="hidden">
+                                                                                                <label class="duple" for="web_server_wan_port">Remote Admin Port&nbsp;:</label>
+                                                                                                <input autocomplete="off" default="8080" disabled="disabled" class="disabled" id="web_server_wan_port" size="10" maxlength="5" type="text">
+                                                                                                <label for="wan_use_https_checkbox">Use HTTPS&nbsp;:</label>
+                                                                                                <input default="false" disabled="disabled" class="disabled" id="wan_use_https_checkbox" onclick="wan_use_https_selector(this.checked)" type="checkbox">
+                                                                                        </p>
+                                                                                        <p>
+                                                                                                <label class="duple">Remote Admin
+                                                                                                        <a href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>&nbsp;:</label>
+                                                                                                <input default="Allow All" id="wan_web_ingress_filter_name" name="config.wan_web_ingress_filter_name" value="Allow All" type="hidden">
+                                                                                                <select id="wan_web_ingress_filter_name_select" onchange="wan_web_ingress_filter_name_selector(this.value)">
+                                                                                                        
+                                                                                                        
+                                                                                                <option default="true" value="Allow All">Allow All</option><option default="false" value="Deny All">Deny All</option></select>
+                                                                                        </p>
+                                                                                        <p>
+                                                                                                <label class="duple" for="wan_ingress_filter_details">Details&nbsp;:</label>
+                                                                                                <input autocomplete="off" default="Allow All" id="wan_ingress_filter_details" name="wan_ingress_filter_details" class="rule_details" size="48" maxlength="48" readonly="readonly" value="" type="text">
+                                                                                        </p>
+                                                                                        </div>
+                                                                                        </fieldset>
+                                                                                </div>
+                                                                        </form>
+                                                                        <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                        <td id="sidehelp_container">
+                                                                <div id="help_text">
+                                                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                                                        <strong>Helpful Hints...</strong>
+                        <p>For
+security reasons, it is recommended that you change the password for
+the Admin and User accounts. Be sure to write down the new and
+passwords to avoid having to reset the router in case they are
+forgotten.</p>
+                        <p>Enabling Remote Management, allows you or others to change the router configuration from a computer on the Internet.</p>
+                        <p>Choose a port to open for remote management.</p>
+                        <p>
+                                Select a filter that controls access as needed for this admin port.
+                                If you do not see the filter you need in the list of filters, go to the <a href="Inbound_Filter.html">Advanced → Inbound&nbsp;Filter</a> screen and create a new filter.
+                        </p>
+                                                                                <p class="more">
+                                                                                        <!-- Link to more help -->
+                                                                                        <a href="Tools.html#Admin" onclick="return jump_if();">More...</a>                                                                              </p>
+                                                                <!-- InstanceEndEditable -->
+                                                                </div>
+                                                        </td>
+
+                                                </tr>
+                                        </tbody></table>
+                                        <table id="footer_container" summary="" border="0" cellspacing="0">
+                                                <tbody><tr>
+                                                        <td>
+                                                                <img src="img_wireless_bottom.gif" alt="" width="114" height="35">
+                                                        </td>
+                                                        <td>&nbsp;
+
+                                                        </td>
+                                                </tr>
+                                        </tbody></table>
+                                </td>
+                        </tr>
+                </tbody></table>
+
+                <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+        </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

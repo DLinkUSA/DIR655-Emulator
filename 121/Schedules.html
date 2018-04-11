@@ -1,0 +1,1507 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+    	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+    <!-- InstanceBeginEditable name="Page Title" -->
+    <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER  :
+        Tools / Schedules    
+    </title>
+    <!-- InstanceEndEditable -->
+
+    <!-- InstanceBeginEditable name="Local Styles" -->
+    <style type="text/css">
+    /*
+     * Styles used only on this page.
+     */
+    .hour_box {
+        width: 40px;
+    }
+    .min_box {
+        width: 40px;
+    }
+    .ampm_box {
+        width: 50px;
+    }
+    #day_select  {
+        margin-bottom: 10px;
+    }
+    #day_select input {
+        margin: 0 1px 0 0;
+        padding: 0;
+    }
+    #day_select label {
+        margin: 0 4px 0 1px;
+        padding: 0;
+    }
+    fieldset label.duple {
+        width: 135px;
+    }
+    </style>
+    <!-- InstanceEndEditable -->
+
+    
+        
+    
+
+    
+        
+    
+
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="ajax.js"></script>
+    <script type="text/javascript" src="navigation.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                                  "If not, press Cancel and then click Save Settings.\n" +
+                                  "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Tools/Schedules.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+                //document.getElementById("fw_minor_head").innerHTML = global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+    //]]>
+    </script>
+
+    <!-- InstanceBeginEditable name="Scripts" -->
+    <script type="text/javascript">
+    //<![CDATA[
+        //
+		/*
+		 * General array editor (AE) functions
+		 */
+
+		/*extern add_class, remove_class */
+
+		/*
+		 * The currently selected AE row, or null
+		 */
+		var ae_selected_row = null;
+
+		/*
+		 * Call this function when you are finished
+		 *  with a specific row of the array.
+		 */
+		function deselect_ae_row()
+		{
+			if (ae_selected_row !== null) {
+				remove_class(ae_selected_row, 'ae_selected_row');
+				ae_selected_row = null;
+			}
+		}
+
+		/*
+		 * Call this function anytime you want to talk to the user
+		 *  about a specific row of the array (i.e. edit or delete it).
+		 */
+		function select_ae_row(child_element)
+		{
+			deselect_ae_row();
+
+			/*
+			 * Find the table row that contains the given element.
+			 * Allowing caller to specify a row by passing
+			 *  a child element of the row is simply a convenience,
+			 *  so you don't have to add an ID to the TR element.
+			 * Follow the parent chain up the tree, but stop if you leave the table.
+			 * The child_element parameter can be either an element id or element object.
+			 */
+
+			var el = child_element;
+			if (typeof(el) === 'string') {
+				el = document.getElementById(el);
+				if (el === null) {
+					//alert('select_ae_row: Element "' + child_element + '" does not exist.');
+					return;
+				}
+			}
+			if (typeof(el) !== 'object') {
+				//alert('select_ae_row: Invalid parameter: ' + child_element);
+				return;
+			}
+			if (el === null) {
+				//alert('select_ae_row: Invalid null parameter');
+				return;
+			}
+			if ('' === el.getAttribute('tagName'))  {
+				//alert('select_ae_row: Parameter has no attribute "tagName": ' + child_element);
+				return;
+			}
+
+			while (el.tagName !== 'TR') {
+				if (el.tagName === 'TABLE') {
+					return;
+				}
+				el = el.parentNode;
+			}
+			/*
+			 * Highlight the row with CSS properties
+			 *  so the user is sure which row will be operated on.
+			 */
+			add_class(el, 'ae_selected_row');
+			/*
+			 * Remember which row it is, so we don't have to look it up later.
+			 */
+			ae_selected_row = el;
+		}
+
+
+
+        /*
+         * Handle for document forms.
+         */
+        var mf, rf;
+
+        /*
+         * Check for validation errors.
+         */
+        var verify_failed = "";
+
+        /*
+         * is_sched_valid()
+         */
+        function is_sched_valid()
+        {
+            if (!is_number(mf.start_time_hour.value)
+                    || (mf.start_time_hour.value < 1)
+                    || (mf.start_time_hour.value > 12)) {
+                mf.start_time_hour.select();
+                mf.start_time_hour.focus();
+                return false;
+            }
+            if (!is_number(mf.end_time_hour.value)
+                    || (mf.end_time_hour.value < 1)
+                    || (mf.end_time_hour.value > 12)) {
+                mf.end_time_hour.select();
+                mf.end_time_hour.focus();
+                return false;
+            }
+            if (!is_number(mf.start_time_min.value)
+                    || (mf.start_time_min.value < 0)
+                    || (mf.start_time_min.value >59)) {
+                mf.start_time_min.select();
+                mf.start_time_min.focus();
+                return false;
+            }
+            if (!is_number(mf.end_time_min.value)
+                    || (mf.end_time_min.value < 0)
+                    || (mf.end_time_min.value > 59)) {
+                mf.end_time_min.select();
+                mf.end_time_min.focus();
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * padout()
+         * Padout a number with leading 0
+         */
+        function padout(number)
+        {
+            return (number < 10) ? '0' + number : number;
+        }
+
+        /*
+         * sec_to_string()
+         *  Convert seconds into time format such as "09:30AM".
+         */
+        function sec_to_string(sec)
+        {
+            var min = (sec % 3600) / 60;
+            var hr = (sec - min * 60) / 3600;
+            var pm;
+            if (hr >= 12) {
+                pm = "PM";
+                hr -= (hr > 12) ? 12 : 0;
+            } else {
+                hr = (hr == 0) ? 12 : hr;
+                pm = "AM";
+            }
+            return(padout(hr) + ":" + padout(min) + " " + pm);
+        }
+
+        /*
+         * time_to_string()
+         * Convert start and end time into time format such as "09:30AM-03:25PM".
+         *  Return "24 Hours" if start==0 and end==86400.
+         *  Return "--" if (start == 0) and (end == 0).
+         */
+        function time_to_string(start, end)
+        {
+            if ((start == "0") && (end == "86400")) {
+                return("All Day");
+            }
+            return(sec_to_string(start) + "-" + sec_to_string(end));
+        }
+
+        /*
+         * days_to_string()
+         */
+        function days_to_string(val)
+        {
+            var days = [
+                "Sun",
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat"
+            ];
+
+            if (val == 127) {
+                return ("Every Day");
+            }
+
+            var s = "";
+            for (var i = 0; i < 7; i++) {
+                if (val & (1 << i)) {
+                    s += days[i] + " ";
+                }
+            }
+            return s;
+        }
+
+        /*
+         * sched_weekdays_selector()
+         */
+        function sched_weekdays_selector(checked, val)
+        {
+            if (checked) {
+                mf.sel_days.checked = true;
+                mf.weekdays.value |= val;   // Set the bit.
+            } else {
+                mf.weekdays.value &= ~val;  // Clear the bit.
+            }
+            if (mf.weekdays.value == 127) {
+                all_week_radio_selector(true, false);
+            }
+        }
+
+        /*
+         * is_day_set()
+         * Convert from stored config data to UI checkbox value.
+         */
+        function is_day_set(val, saved_val)
+        {
+            if ((saved_val.value == 0x7f) && (saved_val.value != val)) {
+                return false;
+            }
+                return(((saved_val & val) == val) ? true : false);
+        }
+
+        /*
+         * all_week_radio_selector()
+         */
+        function all_week_radio_selector(val, clear_flag)
+        {
+            if (val) {
+                mf.all_week.checked = true;
+                mf.weekdays.value = 127;
+            } else {
+                mf.sel_days.checked = true;
+                if (clear_flag) {
+                    mf.weekdays.value = 0;
+                }
+            }
+
+            /*
+             * Enable/disable weekdays checkbox.
+             */
+            disable_form_field(mf.Sun_select, val);
+            disable_form_field(mf.Mon_select, val);
+            disable_form_field(mf.Tue_select, val);
+            disable_form_field(mf.Wed_select, val);
+            disable_form_field(mf.Thu_select, val);
+            disable_form_field(mf.Fri_select, val);
+            disable_form_field(mf.Sat_select, val);
+
+            /*
+             * Set weekdays checkbox.
+             */
+            var saved_val = mf.weekdays.value;
+            mf.Sun_select.checked = is_day_set(0x01, saved_val);
+            mf.Mon_select.checked = is_day_set(0x02, saved_val);
+            mf.Tue_select.checked = is_day_set(0x04, saved_val);
+            mf.Wed_select.checked = is_day_set(0x08, saved_val);
+            mf.Thu_select.checked = is_day_set(0x10, saved_val);
+            mf.Fri_select.checked = is_day_set(0x20, saved_val);
+            mf.Sat_select.checked = is_day_set(0x40, saved_val);
+        }
+
+        /*
+         * all_day_selector()
+         */
+        function all_day_selector(val)
+        {
+            if (val) {
+                mf.start_time.value = 0;
+                mf.end_time.value = 86400;
+            }
+
+            /*
+             * Set display value.
+             */
+            mf.start_time_hour.value = time_retriever(mf.start_time.value, 1);
+            mf.start_time_min.value = time_retriever(mf.start_time.value, 2);
+            mf.start_time_ampm.value = time_retriever(mf.start_time.value, 3);
+            mf.end_time_hour.value = time_retriever(mf.end_time.value, 1);
+            mf.end_time_min.value = time_retriever(mf.end_time.value, 2);
+            mf.end_time_ampm.value = time_retriever(mf.end_time.value, 3);
+
+            /*
+             * Set enabled/disabled.
+             */
+            disable_form_field(mf.start_time_hour, val);
+            disable_form_field(mf.start_time_min, val);
+            disable_form_field(mf.start_time_ampm, val);
+            disable_form_field(mf.end_time_hour, val);
+            disable_form_field(mf.end_time_min, val);
+            mf.end_time_ampm.disabled = val;
+        }
+
+        /*
+         * time_retriever()
+         * Get hr, min or am/pm value given a time.
+         * time: in seconds
+         * id: 1 (hr), 2(min), 3(ampm)
+         * 12:00AM => 0, or 86400
+         * 12:30AM => 1800
+         * 01:00AM => 3600
+         * 12:00PM => 43200, noon.
+         * 12:30PM => 45000
+         * 01:00PM => 46800
+         * 11:59PM => 86340, a minute before midnight
+         */
+        function time_retriever(time, id)
+        {
+            var min = (time % 3600) / 60;
+            var hr = (time - min*60) / 3600;
+            var pm = (hr >= 12 && hr != 24) ? 1 : 0;
+            switch(id) {
+            case 1:
+                if (hr == 0 && pm == 0) {
+                    return(12); /*   300 => 12:05AM */
+                }
+                hr -= (hr > 12) ? 12 : 0;
+                return (hr);
+            case 2:
+                return(min);
+            case 3:
+                return(pm);
+            }
+        }
+
+        /*
+         * sched_time_to_sec()
+         * Convert from hh:mm:pm to seconds.
+         */
+        function sched_time_to_sec(hr, min, pm)
+        {
+            hr = (hr == 12) ? 0 : hr;
+            return (hr * 3600 + min * 60 + pm * 12 * 3600);
+        }
+
+        /*
+         * table_form_set_display_if_table_is_full()
+         */
+        function table_form_set_display_if_table_is_full(val)
+        {
+            if (val == true) {
+                document.getElementById("mainform_box").style.display = "none";
+                document.getElementById("fullform_box").style.display = "block";
+            } else {
+                document.getElementById("mainform_box").style.display = "block";
+                document.getElementById("fullform_box").style.display = "none";
+            }
+        }
+
+        /*
+         * table_form_set_action_title()
+         */
+        function table_form_set_action_title(val)
+        {
+            if (val == "1") {   // Add
+                document.getElementById("Action").value = "Save";
+                document.getElementById("Action").onclick = table_form_add;
+                document.getElementById("sched_title").innerHTML = "Add";
+            } else if (val == "2") {    // Update
+                document.getElementById("Action").value = "Update";
+                document.getElementById("Action").onclick = table_form_update;
+                document.getElementById("sched_title").innerHTML = "Edit";
+            }
+        }
+
+        /*
+         * table_form_delete()
+         */
+        function table_form_delete(val)
+        {
+            if (!is_admin) {
+                return;
+            }
+
+            select_ae_row("sched_name_" + val);
+            var name = document.getElementById("sched_name_" + val).value;
+            if (!confirm("Are you sure you want to delete" + ": " + name)) {
+                deselect_ae_row();
+                return;
+            }
+
+            mf.used.value = "0";
+            mf.used.name = "config.sched_table[" + val + "].used";
+            mf.enabled.value = "false";
+            mf.enabled.name = "config.sched_table[" + val + "].enabled";
+            mf.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * table_form_edit()
+         */
+        function table_form_edit(val)
+        {
+            if (!is_admin) {
+                return;
+            }
+
+            table_form_set_display_if_table_is_full(false);
+            table_form_set_action_title("2");
+
+            select_ae_row("used_" + val);
+            mf.index.value = val;
+            mf.used.value = rf["used_" + val].value;
+            mf.enabled.value = rf["enabled_" + val].value;
+            mf.sched_name.value = rf["sched_name_" + val].value;
+            mf.weekdays.value = rf["weekdays_" + val].value;
+            mf.start_time.value = rf["start_time_" + val].value;
+            mf.end_time.value = rf["end_time_" + val].value;
+
+            all_week_radio_selector(mf.weekdays.value == 127, false);
+
+            if (mf.start_time.value == "0" && mf.end_time.value == "86400") {
+                mf.all_day.checked = true;
+            } else {
+                mf.all_day.checked = false;
+            }
+            all_day_selector(mf.all_day.checked);
+        }
+
+        /*
+         * edit_form_submit()
+         */
+        function edit_form_submit(idx)
+        {
+            /*
+             * Reason: Check schedule name can not be "Always" or "Never".
+             * Modified: Yufa Huang
+             * Date: 2008.04.02
+             */
+            var schedule_name = mf.sched_name.value;
+            if (schedule_name.toUpperCase() == "ALWAYS" || schedule_name.toUpperCase() == "NEVER")
+            {
+                alert("The schedule name can not be 'Always' or 'Never'.");
+                mf.sched_name.select();
+                mf.sched_name.focus();
+                return;
+            }
+
+
+            /*
+             * Check errors.
+             */
+            if (!is_sched_valid()) {
+                alert("The schedule is not valid.");
+                return;
+            }
+
+            /*
+             * Calculate start time and end time if all_day is not set.
+             */
+            if (!mf.all_day.checked) {
+                mf.start_time.value = sched_time_to_sec(mf.start_time_hour.value, mf.start_time_min.value, mf.start_time_ampm.value);
+                mf.end_time.value = sched_time_to_sec(mf.end_time_hour.value, mf.end_time_min.value, mf.end_time_ampm.value);
+
+                /*
+                 * Reason: end_time can not less than start_time
+                 * Modified: Yufa Huang
+                 * Date: 2008.07.02
+                 */
+                if (mf.end_time.value <= mf.start_time.value) {
+                    alert("Invalid Time");
+                    return;
+                }
+            }
+
+            /*
+             * Set submit elements' name.
+             */
+            mf.used.name = "config.sched_table[" + idx + "].used";
+            mf.used.value = "1";
+            mf.enabled.name = "config.sched_table[" + idx + "].enabled";
+            mf.enabled.value = (mf.used.value == "1") ? true : false;
+            mf.sched_name.name = "config.sched_table[" + idx + "].sched_name";
+            mf.weekdays.name = "config.sched_table[" + idx + "].weekdays";
+            mf.start_time.name = "config.sched_table[" + idx + "].start_time";
+            mf.end_time.name = "config.sched_table[" + idx + "].end_time";
+
+            mf.submit();
+            deselect_ae_row();
+        }
+
+        /*
+         * table_form_update()
+         */
+        function table_form_update()
+        {
+            var idx = mf.index.value;
+
+            var name = document.getElementById("sched_name_" + idx).value;
+            if (!confirm("Are you sure you want to update" + ": " + name)) {
+                return;
+            }
+
+            // 2007.07.30
+            if (name == "") {
+                if( name != mf["sched_name"].value) {
+                    var s,s2;
+                    s = "Schedule";
+                    s2 =  s;
+                    s = "can't be deleted or renamed because it is used.";
+                    s2 = s2 + " '" + name + "' " + s;
+
+                    alert(s2);
+                    return;
+                }
+            }
+
+            mf.act.value = "2";  // 2: update an entry
+            edit_form_submit(idx);
+            deselect_ae_row();
+        }
+
+        /*
+         * table_form_add()
+         */
+        function table_form_add()
+        {
+          
+        }
+
+        /*
+         * table_form_recover()
+         */
+        function table_form_recover()
+        {
+            var idx = "";
+            var act = "";
+            if (idx != "") {
+                table_form_set_display_if_table_is_full(false);
+                table_form_set_action_title(act);
+
+                mf.sched_name.value = "";
+                mf.weekdays.value = "";
+                mf.start_time.value = "";
+                mf.end_time.value = "";
+
+                /*
+                 * Set weekdays display and checkboxes.
+                 */
+                all_week_radio_selector(mf.weekdays.value == 127, false);
+
+                /*
+                 * Set time display and checkboxes.
+                 */
+                if (mf.start_time.value == "0" && mf.end_time.value == "86400") {
+                    mf.all_day.checked = true;
+                } else {
+                    mf.all_day.checked = false;
+                }
+                all_day_selector(mf.all_day.checked);
+            }
+        }
+
+        /*
+         * update_rulesform()
+         */
+        function update_rulesform()
+        {
+            var cnt = parseInt("32", 10);
+            for (var i = 0; i < cnt; i++) {
+                if (typeof(rf["used_" + i]) != "undefined") {
+                    document.getElementById("sched_name_str_" + i).innerHTML = rf["sched_name_" + i].value;
+                    document.getElementById("weekdays_str_" + i).innerHTML = days_to_string(rf["weekdays_" + i].value);
+                    document.getElementById("time_str_" + i).innerHTML = time_to_string(rf["start_time_" + i].value, rf["end_time_" + i].value);
+                }
+            }
+        }
+
+        /*
+         * set_time()
+         * Set start and end time in mainform.
+         */
+        function set_time(sh, sm, sampm, eh, em, eampm)
+        {
+            mf.start_time_hour.value = sh;
+            mf.start_time_min.value = sm;
+            mf.start_time_ampm.value = sampm;
+            mf.end_time_hour.value = eh;
+            mf.end_time_min.value = em;
+            mf.end_time_ampm.value = eampm;
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") || verify_failed != "") {
+                if (verify_failed != "") {
+                    top.location = "/Tools/Schedules.html";
+                } else {
+                    reset_form("mainform");
+                    reset_form("rulesform");
+                    table_form_set_action_title("1");
+                    page_load();
+                }
+            }
+            deselect_ae_row();
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+            rf = document.forms.rulesform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                rf.free.value = 0;
+                mf.sel_days.checked = true;
+                table_form_set_display_if_table_is_full(false);
+                return;
+            }
+
+            table_form_set_display_if_table_is_full(rf.free.value == -1);
+
+            /*
+             * Update the rules list.
+             */
+            update_rulesform();
+
+            /*
+             * Initialize array editor and set default.
+             */
+            mf.sched_name.value = "";
+            mf.weekdays.value = 0;
+            all_week_radio_selector(mf.weekdays.value == 127, true);
+            set_time(0, 0, 0, 0, 0, 0);
+            mf.all_day.checked = false;
+            all_day_selector(mf.all_day.checked);
+
+            if (!is_admin) {
+                mf.style.display = "none";
+                do_block_enable(rf, false);
+                return;
+            }
+
+            save_form_default_values("mainform");
+            save_form_default_values("rulesform");
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed != "") {
+                table_form_recover();
+                alert(verify_failed);
+            }
+        }
+    //]]>
+    </script>
+    <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+    <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+    <div id="outside">
+        <table id="table_shell" summary="" cellspacing="0"><col span="1">
+            <tbody><tr>
+                <td>
+                    <div id="header_container">
+                        <div id="info_bar">
+                            <div class="fwv">Firmware Version:
+                            1.<span id="fw_minor_head">21</span>
+                            </div>
+                            <div class="hwv">Hardware Version:
+                            A4
+                            </div>
+                            <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                        </div>
+                    </div>
+                    <table id="masthead_container" summary="" cellspacing="0">
+                        <tbody><tr>
+                            <td><div id="masthead_image"></div></td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="topnav_container" summary="" border="0" cellspacing="1">
+                        <tbody><tr>
+                            <td id="modnum">
+                                <div id="modnum_image"></div>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                            </td>
+                            <td class="topnavon">
+                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                            </td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                        <tbody><tr>
+                            <td id="sidenav_container">
+                                <div id="sidenav">
+
+                                    <ul id="Basic_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul id="Advanced_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul style="display: block;" id="Tools_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="here">
+                                            <div>
+                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                            </div>
+                                        </li>
+
+                                        
+                                    </ul>
+
+                                    <ul id="Status_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                    </ul>
+
+                                    <ul id="Help_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </td>
+                            <td id="maincontent_container">
+                                <div id="rebootcontent" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>Reboot needed</h2>
+                                            <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                            <form id="rebootdummy" action="#" method="get">
+
+                                            <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                            <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                            </form>
+                                        </div>
+                                    </div> <!-- reboot_warning -->
+                                </div>
+                                <div id="warnings_section" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>
+                                                Configuration Warnings
+                                            </h2>
+                                            <div style="display: block;" id="warnings_section_content">
+                                                <!-- This division will be populated with configuration warning information -->
+                                            </div><!-- box warnings_section_content -->
+                                        </div>
+                                    </div>
+                                </div> <!-- warnings_section -->
+                                <input id="radio_count" value="1" type="hidden">
+                                <div id="maincontent" style="display: block;">
+                                    <!-- InstanceBeginEditable name="Main Content" -->
+                                    <form saved="true" id="mainform" action="/Tools/Schedules.html" method="post" onsubmit="return false;">
+                                        <div class="section">
+                                            <div class="section_head">
+                                                <h2>Schedules</h2>
+                                                <p>
+The Schedule configuration option is used to manage schedule rules for
+various firewall and parental control features. </p>
+                                            </div>
+                                            <div id="fullform_box" class="box" style="display: none;">
+                                                <h3>
+                                                    <span id="sched_title0">Add</span>
+                                                    Schedule Rule
+                                                </h3>
+                                                You cannot add more rules because the table is full.
+                                            </div>
+                                            <div style="display: block;" id="mainform_box" class="box">
+                                                <h3>
+                                                    <span id="sched_title">Add</span>
+                                                    Schedule Rule
+                                                </h3>
+                                                <fieldset>
+                                                    <input default="" name="index" type="hidden">
+                                                    <input default="" name="act" type="hidden">
+                                                    <input default="" id="used" type="hidden">
+                                                    <input default="" id="enabled" type="hidden">
+                                                    <input default="0" value="0" id="weekdays" type="hidden">
+                                                    <input default="" id="start_time" type="hidden">
+                                                    <input default="" id="end_time" type="hidden">
+                                                    <p>
+                                                        <label class="duple" for="sched_name">Name&nbsp;:</label>
+                                                        <input autocomplete="off" default="" id="sched_name" size="20" maxlength="16" value="" type="text">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple">Day(s)&nbsp;:</label>
+                                                        <input default="false" id="all_week" name="set_days" value="1" onclick="all_week_radio_selector(true, true);" type="radio">
+                                                        <label for="all_week">All Week</label>
+                                                        <input default="true" id="sel_days" name="set_days" value="0" onclick="all_week_radio_selector(false, true)" type="radio">
+                                                        <label for="sel_days">Select Day(s)</label>
+                                                    </p>
+                                                    <p id="day_select">
+                                                        <label class="duple">&nbsp;</label>
+                                                        <input default="false" class="" id="Sun_select" onclick="sched_weekdays_selector(this.checked, 0x01);" type="checkbox">
+                                                        <label for="Sun_select">Sun</label>
+                                                        <input default="false" class="" id="Mon_select" onclick="sched_weekdays_selector(this.checked, 0x02);" type="checkbox">
+                                                        <label for="Mon_select">Mon</label>
+                                                        <input default="false" class="" id="Tue_select" onclick="sched_weekdays_selector(this.checked, 0x04);" type="checkbox">
+                                                        <label for="Tue_select">Tue</label>
+                                                        <input default="false" class="" id="Wed_select" onclick="sched_weekdays_selector(this.checked, 0x08);" type="checkbox">
+                                                        <label for="Wed_select">Wed</label>
+                                                        <input default="false" class="" id="Thu_select" onclick="sched_weekdays_selector(this.checked, 0x10);" type="checkbox">
+                                                        <label for="Thu_select">Thu</label>
+                                                        <input default="false" class="" id="Fri_select" onclick="sched_weekdays_selector(this.checked, 0x20);" type="checkbox">
+                                                        <label for="Fri_select">Fri</label>
+                                                        <input default="false" class="" id="Sat_select" onclick="sched_weekdays_selector(this.checked, 0x40);" type="checkbox">
+                                                        <label for="Sat_select">Sat</label>
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="all_day">All Day - 24 hrs&nbsp;:</label>
+                                                        <input default="false" id="all_day" onclick="all_day_selector(this.checked);" type="checkbox">
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="start_time_hour">Start Time&nbsp;:</label>
+                                                        <input autocomplete="off" default="12" id="start_time_hour" maxlength="2" class="hour_box" type="text"> :
+                                                        <input autocomplete="off" default="0" id="start_time_min" maxlength="2" class="min_box" type="text">
+                                                        <select id="start_time_ampm" class="ampm_box">
+                                                            <option default="true" value="0">AM</option>
+                                                            <option default="false" value="1">PM</option>
+                                                        </select>
+                                                        &nbsp;&nbsp;(hour:minute, 12 hour time)
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple" for="end_time_hour">End Time&nbsp;:</label>
+                                                        <input autocomplete="off" default="12" id="end_time_hour" maxlength="2" class="hour_box" type="text"> :
+                                                        <input autocomplete="off" default="0" id="end_time_min" maxlength="2" class="min_box" type="text">
+                                                        <select id="end_time_ampm" class="ampm_box">
+                                                            <option default="true" value="0">AM</option>
+                                                            <option default="false" value="1">PM</option>
+                                                        </select>
+                                                        &nbsp;&nbsp;(hour:minute, 12 hour time)
+                                                    </p>
+                                                    <p>
+                                                        <label class="duple">&nbsp;</label>
+                                                        <input class="button_submit" id="Action" value="Save" onclick=";" type="button">
+                                                        <input class="button_submit" value="Clear" onclick="page_cancel();" type="button">
+                                                    </p>
+                                                </fieldset>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <form saved="true" id="rulesform" action="/Tools/Schedules.html" method="post" onsubmit="return false;">
+                                        <div class="section">
+                                            <div id="rulesform_box" class="box">
+                                                <h3>Schedule Rules List</h3>
+                                                <fieldset>
+                                                <table class="formlisting" id="tools_schedules_ruleslist" summary="" border="0" cellpadding="0" cellspacing="1">
+                                                    <tbody><tr class="form_label_row">
+                                                        <th class="formlist_col1" rowspan="1" colspan="1">Name</th>
+                                                        <th class="formlist_col2" rowspan="1" colspan="1">Day(s)</th>
+                                                        <th class="formlist_col3" rowspan="1" colspan="1">Time Frame</th>
+                                                        <th class="formlist_col4" rowspan="1" colspan="1">&nbsp;</th>
+                                                        <th class="formlist_col5" rowspan="1" colspan="1">&nbsp;</th>
+                                                    </tr>
+                                                    
+                                                        
+                                                            
+                                                                
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                        
+                                                            
+                                                        
+                                                        
+                                                    
+                                                    
+                                                </tbody></table>
+                                                </fieldset>
+                                                <input default="0" id="free" value="0" type="hidden">
+                                            </div><!-- box -->
+                                        </div><!-- section -->
+                                    </form>
+                                    <!-- InstanceEndEditable -->
+                                </div>
+                            </td>
+                            <td id="sidehelp_container">
+                                <div id="help_text">
+                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                    <strong>Helpful Hints...</strong>
+                                    <p>Schedules are used with a number of other features to define when those features are in effect.</p>
+                                    <p>Give
+each schedule a name that is meaningful to you. For example, a schedule
+for Monday through Friday from 3:00pm to 9:00pm, might be called "After
+School".</p>
+                                    <p>Click <strong>Save</strong> to add a completed schedule to the list below.</p>
+                                    <p>Click the <strong>Edit</strong> icon to change an existing schedule.</p>
+                                    <p>Click the <strong>Delete</strong> icon to permanently delete a schedule.</p>
+                                        <p class="more">
+                                            <!-- Link to more help -->
+                                            <a href="Tools.html#Schedules" onclick="return jump_if();">More...</a>
+                                        </p>
+                                <!-- InstanceEndEditable -->
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody></table>
+                    <table id="footer_container" summary="" border="0" cellspacing="0">
+                        <tbody><tr>
+                            <td>
+                                <img src="img_wireless_bottom.gif" alt="" width="114" height="35">
+                            </td>
+                            <td>&nbsp;
+
+                            </td>
+                        </tr>
+                    </tbody></table>
+                </td>
+            </tr>
+        </tbody></table>
+
+        <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+    </div><!-- outside -->
+<!-- InstanceEnd --></body></html>

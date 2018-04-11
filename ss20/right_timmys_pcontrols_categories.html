@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<script type="text/JavaScript">
+<!--
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+
+function show_buttons(){
+		if (val == "1"){
+		document.getElementById("s_hour").style.display= "block";
+		document.getElementById("s_min").style.display= "block";
+		document.getElementById("s_am_pm").style.display= "block";
+		document.getElementById("jpeg_2").style.display= "none";
+						}
+}
+//-->
+</script>
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-image: url(firewall_bg.jpg);
+	background-repeat: repeat-y;
+}
+
+select.dropdownmenu {width:150px}
+
+input.textfield { backgorund-color:#FFFFFF; font:Arial; font-size:11px; line-height:10px; width:147}
+.style1 {
+	font-size: 10px;
+	font-family: "MS Sans Serif";
+}
+
+
+
+-->
+</style>
+
+
+<script type="text/javascript">
+
+function show_buttons(val){
+
+		if (val == "1"){
+		document.getElementById("button_clear").style.display= "block";
+		document.getElementById("button_select").style.display= "block";
+						}
+		if (val == "2"){
+		document.getElementById("button_clear").style.display= "none";
+		document.getElementById("button_select").style.display= "none";
+						}				
+}
+
+</script>
+</head>
+
+<body>
+<table width="370" height="657" border="0" cellpadding="0" cellspacing="0" background="">
+
+  <tr>
+    <td height="142" colspan="7"><img src="right_timmys_top1.jpg" border="0" usemap="#Map" /><br />
+   	  <img src="right_pcontrols_categories_1.jpg" />
+      <div><form>&nbsp;&nbsp;
+      <input type="radio" name="1" value="1"onclick="javascript: show_buttons(this.value); categories.location.href='pcontrols_categories_custom.html'"/>Custom&nbsp;&nbsp;
+      <input type="radio" name="1" value="2" onclick="javascript: show_buttons(this.value); categories.location.href='pcontrols_categories_youth.html'"/>Youth (9-12)&nbsp;&nbsp;
+      <input type="radio" name="1" value="2" onclick="javascript: show_buttons(this.value); categories.location.href='pcontrols_categories_adult.html'"/>Adult (18+)
+      <br />&nbsp;&nbsp;
+      <input type="radio" name="1" value="2" onclick="javascript: show_buttons(this.value); categories.location.href='pcontrols_categories_child.html'"/>Child (0-8)&nbsp;
+      <input type="radio" name="1" value="2" onclick="javascript: show_buttons(this.value); categories.location.href='pcontrols_categories_adolescent.html'"   checked="checked" />Adolescent (13-17)	
+      </form>
+      </div>
+      <center>
+      </center>        </td>
+  </tr>
+  <tr>
+    <td height="19" colspan="7" align="right"><span class="style1"><a href="https://dlink.custhelp.com/cgi-bin/dlink.cfg/php/enduser/std_adp.php?p_faqid=238" target="_blank">Category Descriptions</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="255" colspan="7"><center><iframe width="350" height="250" id="categories" name="categories" src="pcontrols_categories_adolescent.html"></iframe></center></td>
+  </tr>
+  <tr>
+    <td width="70">&nbsp;</td>
+    <td width="63"><div id="button_clear" style="display:none"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('clear1','','button_clearall2.jpg',1)"><img id="clear1" src="button_clearall1.jpg" border="0"/></a>
+</div></td>
+    <td width="46">&nbsp;</td>
+    <td width="67"><div id="button_select" style="display:none"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('select','','button_selectall2.jpg',1)"><img id="select" src="button_selectall1.jpg" border="0"/></a>
+    </div>    </td>
+    <td width="49">&nbsp;</td>
+    <td width="66"><a href="#" onClick='alert("This feature has been disabled on this emulator.")' onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('save','','button_save2.jpg',1)"><img id="save" src="button_save1.jpg" border="0"/></a></td>
+    <td width="29">&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="7"><img src="right_pcontrols_categories_2.jpg" /></td>
+  </tr>
+</table>
+
+
+
+
+<map name="Map" id="Map">
+<area shape="circle" coords="349,39,13" href="timmys_pcontrols.html" target="_parent" />
+</map></body>
+</html>

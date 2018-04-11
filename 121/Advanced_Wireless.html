@@ -1,0 +1,1598 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head>
+<!-- InstanceBegin template="/Templates/Master.dwt" codeOutsideHTMLIsLocked="false" -->
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" rev="stylesheet" href="style.css" type="text/css">
+    	
+	<link rel="stylesheet" rev="stylesheet" href="substyle_DIR-655.css" type="text/css">
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+    <!-- InstanceBeginEditable name="Page Title" -->
+    <title>D-LINK SYSTEMS, INC. | WIRELESS ROUTER :
+        Advanced / Advanced Wireless
+    </title>
+    <!-- InstanceEndEditable -->
+
+    <!-- InstanceBeginEditable name="Local Styles" -->
+    <style type="text/css">
+    /*
+     * Styles used only on this page.
+     */
+    </style>
+    <!-- InstanceEndEditable -->
+
+    
+        
+    
+
+    
+        
+    
+
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="ajax.js"></script>
+    <script type="text/javascript" src="navigation.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * JavaScript related to HTML in templates and common to all pages.
+         */
+
+        /*
+         * For debuging the page on a local client.
+         *  This variable will be TRUE if this page is loaded locally in a browser,
+         *  and FALSE if this page is loaded from a live device.
+         */
+        var local_debug = ("" == "") ? false : true;
+
+        /*
+         * Check if logged as admin.
+         */
+        var is_admin = "true" == "true";
+
+        /*
+         * Number of radios supported, 2 if dual radio
+         */
+        var radio_count = 1;
+        var radio_name = ["2.4GHz Band", "5GHz Band"];
+
+        /*
+         * Handle the user's response to the "Do you want to reboot?" message.
+         *
+         * no_reboot_alt_location is for wizards, which want to return
+         * to the "launch page", instead of the same page.
+         */
+        var no_reboot_alt_location = "";
+
+        /*
+         * do_reboot()
+         */
+        function do_reboot()
+        {
+            top.location = "/reboot.cgi?reset=false";
+        }
+
+        /*
+         * no_reboot()
+         */
+        function no_reboot()
+        {
+            if (no_reboot_alt_location) {
+                top.location = no_reboot_alt_location;
+                return;
+            }
+            document.getElementById("maincontent").style.display = "block";
+            document.getElementById("rebootcontent").style.display = "none";
+        }
+
+        /*
+         * jump_if()
+         */
+        function jump_if()
+        {
+            for (var i = 0, l = document.forms.length; i < l; i++) {
+                if (is_form_modified(document.forms[i].id)) {
+                    if (!confirm ("There is unsaved data on this page. Do you want to abandon it?\n" +
+                              "If not, press Cancel and then click Save Settings.\n" +
+                              "If so, press Ok.")) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        /*
+         * get_webserver_ssi_uri()
+         *  Used by navigation.js.
+         * You cannot put this function in a sourced file, because SSI will not process it.
+         */
+        function get_webserver_ssi_uri()
+        {
+            return (local_debug) ? "/Basic/Setup.html" : "/Advanced/Advanced_Wireless.html";
+        }
+
+        /*
+         * template_load()
+         * Perform initialization for items that belong to the DWT when page is loaded.
+         */
+        function template_load()
+        {
+            /*
+             * Prepend "0" to Firmware minor version if it is less than 10
+             */
+            global_fw_minor_version = "21";
+            if (global_fw_minor_version < 10) {
+                global_fw_minor_version = "0" + global_fw_minor_version;
+            }
+
+            //
+            var fw_extend_ver = "";
+            //
+
+            var fw_minor;
+
+            fw_minor = global_fw_minor_version + fw_extend_ver;
+            document.getElementById("fw_minor_head").innerHTML = fw_minor;
+            global_fw_minor_version = fw_minor; // save to for device info use
+
+            //
+            /*
+             * Enable or disable subnavigation links depending on feature options.
+             */
+
+            /*extern set_subnav_link */
+
+            // 
+            var wireless_enabled = "1" == "1";
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_wireless_nav_link");
+            set_subnav_link(wireless_enabled, "Status_wireless_nav_link");
+            // 
+            set_subnav_link(wireless_enabled, "Advanced_WISH_nav_link");
+            var WISH_enabled = wireless_enabled && "true" == "true";
+            set_subnav_link(WISH_enabled, "Status_WISH_nav_link");
+            // 
+            // 
+            set_subnav_link(wireless_enabled, "protected_setup_nav_link");
+            // 
+            // 
+            var router_mode_enabled = "0" != "1";
+            set_subnav_link(router_mode_enabled, "Basic_Internet_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Virtual_Server_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Special_Applications_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Port_Forwarding_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Firewall_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Inbound_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Access_Control_nav_link");
+            set_subnav_link(router_mode_enabled, "Advanced_Web_Filter_nav_link");
+            set_subnav_link(router_mode_enabled, "Tools_Dynamic_DNS_nav_link");
+            //set_subnav_link(router_mode_enabled, "Status_Routing_nav_link");
+            set_subnav_link(router_mode_enabled, "Status_Internet_Sessions_nav_link");
+
+
+            topnav_init(document.getElementById("topnav_container"));
+
+            page_load();
+
+            /*
+             * Render any warnings to the user.
+             */
+            watcher_warnings_check("/warning.sxsl", "<?xml version='1.0'?><xml><\/xml>", "warnings_section", "warnings_section_content");
+
+            document.getElementById("loader_container").style.display = "none";
+        }
+    //]]>
+    </script>
+
+    <!-- InstanceBeginEditable name="Scripts" -->
+
+    <!-- Include radio definitions. -->
+
+    <!-- File "wlan_radio_inc.html" -->
+<!-- This file replaces the old gateway_radio.lua file which controlled cooker -->
+<!-- The ATHEROS part of the lua code has been translated into SSI -->
+<!-- FALSE is the empty string; TRUE is a nonempty string -->
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+		
+	
+	<!-- If either radio supports 11A, we display 11A related Help text -->
+	<!-- These variables are used only in the Help section of the UI -->
+	
+	
+
+
+
+
+
+
+<!-- If either radio needs extra ui config, we display the Help text on extra ui config -->
+
+
+<script type="text/javascript">
+//<![CDATA[
+/*
+ * Default channel
+ */
+var DEFAULT_CHANNEL_A = 40;
+var DEFAULT_CHANNEL_G = 6;
+
+/*
+ *  802.11 band
+ *  On some UI, we split phy modes into two drop down list for the user to select
+ *	2.4GHz
+ * 		11b only
+ * 		11g only
+ *		11n only
+ *		mixed 11g, 11b
+ *		mixed 11n, 11g
+ * 		mixed 11n, 11g, and 11b
+ * 	5Ghz
+ * 		11a only
+ *		11n only
+ *		mixed 11n and 11a
+ */
+ var DEFAULT_BAND = "2";	// 2.4GHz or 5GHz or both, used for the UIs that do not need to split the drop down list.
+ var G_BAND_ONLY = "0";		// 2.4GHz
+ var A_BAND_ONLY = "1";		// 5GHz
+
+/*
+ * Default phy mode to be selected
+ */
+ var DEFAULT_PHY_MODE_G_BAND = "11";
+ var DEFAULT_PHY_MODE_A_BAND = "20";
+ var DEFAULT_PHY_MODE_A_AND_G_BAND = "31";
+
+/*
+ * This defines a Radio object with properties that are used to include or
+ *	exclude optional sections on the web pages.
+ *	It also provides methods to populate radio settings <select>'s.
+ */
+
+function Radio(radio_index)
+{
+	/*
+	 * Define radio's attributes and their default values.
+	 */
+	if (radio_index == 1) {
+		//
+			this.region = parseInt("4");
+		//
+	} else if (radio_index == 2) {
+		//
+	}
+	this.type = ""
+	this.type_A = false;
+	this.type_B = false;
+	this.type_G = false;
+	this.type_NG = false;
+	this.type_NA = false;
+	this.auto_channel = false;
+	this.extra_ui_config = false;
+	this.scan_type_dual = false;
+	this.rf_test_mode = false;
+	this.band = DEFAULT_BAND;
+
+	if (radio_index == 1) {
+		//
+	} else if (radio_index == 2) {
+		//
+	}
+
+	/*
+	 * Update attribute values according to configuration.
+	 */
+	//
+		this.type = "BG";
+		this.type_B = true;
+		this.type_G = true;
+		//
+			this.type = "BGN";
+			this.type_NG = true;
+		//
+		if (radio_index == 1) {
+			//
+		} else if (radio_index == 2) {
+			//
+		}
+		this.auto_channel = true;
+	//
+
+	//
+
+	//
+
+	//
+
+	//
+
+	/*
+	 * Private method to easily add an <option> to a given <select>.
+	 */
+	function add(select, name, value)
+	{
+		//
+		/*
+		 * Hide DFS channels
+		 */
+		if (( value >= 52) && (value < 149) && name.match("GHz - CH")) {
+			return;
+		}
+		//
+
+		select.options.add(new Option(name, value));
+	}
+
+	/*
+	 * Standard toString method.
+	 */
+	this.toString = function () {
+		return this.type;
+	};
+
+	/*
+	 * Get the default channel for the radio
+	 */
+	this.get_default_channel = function() {
+		if (this.type_A || this.type_NA) {
+			if (this.region == 23 || this.region == 39 || this.region == 40)
+				return 149;
+			else
+			return DEFAULT_CHANNEL_A;
+		} else {
+			return DEFAULT_CHANNEL_G;
+		}
+	}
+
+	/*
+	 * populate_channel_selector()
+	 *	Adds channel <option>'s to the given <select>.
+	 */
+	this.populate_channel_selector = function (select) {
+		if (this.type_B || this.type_G || this.type_NG) {
+			if (this.region != 2 && this.region != 10) {
+				add(select, "2.412 GHz - CH 1", 1);
+				add(select, "2.417 GHz - CH 2", 2);
+				add(select, "2.422 GHz - CH 3", 3);
+				add(select, "2.427 GHz - CH 4", 4);
+			}
+
+			if (this.region != 10) {
+				add(select, "2.432 GHz - CH 5", 5);
+				add(select, "2.437 GHz - CH 6", 6);
+				add(select, "2.442 GHz - CH 7", 7);
+			}
+
+			if (this.region != 2 && this.region != 10) {
+				add(select, "2.447 GHz - CH 8", 8);
+				add(select, "2.452 GHz - CH 9", 9);
+			}
+
+			if (this.region != 2) {
+				add(select, "2.457 GHz - CH 10", 10);
+				add(select, "2.462 GHz - CH 11", 11);
+			}
+
+            /*
+             * Reason: Add region code for Latin America
+             * Modified: Yufa Huang
+             * Date: 2008.07.09
+             */
+			if (this.region != 2 && this.region != 4 && this.region != 6 && this.region != 30 &&
+			    this.region != 32 && this.region != 34 && this.region != 39 && this.region != 40) {
+				add(select, "2.467 GHz - CH 12", 12);
+				add(select, "2.472 GHz - CH 13", 13);
+			}
+
+			if (this.region == 16 || this.region == 17 || this.region == 19) {
+				add(select, "2.484 GHz - CH 14 (802.11b ONLY)", 14);
+			}
+
+			if (this.region == 26 || this.region == 27 || this.region == 28) {
+				add(select, "2.484 GHz - CH 14", 14);
+			}
+		}
+
+		/*
+		 * Now add the 802.11a channels.
+		 */
+		if (!(this.type_A || this.type_NA)) {
+			return;
+		}
+
+		/*
+		 *  	FCC1_FCCA
+		 *	FCC1_WORLD
+		 *	FCC2_FCCA
+		 *	FCC2_WORLD
+		 *	FCC2_ETSIC
+		 */
+		if (this.region == 4 || this.region == 5 || this.region == 6 || this.region == 7 || this.region == 8) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+
+		if (this.region == 9 || this.region == 10 || this.region == 11 || this.region == 12 || this.region == 13 || this.region == 14 || this.region == 15) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+
+			if (this.region != 15) {
+				add(select, "5.260 GHz - CH 52", 52);
+				add(select, "5.280 GHz - CH 56", 56);
+			}
+
+			if (this.region != 15 && this.region != 11) {
+				add(select, "5.300 GHz - CH 60", 60);
+				add(select, "5.320 GHz - CH 64", 64);
+			}
+
+			if (this.region == 11 || this.region == 14) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				add(select, "5.660 GHz - CH 132", 132);
+				add(select, "5.680 GHz - CH 136", 136);
+				add(select, "5.700 GHz - CH 140", 140);
+			}
+		}
+		if (this.region == 16 || this.region == 17 || this.region == 19) {
+			add(select, "5.170 GHz - CH 34", 34);
+			add(select, "5.190 GHz - CH 38", 38);
+			add(select, "5.210 GHz - CH 42", 42);
+			add(select, "5.230 GHz - CH 46", 46);
+		}
+
+		if (this.region == 19) {
+			add(select, "4.920 GHz - CH 184", 184);
+			add(select, "4.940 GHz - CH 188", 188);
+			add(select, "4.960 GHz - CH 192", 192);
+			add(select, "4.980 GHz - CH 196", 196);
+		}
+
+		if (this.region == 18 || this.region == 20 || this.region == 21 || this.region == 22 || this.region == 23 || this.region == 24 || this.region == 25) {
+			if (this.region == 18) {
+				add(select, "5.180 GHz - CH 36", 36);
+				add(select, "5.200 GHz - CH 40", 40);
+				add(select, "5.220 GHz - CH 44", 44);
+				add(select, "5.240 GHz - CH 48", 48);
+			}
+			if (this.region == 21) {
+				add(select, "5.280 GHz - CH 56", 56);
+				add(select, "5.300 GHz - CH 60", 60);
+				add(select, "5.320 GHz - CH 64", 64);
+			}
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			if (this.region == 18 || this.region == 23 || this.region == 24) {
+				add(select, "5.825 GHz - CH 165", 165);
+			}
+		}
+		if (this.region >= 26 && this.region <= 31) {
+			add(select, "5.180 GHz - CH 36", 36);
+			add(select, "5.200 GHz - CH 40", 40);
+			add(select, "5.220 GHz - CH 44", 44);
+			add(select, "5.240 GHz - CH 48", 48);
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+			if (this.region >= 26 && this.region <= 28) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				add(select, "5.600 GHz - CH 120", 120);
+				add(select, "5.620 GHz - CH 124", 124);
+				add(select, "5.640 GHz - CH 128", 128);
+				add(select, "5.660 GHz - CH 132", 132);
+				add(select, "5.680 GHz - CH 136", 136);
+				add(select, "5.700 GHz - CH 140", 140);
+			}
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+
+		/*
+		 *  	FCC3_FCCA
+		 *	FCC3_WORLD
+		 *	FCC6_FCCA
+		 *	FCC6_WORLD
+		 *	APL6_WORLD
+		 *	APL8_WORLD
+		 *	APL9_WORLD
+		 *	APL3_FCCA
+		 */
+		if (this.region >= 32 && this.region <= 38) {
+			if (this.region != 37) {
+				add(select, "5.180 GHz - CH 36", 36);
+				add(select, "5.200 GHz - CH 40", 40);
+				add(select, "5.220 GHz - CH 44", 44);
+				add(select, "5.240 GHz - CH 48", 48);
+			}
+
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			if (this.region != 36 && this.region != 37) {
+				add(select, "5.500 GHz - CH 100", 100);
+				add(select, "5.520 GHz - CH 104", 104);
+				add(select, "5.540 GHz - CH 108", 108);
+				add(select, "5.560 GHz - CH 112", 112);
+				add(select, "5.580 GHz - CH 116", 116);
+				if (this.region == 32 || this.region == 33 || this.region == 38) {
+					add(select, "5.600 GHz - CH 120", 120);
+					add(select, "5.620 GHz - CH 124", 124);
+				}
+				if (this.region == 32 || this.region == 33) {
+					add(select, "5.640 GHz - CH 128", 128);
+				}
+				if (this.region != 38) {
+					add(select, "5.660 GHz - CH 132", 132);
+					add(select, "5.680 GHz - CH 136", 136);
+					add(select, "5.700 GHz - CH 140", 140);
+				}
+			}
+
+			add(select, "5.745 GHz - CH 149", 149);
+			add(select, "5.765 GHz - CH 153", 153);
+			add(select, "5.785 GHz - CH 157", 157);
+			add(select, "5.805 GHz - CH 161", 161);
+			if (this.region != 38) {
+			add(select, "5.825 GHz - CH 165", 165);
+		}
+		}
+
+        	if (this.region == 39) {
+			add(select, "5.260 GHz - CH 52", 52);
+			add(select, "5.280 GHz - CH 56", 56);
+			add(select, "5.300 GHz - CH 60", 60);
+			add(select, "5.320 GHz - CH 64", 64);
+
+			add(select, "5.500 GHz - CH 100", 100);
+			add(select, "5.520 GHz - CH 104", 104);
+			add(select, "5.540 GHz - CH 108", 108);
+			add(select, "5.560 GHz - CH 112", 112);
+			add(select, "5.580 GHz - CH 116", 116);
+			add(select, "5.600 GHz - CH 120", 120);
+			add(select, "5.620 GHz - CH 124", 124);
+			add(select, "5.640 GHz - CH 128", 128);
+			add(select, "5.660 GHz - CH 132", 132);
+			add(select, "5.680 GHz - CH 136", 136);
+			add(select, "5.700 GHz - CH 140", 140);
+
+            		add(select, "5.745 GHz - CH 149", 149);
+            		add(select, "5.765 GHz - CH 153", 153);
+            		add(select, "5.785 GHz - CH 157", 157);
+            		add(select, "5.805 GHz - CH 161", 161);
+        	}
+
+        if (this.region == 40) {
+            add(select, "5.745 GHz - CH 149", 149);
+            add(select, "5.765 GHz - CH 153", 153);
+            add(select, "5.785 GHz - CH 157", 157);
+            add(select, "5.805 GHz - CH 161", 161);
+        }
+
+	};
+
+	/*
+	 * populate_phymode_selector()
+	 *	Adds PHY mode <option>'s to the given <select> in some particular order: list 802.11b only
+	 * 802.11g only and 802.11n only first, then mixed modes.
+	 */
+	this.populate_phy_selector = function(select, band) {
+		band = band || this.band;
+		if (this.scan_type_dual && (band == DEFAULT_BAND)) {
+			add(select, "Mixed 802.11a and 802.11g", 6);
+			add(select, "Mixed 802.11a, 802.11g and 802.11b", 7);
+			add(select, "Mixed 802.11a, 802.11g and 802.11ng", 14);
+			add(select, "Mixed 802.11a, 802.11g, 802.11ng and 802.11b", 15);
+			add(select, "Mixed 802.11na, 802.11a and 802.11g", 22);
+			add(select, "Mixed 802.11na, 802.11a, 802.11g and 802.11b", 23);
+			add(select, "Mixed 802.11na, 802.11a, 802.11ng and 802.11g", 30);
+			add(select, "Mixed 802.11na, 802.11a, 802.11ng, 802.11g and 802.11b", 31);
+			return;
+		}
+
+		if (band == G_BAND_ONLY) {
+			if (this.type_B) {
+				add(select, "802.11b only", 1);
+			}
+
+			if (this.type_G) {
+				add(select, "802.11g only", 2);
+			}
+
+			if (this.type_NG) {
+				add(select, "802.11n only", 8);
+			}
+
+			if (this.type_G) {
+				add(select, "Mixed 802.11g and 802.11b", 3);
+			}
+
+			if (this.type_NG) {
+				//
+                add(select, "Mixed 802.11n and 802.11g", 10);
+				//
+                add(select, "Mixed 802.11n, 802.11g and 802.11b", 11);
+			}
+		}
+		if (band == A_BAND_ONLY) {
+			if (this.type_A) {
+				add(select, "802.11a only", 4);
+			}
+			if (this.type_NA) {
+				add(select, "802.11n only", 16);
+                add(select, "Mixed 802.11n and 802.11a", 20);
+			}
+		}
+	};
+
+	/*
+	 * populate_txrate_selector()
+	 *	Adds tx rate <option>'s to the given <select>.
+	 */
+	this.populate_txrate_selector = function(select) {
+		add(select, "Best (automatic)", 0);
+		if (this.type_NA || this.type_NG) {
+			add(select, "MCS 15 - 130 [270]", 27);
+			add(select, "MCS 14 - 117 [243]", 26);
+			add(select, "MCS 13 - 104 [216]", 25);
+			add(select, "MCS 12 - 78 [162]", 24);
+			add(select, "MCS 11 - 52 [108]", 23);
+			add(select, "MCS 10 - 39 [81]", 22);
+			add(select, "MCS 9 - 26 [54]", 21);
+			add(select, "MCS 8 - 13 [27]", 20);
+			add(select, "MCS 7 - 65 [135]", 19);
+			add(select, "MCS 6 - 58.5 [121.5]", 18);
+			add(select, "MCS 5 - 52 [108]", 17);
+			add(select, "MCS 4 - 39 [81]", 16);
+			add(select, "MCS 3 - 26 [54]", 15);
+			add(select, "MCS 2 - 19.5 [40.5]", 14);
+			add(select, "MCS 1 - 13 [27]", 13);
+			add(select, "MCS 0 - 6.5 [13.5]", 12);
+		}
+		if (this.type_A || this.type_G) {
+			add(select, "54", 11);
+			add(select, "48", 10);
+			add(select, "36", 9);
+			add(select, "24", 8);
+			add(select, "18", 7);
+			add(select, "12", 6);
+			add(select, "9", 5);
+			add(select, "6", 4);
+		}
+		if (this.type_B) {
+			add(select, "11", 3);
+			add(select, "5.5", 2);
+			add(select, "2", 1);
+			add(select, "1", 32768);
+		}
+	}
+
+	/*
+	 * populate_cwm_selector()
+	 *	Adds channel width <option>'s to the given <select>.
+	 */
+	this.populate_cwm_selector = function(select, phy_mode) {
+		if (this.type_NG || this.type_NA) {
+			add(select, "20 MHz", 0);
+    /* reason: Add channel bandwidth "40MHz" when set 802.11 mode to 11n only.
+     * modified by JerryChen
+     * date: 2008.07.25
+     */			
+			if (this.extra_ui_config || phy_mode == 8 || phy_mode == 16) {
+			    add(select, "40 MHz", 2);
+			}
+			add(select, "Auto 20/40 MHz", 1);
+		} else {
+			add(select, "Not applicable", -1);
+		}
+	};
+
+	/*
+	 * populate_streams_selector()
+	 *	Adds spacial stream <option>'s to the given <select>.
+	 */
+	this.populate_streams_selector = function(select) {
+		if (this.extra_ui_config && (this.type_NG || this.type_NA)) {
+			add(select, "1 Stream", 255);
+			add(select, "2 Streams", 65280);
+			add(select, "Auto (1 streams preferred)", 61695);
+			add(select, "Auto (2 streams preferred)", 65281);
+			add(select, "Auto (all rates)", 65535);
+		} else {
+			add(select, "Not applicable", -1);
+		}
+	};
+};
+//]]>
+</script>
+
+
+
+    <script type="text/javascript">
+    //<![CDATA[
+        /*
+         * Server answers after page submission.
+         */
+        var verify_failed = "";
+
+        /*
+         * Handle for document form.
+         */
+        var mf;
+
+        /*
+         * wireless_tx_power_selector()
+         */
+        function wireless_tx_power_selector(value, radio_index)
+        {
+            mf["wireless_tx_power_" + radio_index].value = value;
+            mf["wireless_tx_power_select_" + radio_index].value = value;
+        }
+
+        /*
+         * wireless_dot11d_enabled_selector()
+         */
+        function wireless_dot11d_enabled_selector(checked, radio_index)
+        {
+            mf["wireless_dot11d_enabled_" + radio_index].value = checked;
+            mf["wireless_dot11d_enabled_select_" + radio_index].checked = checked;
+        }
+
+        /*
+         * wireless_l2_isolation_enabled_selector()
+         */
+        function wireless_l2_isolation_enabled_selector(checked, radio_index)
+        {
+            mf["wireless_l2_isolation_enabled_" + radio_index].value = checked;
+            mf["wireless_l2_isolation_enabled_select_" + radio_index].checked = checked;
+        }
+
+        /*
+         * wireless_qos_enabled_selector()
+         */
+        function wireless_qos_enabled_selector(checked, radio_index)
+        {
+            mf["wireless_qos_enabled_" + radio_index].value = checked;
+            mf["wireless_qos_enabled_select_" + radio_index].checked = checked;
+        }
+
+        /*
+         * wireless_force_11n_sslot_selector()
+         */
+        function wireless_force_11n_sslot_selector(checked, radio_index)
+        {
+            mf["wireless_force_11n_sslot_" + radio_index].value = checked;
+            mf["wireless_force_11n_sslot_select_" + radio_index].checked = checked;
+        }
+
+        /*
+         * wireless_ampdu_aggr_selector()
+         */
+        function wireless_ampdu_aggr_selector(checked, radio_index)
+        {
+            mf["wireless_ampdu_aggr_" + radio_index].value = checked;
+            mf["wireless_ampdu_aggr_select_" +  radio_index].checked = checked;
+        }
+
+        //
+        /*
+         * wireless_shortgi_selector()
+         */
+        function wireless_shortgi_selector(checked, radio_index)
+        {
+            mf["wireless_shortgi_" + radio_index].value = checked;
+            mf["wireless_shortgi_select_" + radio_index].checked = checked;
+        }
+        //
+
+        //
+
+        /*
+         * wireless_erp_protection_selector()
+         */
+        function wireless_erp_protection_selector(checked, radio_index)
+        {
+            mf["wireless_erp_protection_" + radio_index].value = checked;
+            mf["wireless_erp_protection_select_" + radio_index].checked = checked;
+        }
+
+        /*
+         * wireless_aggr_limit_selector()
+         */
+        function wireless_aggr_limit_selector(value, radio_index)
+        {
+            mf["wireless_aggr_limit_" + radio_index].value = value;
+            mf["wireless_aggr_limit_select_" + radio_index].value = value;
+        }
+
+        /*
+         * page_verify_radio()
+         */
+        function page_verify_radio(radio_index)
+        {
+            /*
+             * Validate fields for type-correctness.
+             */
+            if (!is_number(mf["wireless_beacon_period_" +  radio_index].value) || (mf["wireless_beacon_period_" +  radio_index].value < 0)) {
+                alert("Invalid Beacon Period");
+                try {
+                    mf["wireless_beacon_period_" + radio_index].select();
+                    mf["wireless_beacon_period_" + radio_index].focus();
+                } catch (e) {
+                }
+                return false;
+            }
+            if (!is_number(mf["wireless_rts_threshold_" +  radio_index].value) || (mf["wireless_rts_threshold_" +  radio_index].value < 0)) {
+                alert("Invalid RTS Threshold");
+                try {
+                    mf["wireless_rts_threshold_" + radio_index].select();
+                    mf["wireless_rts_threshold_" + radio_index].focus();
+                } catch (e) {
+                }
+                return false;
+            }
+            if (!is_number(mf["wireless_frag_threshold_" +  radio_index].value) || (mf["wireless_frag_threshold_" +  radio_index].value < 0)) {
+                alert("Invalid Fragmentation Threshold");
+                try {
+                    mf["wireless_frag_threshold_" + radio_index].select();
+                    mf["wireless_frag_threshold_" + radio_index].focus();
+                } catch (e) {
+                }
+                return false;
+            }
+
+            var dtim_interval = mf["wireless_dtim_interval_" +  radio_index].value;
+            if (!is_number(dtim_interval) || (dtim_interval < 1) || (dtim_interval > 255)) {
+                alert("DTIM should be between 1 and 255.");
+                try {
+                    mf["wireless_dtim_interval_" + radio_index].select();
+                    mf["wireless_dtim_interval_" + radio_index].focus();
+                } catch (e) {
+                }
+                return false;
+            }
+            if (!is_number(mf["wireless_tpc_max_gain_" +  radio_index].value)) {
+                alert("Invalid TPC Max Gain");
+                try {
+                    mf["wireless_tpc_max_gain_" + radio_index].select();
+                    mf["wireless_tpc_max_gain_" + radio_index].focus();
+                } catch (e) {
+                }
+                return false;
+            }
+            if (!is_number(mf["wireless_aggr_byte_cnt_" +  radio_index].value)) {
+                alert("Invalid Aggregation Max Size");
+                try {
+                    mf["wireless_aggr_byte_cnt_" + radio_index].select();
+                    mf["wireless_aggr_byte_cnt_" + radio_index].focus();
+                } catch (e) {
+                }
+                return false;
+            }
+            if (!is_number(mf["wireless_aggr_pkt_cnt_" +  radio_index].value)) {
+                alert("Invalid Aggregation Num Packets");
+                try {
+                    mf["wireless_aggr_pkt_cnt_" + radio_index].select();
+                    mf["wireless_aggr_pkt_cnt_" + radio_index].focus();
+                } catch (e) {
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        /*
+         * page_verify()
+         */
+        function page_verify()
+        {
+            var result = true;
+            for (var i=0; i < radio_count; i++) {
+                result = result && (page_verify_radio(i));
+            }
+            return result;
+        }
+
+        /*
+         * page_load()
+         */
+        function page_load()
+        {
+            mf = document.forms.mainform;
+
+            if (local_debug) {
+                hide_all_ssi_tr();
+                return;
+            }
+
+            radio_count = parseInt(document.getElementById("radio_count").value, 10);
+            var radio = new Array();
+
+            for (var i=0; i < radio_count; i++) {
+                radio[i] = new Radio(i+1);
+       
+                wireless_tx_power_selector(mf["wireless_tx_power_" + i].value, i);
+                wireless_dot11d_enabled_selector(mf["wireless_dot11d_enabled_" + i].value == "true", i);
+                wireless_l2_isolation_enabled_selector(mf["wireless_l2_isolation_enabled_" + i].value == "true", i);
+                wireless_qos_enabled_selector(mf["wireless_qos_enabled_" + i].value == "true", i);
+                wireless_force_11n_sslot_selector(mf["wireless_force_11n_sslot_" + i].value == "true", i);
+                wireless_ampdu_aggr_selector(mf["wireless_ampdu_aggr_" + i].value == "true", i);
+                //
+                wireless_shortgi_selector(mf["wireless_shortgi_" + i].value == "true", i);
+                //
+                wireless_erp_protection_selector(mf["wireless_erp_protection_" + i].value == "true", i);
+
+                document.getElementById("box_wireless_aggr_limit_" + i).style.display = radio[i].extra_ui_config && (radio[i].type_NG || radio[i].type_NA) ? "block" : "none";
+                document.getElementById("box_wireless_tpc_max_gain_" + i).style.display = radio[i].extra_ui_config && (radio[i].type_NG || radio[i].type_NA) ? "block" : "none";
+                document.getElementById("box_wireless_aggr_byte_cnt_" + i).style.display = radio[i].extra_ui_config && (radio[i].type_NG || radio[i].type_NA) ? "block" : "none";
+                document.getElementById("box_wireless_aggr_pkt_cnt_" + i).style.display = radio[i].extra_ui_config && (radio[i].type_NG || radio[i].type_NA) ? "block" : "none";
+                document.getElementById("box_wireless_force_11n_sslot_" + i).style.display = radio[i].extra_ui_config && (radio[i].type_NG || radio[i].type_NA) ? "block" : "none";
+                document.getElementById("box_wireless_ampdu_aggr_" + i).style.display = radio[i].extra_ui_config && (radio[i].type_NG || radio[i].type_NA) ? "block" : "none";
+                //
+                document.getElementById("box_wireless_shortgi_" + i).style.display = radio[i].type_NG || radio[i].type_NA ? "block" : "none";
+                //
+                document.getElementById("box_wireless_erp_protection_" + i).style.display = (mf["wireless_phy_mode_" + i].value & 1) ? "none" : "block";
+
+                if (radio[i].extra_ui_config && (radio[i].type_NG || radio[i].type_NA)) {
+                    wireless_aggr_limit_selector(mf["wireless_aggr_limit_" + i].value, i);
+                }
+                
+                /* 
+                 * reason:When Wireless_Radio 0 or 1 disable,Advanced Wireless_Radio 0 or 1 Settings OFF
+                 * modified by JerryChen
+                 * date: 2008.07.11
+                 */               
+                if (mf["wireless_checkbox_control_" + i].value == "0") {
+                    disable_form_field(mf["wireless_tx_power_select_" + i], true);
+                    disable_form_field(mf["wireless_beacon_period_" + i], true); 
+                    disable_form_field(mf["wireless_rts_threshold_" + i], true);     
+                    disable_form_field(mf["wireless_frag_threshold_" + i], true);  
+                    disable_form_field(mf["wireless_dtim_interval_" + i], true);     
+                    disable_form_field(mf["wireless_l2_isolation_enabled_select_" + i], true);
+                    disable_form_field(mf["wireless_qos_enabled_select_" + i], true);     
+                    disable_form_field(mf["wireless_shortgi_select_" + i], true);    
+                }            
+            }
+            if (!is_admin) {
+                do_block_enable(mf, false);
+                document.getElementById("user_only").style.display = "block";
+                return;
+            }
+
+            
+
+            save_form_default_values("mainform");
+
+            /*
+             * Check for validation errors.
+             */
+            if (verify_failed != "") {
+                set_form_always_modified("mainform");
+                alert(verify_failed);
+                return;
+            }
+        }
+
+        /*
+         * page_submit()
+         */
+        function page_submit()
+        {
+            if (!is_form_modified("mainform") && !confirm("Nothing has changed. Save anyway?")) {
+                return;
+            }
+
+            if (!page_verify()) {
+                return;
+            }
+
+			if (is_form_modified("mainform") && !confirm("Associated wireless clients gets disconnected")) {
+				return;
+			}
+
+            mf.submit();
+        }
+
+        /*
+         * page_cancel()
+         */
+        function page_cancel()
+        {
+            if (is_form_modified("mainform") && confirm ("Do you want to abandon all changes you made to this page?")) {
+                if (verify_failed != "") {
+                    top.location = "/Advanced/Advanced_Wireless.html";
+                } else {
+                    reset_form("mainform");
+                    page_load();
+                }
+            }
+        }
+    //]]>
+    </script>
+    <!-- InstanceEndEditable -->
+
+</head><body onload="template_load();">
+    <div style="display: none;" id="loader_container" onclick="return false;">&nbsp;</div>
+    <div id="outside">
+        <table id="table_shell" summary="" cellspacing="0"><col span="1">
+            <tbody><tr>
+                <td>
+                    <div id="header_container">
+                        <div id="info_bar">
+                            <div class="fwv">Firmware Version:
+                            1.<span id="fw_minor_head">21</span>
+                            </div>
+                            <div class="hwv">Hardware Version:
+                            A4
+                            </div>
+                            <div class="pp">Product Page: <a href="http://support.dlink.com.tw/" onclick="return jump_if();">DIR-655</a></div>
+                        </div>
+                    </div>
+                    <table id="masthead_container" summary="" cellspacing="0">
+                        <tbody><tr>
+                            <td><div id="masthead_image"></div></td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="topnav_container" summary="" border="0" cellspacing="1">
+                        <tbody><tr>
+                            <td id="modnum">
+                                <div id="modnum_image"></div>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Internet.html" id="Basic_topnav" rel="Chapter Basic_subnav" onclick="return jump_if();">Setup</a>
+                            </td>
+                            <td class="topnavon">
+                                <a href="Virtual_Server.html" id="Advanced_topnav" rel="Chapter Advanced_subnav" onclick="return jump_if();">Advanced</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Admin.html" id="Tools_topnav" rel="Chapter Tools_subnav" onclick="return jump_if();">Tools</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Device_Info.html" id="Status_topnav" rel="Chapter Status_subnav" onclick="return jump_if();">Status</a>
+                            </td>
+                            <td class="topnavoff">
+                                <a href="Menu.html" id="Help_topnav" rel="Chapter Help_subnav" onclick="return jump_if();">Support</a>
+                            </td>
+                        </tr>
+                    </tbody></table>
+
+                    <table id="content_container" summary="" border="0" cellspacing="0"><col span="3">
+                        <tbody><tr>
+                            <td id="sidenav_container">
+                                <div id="sidenav">
+
+                                    <ul id="Basic_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Basic_Internet_nav_link" href="Internet.html" onclick="return jump_if();">Internet</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Wizard_Wireless.html" onclick="return jump_if();">Wireless Settings</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a id="Basic_Network_nav_link" href="Network.html" onclick="return jump_if();">Network Settings</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul style="display: block;" id="Advanced_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Virtual_Server_nav_link" href="Virtual_Server.html" onclick="return jump_if();">Virtual Server</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Port_Forwarding_nav_link" href="Gaming.html" onclick="return jump_if();">Port Forwarding</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Special_Applications_nav_link" href="Special_Applications.html" onclick="return jump_if();">Application Rules</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Traffic_Shaping.html" onclick="return jump_if();">QOS Engine</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="MAC_Address_Filter.html" onclick="return jump_if();">Network Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Access_Control_nav_link" href="Access_Control.html" onclick="return jump_if();">Access Control</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Web_Filter_nav_link" href="Web_Filter.html" onclick="return jump_if();">Website Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Inbound_Filter_nav_link" href="Inbound_Filter.html" onclick="return jump_if();">Inbound Filter</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Firewall_nav_link" href="Firewall.html" onclick="return jump_if();">Firewall Settings</a>
+                                            </div>
+                                        </li>
+
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_Routing_nav_link" href="Routing.html" onclick="return jump_if();">Routing</a>
+                                            </div>
+                                        </li>
+                                        
+
+                                        
+                                        <li class="here">
+                                            <div>
+                                                <a id="Advanced_wireless_nav_link" href="Advanced_Wireless.html" onclick="return jump_if();">Advanced Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Advanced_WISH_nav_link" href="WISH.html" onclick="return jump_if();">WISH</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="protected_setup_nav_link" href="Protected_Setup.html" onclick="return jump_if();">Wi-Fi Protected Setup</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Network.html" onclick="return jump_if();">Advanced Network</a>
+                                            </div>
+                                        </li>
+ 										                    
+										                     <li>
+											                        <div>
+												                         <a id="Advanced_Bsecure_nav_link" href="Bsecure.html" onclick="return jump_if();">securespot</a>
+											                        </div>
+										                     </li>
+										                    
+                                        
+                                        <li>
+                                            <div>
+                                                 <a href="Guest_Zone.html" onclick="return jump_if();">Guest Zone</a>
+                                            </div>
+                                        </li>
+                                        
+                                    </ul>
+
+                                    <ul id="Tools_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Admin.html" onclick="return jump_if();">Admin</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Time.html" onclick="return jump_if();">Time</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="SysLog.html" onclick="return jump_if();">SysLog</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="EMail.html" onclick="return jump_if();">EMail Settings</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="System.html" onclick="return jump_if();">System</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Firmware.html" onclick="return jump_if();">Firmware</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Tools_Dynamic_DNS_nav_link" href="Dynamic_DNS.html" onclick="return jump_if();">Dynamic DNS</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="System_Check.html" onclick="return jump_if();">System Check</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Schedules.html" onclick="return jump_if();">Schedules</a>
+                                            </div>
+                                        </li>
+
+                                        
+                                    </ul>
+
+                                    <ul id="Status_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Device_Info.html" onclick="return jump_if();">Device Info</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li>
+                                            <div>
+                                                <a href="Logs.html" onclick="return jump_if();">Logs</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Statistics.html" onclick="return jump_if();">Statistics</a>
+                                            </div>
+                                        </li>
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_Internet_Sessions_nav_link" href="Internet_Sessions.html" onclick="return jump_if();">Internet Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_wireless_nav_link" href="Wireless.html" onclick="return jump_if();">Wireless</a>
+                                            </div>
+                                        </li>
+                                        
+                                        
+                                        <li class="">
+                                            <div>
+                                                <a id="Status_WISH_nav_link" href="WISH_Sessions.html" onclick="return jump_if();">WISH Sessions</a>
+                                            </div>
+                                        </li>
+                                        
+                                    </ul>
+
+                                    <ul id="Help_subnav" class="subnav_group">
+                                        <li class="">
+                                            <div>
+                                                <a href="Menu.html" onclick="return jump_if();">Menu</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Basic.html" onclick="return jump_if();">Setup</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Advanced.html" onclick="return jump_if();">Advanced</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Tools.html" onclick="return jump_if();">Tools</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Status.html" onclick="return jump_if();">Status</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div>
+                                                <a href="Glossary.html" onclick="return jump_if();">Glossary</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </td>
+                            <td id="maincontent_container">
+                                <div id="rebootcontent" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>Reboot needed</h2>
+                                            <p>
+Your changes have been saved. The router must be rebooted for the
+changes to take effect. You can reboot now, or you can continue to make
+other changes and reboot later. </p>
+                                            <form id="rebootdummy" action="#" method="get">
+
+                                            <input class="button_submit" value="Reboot Now" onclick="do_reboot()" type="button">
+                                            <input class="button_submit" value="Reboot Later" onclick="no_reboot()" type="button">
+                                            </form>
+                                        </div>
+                                    </div> <!-- reboot_warning -->
+                                </div>
+                                <div id="warnings_section" style="display: none;">
+                                    <div class="section">
+                                        <div class="section_head">
+                                            <h2>
+                                                Configuration Warnings
+                                            </h2>
+                                            <div style="display: block;" id="warnings_section_content">
+                                                <!-- This division will be populated with configuration warning information -->
+                                            </div><!-- box warnings_section_content -->
+                                        </div>
+                                    </div>
+                                </div> <!-- warnings_section -->
+                                <input id="radio_count" value="1" type="hidden">
+                                <div id="maincontent" style="display: block;">
+                                    <!-- InstanceBeginEditable name="Main Content" -->
+                                    <form saved="true" id="mainform" action="/Advanced/Advanced_Wireless.html" method="post" onsubmit="return false;">
+                                        <div class="section">
+                                            <div class="section_head">
+                                                <h2>Advanced Wireless</h2>
+                                                <p>If
+you are not familiar with these Advanced Wireless settings, please read
+the help section before attempting to modify these settings.</p>
+                                                <p id="user_only" style="display: none;"><strong>Note: </strong>Only Administrator has access to these functionalities.</p>
+                                                <input class="button_submit" value="Save Settings" onclick=";" type="button">
+                                                <input class="button_submit" value="Don't Save Settings" onclick="page_cancel()" type="button">
+                                            </div>
+                                        
+                                        <div id="radio_0" class="box">
+                                        <input default="1" id="wireless_checkbox_control_0" name="config.wireless[0].radio_control" value="1" type="hidden">
+                                            <h3>Advanced Wireless Settings</h3>
+                                            <fieldset>
+                               	
+                                                <p id="box_wireless_tx_power_0">
+                                                    <label class="duple" for="wireless_tx_power_0">Transmit Power :</label>
+                                                    <input default="0" id="wireless_tx_power_0" name="config.wireless[0].tx_power" value="0" type="hidden">
+                                                    <select id="wireless_tx_power_select_0" onchange="wireless_tx_power_selector(this.value, 0);">
+                                                        <option default="true" value="0">High</option>
+                                                        <option default="false" value="1">Medium</option>
+                                                        <option default="false" value="2">Low</option>
+                                                    </select>
+                                                </p>
+                                                <p>
+                                                    <label class="duple" for="wireless_beacon_period_0">Beacon Period :</label>
+                                                    <input autocomplete="off" default="100" size="10" id="wireless_beacon_period_0" name="config.wireless[0].beacon_period" value="100" type="text">(20..1000)
+                                                </p>
+                                                <p>
+                                                    <label class="duple" for="wireless_rts_threshold_0">RTS Threshold :</label>
+                                                    <input autocomplete="off" default="2346" size="10" id="wireless_rts_threshold_0" name="config.wireless[0].RTS_threshold" value="2346" type="text">(0..2347)
+                                                </p>
+                                                <p>
+                                                    <label class="duple" for="wireless_frag_threshold_0">Fragmentation Threshold :</label>
+                                                    <input autocomplete="off" default="2346" size="10" id="wireless_frag_threshold_0" name="config.wireless[0].frag_threshold" value="2346" type="text">(256..2346)
+                                                </p>
+                                                <p>
+                                                    <label class="duple" for="wireless_dtim_interval_0">DTIM Interval :</label>
+                                                    <input autocomplete="off" default="1" size="10" id="wireless_dtim_interval_0" name="config.wireless[0].dtim_interval" value="1" type="text">(1..255)
+                                                </p>
+                                                <p style="display: none;">
+                                                    <input default="false" id="wireless_dot11d_enabled_0" name="config.wireless[0].dot11d_enabled" value="false" type="hidden">
+                                                    <label class="duple" for="wireless_dot11d_enabled_select_0">802.11d Enable :</label>
+                                                    <input default="false" id="wireless_dot11d_enabled_select_0" onclick="wireless_dot11d_enabled_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                <p>
+                                                    <input default="false" id="wireless_l2_isolation_enabled_0" name="config.wireless[0].l2_isolation_enabled" value="false" type="hidden">
+                                                    <label class="duple" for="wireless_l2_isolation_enabled_0">WLAN Partition :</label>
+                                                    <input default="false" id="wireless_l2_isolation_enabled_select_0" onclick="wireless_l2_isolation_enabled_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                <p style="display: none;">
+                                                    <input default="true" id="wireless_multicast_to_unicast_enabled_0" name="config.wireless[0].multicast_to_unicast_enabled" value="true" type="hidden">
+                                                    <label class="duple" for="wireless_multicast_to_unicast_enabled_select_0">Multicast To Unicast :</label>
+                                                    <input default="false" id="wireless_multicast_to_unicast_enabled_select_0" onclick="wireless_multicast_to_unicast_enabled_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                <p>
+                                                    <input default="true" id="wireless_qos_enabled_0" name="config.wireless[0].qos_enabled" value="true" type="hidden">
+                                                    <label class="duple" for="wireless_qos_enabled_select_0">WMM Enable :</label>
+                                                    <input default="true" id="wireless_qos_enabled_select_0" onclick="wireless_qos_enabled_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                <!-- The following are extra parameters, only diplayed when extra UI is checked in LPJ for AR5416. -->
+                                                <p style="display: none;" id="box_wireless_aggr_limit_0">
+                                                    <input default="3" id="wireless_aggr_limit_0" name="config.wireless[0].aggr_limit" value="3" type="hidden">
+                                                    <label class="duple" for="wireless_aggr_limit_select_0">Aggregation Limit :</label>
+                                                    <select id="wireless_aggr_limit_select_0" onchange="wireless_aggr_limit_selector(this.value, 0);">
+                                                        <option default="true" value="0">8 Kbytes</option>
+                                                        <option default="false" value="1">16 Kbytes</option>
+                                                        <option default="false" value="2">32 Kbytes</option>
+                                                        <option default="false" value="3">64 Kbytes</option>
+                                                    </select>
+                                                </p>
+                                                <p style="display: none;" id="box_wireless_tpc_max_gain_0">
+                                                    <label class="duple" for="wireless_tpc_max_gain_0">TPC Max Gain :</label>
+                                                    <input autocomplete="off" default="20" size="4" id="wireless_tpc_max_gain_0" name="config.wireless[0].tpc_max_gain" value="20" type="text">(0..50)
+                                                </p>
+                                                <p style="display: none;" id="box_wireless_aggr_byte_cnt_0">
+                                                    <label class="duple" for="wireless_aggr_byte_cnt_0">Aggregation Max Size :</label>
+                                                    <input autocomplete="off" default="64000" size="10" id="wireless_aggr_byte_cnt_0" name="config.wireless[0].aggr_byte_cnt" value="64000" type="text">(2000..65535)
+                                                </p>
+                                                <p style="display: none;" id="box_wireless_aggr_pkt_cnt_0">
+                                                    <label class="duple" for="wireless_aggr_pkt_cnt_0">Aggregation Num Packets :</label>
+                                                    <input autocomplete="off" default="32" size="10" id="wireless_aggr_pkt_cnt_0" name="config.wireless[0].aggr_pkt_cnt" value="32" type="text">(1..64)
+                                                </p>
+                                                <p style="display: none;" id="box_wireless_force_11n_sslot_0">
+                                                    <input default="true" id="wireless_force_11n_sslot_0" name="config.wireless[0].force_11n_sslot" value="true" type="hidden">
+                                                    <label class="duple" for="wireless_force_11n_sslot_select_0">Force Short Slot for 11N Clients :</label>
+                                                    <input default="true" id="wireless_force_11n_sslot_select_0" onclick="wireless_force_11n_sslot_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                <!-- The above are extra parameters, only diplayed when extra UI is checked in LPJ for AR5416. -->
+                                                <p style="display: none;" id="box_wireless_ampdu_aggr_0">
+                                                    <input default="true" id="wireless_ampdu_aggr_0" name="config.wireless[0].ampdu_aggr" value="true" type="hidden">
+                                                    <label class="duple" for="wireless_ampdu_aggr_select_0">A-MPDU Aggregation :</label>
+                                                    <input default="true" id="wireless_ampdu_aggr_select_0" onclick="wireless_ampdu_aggr_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                
+                                                <p style="display: block;" id="box_wireless_shortgi_0">
+                                                    <input default="true" id="wireless_shortgi_0" name="config.wireless[0].shortgi" value="true" type="hidden">
+                                                    <label class="duple" for="wireless_shortgi_select_0">Short GI :</label>
+                                                    <input default="true" id="wireless_shortgi_select_0" onclick="wireless_shortgi_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                
+                                                
+                                                <p style="display: none;" id="box_wireless_erp_protection_0">
+                                                    <input default="11" id="wireless_phy_mode_0" value="11" type="hidden">
+                                                    <input default="true" id="wireless_erp_protection_0" name="config.wireless[0].erp_protection" value="true" type="hidden">
+                                                    <label class="duple" for="wireless_erp_protection_select_0">Extra Wireless Protection :</label>
+                                                    <input default="true" id="wireless_erp_protection_select_0" onclick="wireless_erp_protection_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                <p id="box_wireless_wds_enabled_0" style="display: none;">
+                                                    <input default="false" id="wireless_wds_enabled_0" name="config.wireless[0].wds_enabled" value="false" type="hidden">
+                                                    <label class="duple" for="wireless_wds_enabled_select_0">WDS Enable :</label>
+                                                    <input default="false" id="wireless_wds_enabled_select_0" onclick="wireless_wds_enabled_selector(this.checked, 0);" type="checkbox">
+                                                </p>
+                                                <div id="box_wds_mac_0" style="display: none;">
+                                                    
+                                                        <p>
+                                                            
+                                                            <label class="duple">WDS AP MAC Address : 0:</label>
+                                                            
+                                                            <input autocomplete="off" default="00:00:00:00:00:00" size="18" maxlength="17" id="wds_mac_0_0" name="config.wireless[0].wds_mac[0].addr" value="00:00:00:00:00:00" type="text">
+                                                        </p>
+                                                    
+                                                        <p>
+                                                            
+                                                            <label class="duple">1:</label>
+                                                            
+                                                            <input autocomplete="off" default="00:00:00:00:00:00" size="18" maxlength="17" id="wds_mac_1_0" name="config.wireless[0].wds_mac[1].addr" value="00:00:00:00:00:00" type="text">
+                                                        </p>
+                                                    
+                                                        <p>
+                                                            
+                                                            <label class="duple">2:</label>
+                                                            
+                                                            <input autocomplete="off" default="00:00:00:00:00:00" size="18" maxlength="17" id="wds_mac_2_0" name="config.wireless[0].wds_mac[2].addr" value="00:00:00:00:00:00" type="text">
+                                                        </p>
+                                                    
+                                                        <p>
+                                                            
+                                                            <label class="duple">3:</label>
+                                                            
+                                                            <input autocomplete="off" default="00:00:00:00:00:00" size="18" maxlength="17" id="wds_mac_3_0" name="config.wireless[0].wds_mac[3].addr" value="00:00:00:00:00:00" type="text">
+                                                        </p>
+                                                    
+                                                        <p>
+                                                            
+                                                            <label class="duple">4:</label>
+                                                            
+                                                            <input autocomplete="off" default="00:00:00:00:00:00" size="18" maxlength="17" id="wds_mac_4_0" name="config.wireless[0].wds_mac[4].addr" value="00:00:00:00:00:00" type="text">
+                                                        </p>
+                                                    
+                                                        <p>
+                                                            
+                                                            <label class="duple">5:</label>
+                                                            
+                                                            <input autocomplete="off" default="00:00:00:00:00:00" size="18" maxlength="17" id="wds_mac_5_0" name="config.wireless[0].wds_mac[5].addr" value="00:00:00:00:00:00" type="text">
+                                                        </p>
+                                                    
+                                                    <label class="duple">(Leave blank or all 0's to disable WDS for that slot)</label>
+                                                </div>
+                                            </fieldset>
+                                        </div><!-- box radio_k -->
+                                        
+                                        </div><!-- section -->
+                                    </form>
+                                    <!-- InstanceEndEditable -->
+                                </div><!-- main_content -->
+                            </td>
+
+                            <td id="sidehelp_container">
+                                <div id="help_text">
+                                <!-- InstanceBeginEditable name="Help_Text" -->
+                                    <strong>Helpful Hints...</strong>
+                                    <p>It
+is recommended that you leave these parameters at their default values.
+Adjusting them could limit the performance of your wireless network.</p>
+                                    <p style="display: none;">Use <strong>802.11d</strong> only for countries where it is required.</p>
+                                    <p>Enabling <strong>WMM</strong> can help control latency and jitter when transmitting multimedia content over a wireless connection.</p>
+                                    <p class="more">
+                                        <!-- Link to more help -->
+                                        <a href="Advanced.html#Advanced_Wireless" onclick="return jump_if();">More...</a>
+                                    </p>
+                                    <!-- InstanceEndEditable -->
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody></table>
+                    <table id="footer_container" summary="" border="0" cellspacing="0">
+                        <tbody><tr>
+                            <td><img src="img_wireless_bottom.gif" alt="" width="114" height="35"></td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </tbody></table>
+                </td>
+            </tr>
+        </tbody></table>
+
+        <div id="copyright">Copyright © 2004-2008 D-Link Systems, Inc.</div>
+    </div><!-- outside -->
+<!-- InstanceEnd --></body></html>
